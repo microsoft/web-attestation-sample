@@ -1,14 +1,22 @@
-# Project
+# User-centric Web Attestations
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This project is a proof-of-concept prototype for user-centric web attestations. TODO: add description
 
-As the maintainer of this project, please make a few updates:
+The repository contains two projects, which need to be built and installed separately:
+* a sample server that issues tokens to users
+* a web browser extension that obtains tokens, creates and verifies web attestations
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+## System overview
+
+TODO
+
+## Issuer server
+
+For setup instructions, see the sample issuer's [README](./sample-issuer/README.md).
+
+## Web browser extension
+
+For setup instructions, see the browser extension's [README](./browser-extension/README.md).
 
 ## Contributing
 
