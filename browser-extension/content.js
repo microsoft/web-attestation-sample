@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-const CHECKMARK_URL = chrome.runtime.getURL("icons/checkmark.png");
-const INVALID_URL = chrome.runtime.getURL("icons/invalid.png");
-const WARNING_URL = chrome.runtime.getURL("icons/warning.png");
+const CHECKMARK_URL = chrome.runtime.getURL("icons/checkmark.svg");
+const INVALID_URL = chrome.runtime.getURL("icons/invalid.svg");
+const WARNING_URL = chrome.runtime.getURL("icons/warning.svg");
 
 console.log("content.js loaded");
 console.log("Current URL:", window.location.href);
@@ -43,7 +43,7 @@ if (strings) {
                     }
                 }
 
-                let checkmarkImage = `<img src="${BADGE_URL}" alt="checkmark" title="
+                let checkmarkImage = `<img src="${BADGE_URL}" alt="checkmark" width="50" title="
                 ${BADGE_TITLE} &#013;
                 Issued by: ${uwaData.issuer} &#013;
                 Scope: ${uwaData.scope} &#013;

@@ -25,8 +25,8 @@
         }
     ],
     "web_accessible_resources": [
-        "icons/checkmark.png",
-        "icons/invalid.png",
-        "icons/warning.png"
+        "icons/checkmark.svg",
+        "icons/invalid.svg",
+        "icons/warning.svg"
     ]
 }
