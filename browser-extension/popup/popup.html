@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" style="height: 400px; width: 400px;">
+  <head>
+    <title>My Extension Popup</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div>
+      <button class="tab active" data-tab="tokens">Tokens</button>
+      <button class="tab" data-tab="issuer">Issuer</button>
+      <button class="tab" data-tab="about">About</button>
+    </div>
+    <div>
+      <div id="tokens" class="tab-content active-content">
+        <h1>Tokens</h1>
+        <div id="no-tokens-div">
+          <p>
+            <p>You currently have no attestation tokens. Visit participating issuers to obtain some.</p>
+          </p>
+        </div>
+        <div id="has-tokens-div">
+          <p>These are your available tokens.</p>
+          <table id="wa-table">
+            <thead>
+              <tr>
+                <th>Select</th>
+                <th>Issuer</th>
+                <th>Info</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Rows will be dynamically added using JavaScript -->
+            </tbody>
+          </table>
+        </div>
+        <button id="issue-button" disabled>Get tokens</button>
+        <h2>Generation</h2>
+        <button id="present-button" disabled>Present attestation</button>
+        <p id="scope-text"></p>
+        <p id="time-text"></p>
+        <p>
+          <label id="wa-label" style="display: none;">Web attestation:</label>
+          <button id="copy-button" style="display: none;">Copy</button>
+          <textarea id="wa-text" readonly style="display: none;"></textarea>
+        </p>
+      </div>
+      <div id="issuer" class="tab-content">
+        <h1>Trusted Issuer</h1>
+        <p>This is the Issuer tab content.</p>
+        <table id="issuer-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Rows will be dynamically added using JavaScript -->
+          </tbody>
+        </table>
+      </div>
+      <div id="about" class="tab-content">
+        <h1>User-centric Web Attestation Web Browser Extension</h1>
+        <p>This is a proof-of-concept browser extension for a User-centric Web Attestation system. See the <a href="https://github.com/microsoft/web-attestation-sample">github page</a> for details.</p>
+      </div>
+    </div>
+  </body>
+</html>
