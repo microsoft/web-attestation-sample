@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-(async () => {
-const uwa = await import("./uwa.js");
+
+import { parseUWA } from "./uwa.js";
 
 // Define the checkUPWA function
 function checkUWA(string) {
@@ -16,7 +16,7 @@ function checkUWA(string) {
             info: "some info"
         };
     }
-    const uwaData = uwa.parseUWA(string);
+    const uwaData = parseUWA(string);
     return uwaData;
 }
 
@@ -25,5 +25,3 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         sendResponse(checkUWA(msg.string));
     }
 });
-
-})();
