@@ -3,3 +3,7 @@ node_modules/
 
 # compiled js files
 js/*
+
+# sample files
+private/ip.key
+public/.well-known/jwks.json
