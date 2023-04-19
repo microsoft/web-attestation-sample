@@ -4,8 +4,8 @@
   "description": "Sample Issuer of User-centric Web Attestations",
   "scripts": {
     "build": "tsc",
-    "setup-issuer": "ts-node --files src/setup.ts",
-    "deploy-issuer": "ts-node --files src/issuer.ts",
+    "setup-issuer": "node js/setup.js",
+    "deploy-issuer": "node js/issuer.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "license": "MIT",
@@ -16,8 +16,7 @@
     "uprove-node-reference": "github:microsoft/uprove-node-reference"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17",
-    "ts-node": "^10.9.1"
+    "@types/express": "^4.17.17"
   },
   "type": "module"
 }

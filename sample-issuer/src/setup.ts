@@ -8,8 +8,9 @@ import process from "process";
 import { IssuerParamsJWKS } from "./io.js";
 import * as settings from "./settings.js";
 
-import * as UPJF from "uprove-node-reference/src/upjf.js";
-import { ECGroup } from "uprove-node-reference/src/uprove.js";
+import { uprove, upjf as UPJF } from "uprove-node-reference";
+
+const ECGroup = uprove.ECGroup;
 
 interface Options {
     curve: string;
@@ -30,7 +31,7 @@ void (async () => {
         // create a new JWKS
         const jwks: IssuerParamsJWKS = { keys: [] };
 
-        let descGq: ECGroup;
+        let descGq: uprove.ECGroup;
         // parse the curve option (ignore case and dashes)
         switch (options.curve.toUpperCase().replace(/-/g, "")) {
             case "P256":

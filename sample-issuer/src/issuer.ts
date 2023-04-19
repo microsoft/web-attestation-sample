@@ -10,10 +10,7 @@ import * as crypto from "crypto";
 import * as io from "./io.js";
 import * as settings from "./settings.js";
 
-import * as UPJF from "uprove-node-reference/src/upjf.js";
-import * as uprove from "uprove-node-reference/src/uprove.js";
-import * as utils from "uprove-node-reference/src/utils.js";
-import * as serialization from "uprove-node-reference/src/serialization.js";
+import { upjf as UPJF, uprove, utils, serialization } from "uprove-node-reference";
 
 // some issuer settings
 const MAX_TOKEN_COUNT = 10; // maximum number of tokens to issue in parallel

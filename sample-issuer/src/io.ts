@@ -1,5 +1,4 @@
-import * as serialization from "uprove-node-reference/src/serialization.js";
-import { IssuerParamsJWK } from "uprove-node-reference/src/upjf.js";
+import { serialization, IssuerParamsJWK } from "uprove-node-reference";
 
 export interface IssuerParamsJWKS {
     keys: IssuerParamsJWK[];
