@@ -6,7 +6,7 @@
     "build": "tsc",
     "setup-issuer": "node js/setup.js",
     "deploy-issuer": "node js/issuer.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test-issuer": "node js/test-issuer.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -16,7 +16,8 @@
     "uprove-node-reference": "github:microsoft/uprove-node-reference"
   },
   "devDependencies": {
-    "@types/express": "^4.17.17"
+    "@types/express": "^4.17.17",
+    "got": "^12.6.0"
   },
   "type": "module"
 }

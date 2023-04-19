@@ -10,7 +10,7 @@ import * as crypto from "crypto";
 import * as io from "./io.js";
 import * as settings from "./settings.js";
 
-import { upjf as UPJF, uprove, utils, serialization } from "uprove-node-reference";
+import { upjf, uprove, utils, serialization } from "uprove-node-reference";
 
 // some issuer settings
 const MAX_TOKEN_COUNT = 10; // maximum number of tokens to issue in parallel
@@ -19,13 +19,13 @@ const PRIVATE_KEY_PATH = "private/ip.key"; // created by the setup script
 
 // read the issuer parameters
 const jwksString = fs.readFileSync(ISSUER_PARAMS_PATH, "utf8");
-const jwk: UPJF.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0]; // we assume there is one param in the key set
-const issuerParams = UPJF.decodeJWKAsIP(jwk);
+const jwk: upjf.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0]; // we assume there is one param in the key set
+const issuerParams = upjf.decodeJWKAsIP(jwk);
 console.log("Issuer parameters loaded from: " + ISSUER_PARAMS_PATH);
 
 // read the private key
 const privateString = fs.readFileSync(PRIVATE_KEY_PATH, "utf8");
-const privateKey = UPJF.decodeBase64UrlAsPrivateKey(issuerParams, privateString);
+const privateKey = upjf.decodeBase64UrlAsPrivateKey(issuerParams, privateString);
 console.log("Issuer private key loaded from: " + PRIVATE_KEY_PATH);
 
 // create the issuer key and params object
@@ -103,12 +103,12 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
 
             // create the token information object; this will be included in every token and will be visible
             // to Verifiers
-            const spec = UPJF.parseSpecification(issuerParams.S);
-            const tokenInformation: UPJF.TokenInformation = {
+            const spec = upjf.parseSpecification(issuerParams.S);
+            const tokenInformation: upjf.TokenInformation = {
                 iss: settings.ISSUER_URL,
-                exp: UPJF.getExp(spec.expType, 1), // expiration date, 1 year
+                exp: upjf.getExp(spec.expType, 1), // expiration date, 1 year
             };
-            const TI = UPJF.encodeTokenInformation(tokenInformation);
+            const TI = upjf.encodeTokenInformation(tokenInformation);
 
             const issuer = new uprove.Issuer(issuerKeyAndParams, [], TI, n);
             const message1 = serialization.encodeFirstIssuanceMessage(issuer.createFirstMessage());
