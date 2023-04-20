@@ -1,6 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { storeTokens } from "../tokenStore.js";
+import { getTokens } from "../tokens.js";
+
 // web attestation map
 let waMap = new Map();
 console.log("Initializing waMap", waMap);
@@ -14,6 +17,7 @@ console.log("Initializing issuerMap", issuerMap);
 issuerMap.set("Example", { "url": "https://example.com/" });
 issuerMap.set("Contoso", { "url": "https://contoso.com/" });
 issuerMap.set("Fabrikam", { "url": "https://fabrikam.com" });
+issuerMap.set("test", { "url": " http://localhost:8080" });
 
 document.addEventListener("DOMContentLoaded", function () {
   // Add event listeners to switch tabs
@@ -144,15 +148,23 @@ document.addEventListener("DOMContentLoaded", function () {
   //    updateWaTokens();
 
   // get a web attestation from the current page
-  issueButton.addEventListener('click', function () {
+  issueButton.addEventListener('click', async function () {
     console.log("issueButton clicked. waMap:", waMap);
     waMap.set("CommunityXYZ", {
       "info": "Member since 2011",
       "count": 10
     });
+
     console.log("waMap after set:", waMap);
     updateWaTokens();
     console.log("waMap after updateWaTokens:", waMap);
+
+    const issuerUrl = "http://localhost:8080";
+    let {tokens, refreshID} = await getTokens(issuerUrl);
+    if (tokens) {
+      storeTokens(issuerUrl, refreshID, tokens);
+    }
+    console.log(tokens);
   });
 
   // Add a change event listener to the table
