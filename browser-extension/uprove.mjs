@@ -23,25 +23,25 @@ function requireUtilities() {
     if (hasRequiredUtilities) return utilitiesExports;
     hasRequiredUtilities = 1;
     (function (module, exports) {
-		//*******************************************************************************
-		//
-		//    Copyright 2020 Microsoft
-		//
-		//    Licensed under the Apache License, Version 2.0 (the "License");
-		//    you may not use this file except in compliance with the License.
-		//    You may obtain a copy of the License at
-		//
-		//        http://www.apache.org/licenses/LICENSE-2.0
-		//
-		//    Unless required by applicable law or agreed to in writing, software
-		//    distributed under the License is distributed on an "AS IS" BASIS,
-		//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-		//    See the License for the specific language governing permissions and
-		//    limitations under the License.
-		//
-		//*******************************************************************************
+        //*******************************************************************************
+        //
+        //    Copyright 2020 Microsoft
+        //
+        //    Licensed under the Apache License, Version 2.0 (the "License");
+        //    you may not use this file except in compliance with the License.
+        //    You may obtain a copy of the License at
+        //
+        //        http://www.apache.org/licenses/LICENSE-2.0
+        //
+        //    Unless required by applicable law or agreed to in writing, software
+        //    distributed under the License is distributed on an "AS IS" BASIS,
+        //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+        //    See the License for the specific language governing permissions and
+        //    limitations under the License.
+        //
+        //*******************************************************************************
 
-		// tslint:disable: no-bitwise
+        // tslint:disable: no-bitwise
 
         var msrcryptoUtilities = (function () {
 
@@ -66,27 +66,27 @@ function requireUtilities() {
             }
 
             function toBase64(data, base64Url) {
-		        /// <signature>
-		        ///     <summary>Convert Array of bytes to a Base64 string.</summary>
-		        ///     <param name="data" type="Array">Byte values (numbers 0-255)</param>
-		        ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding (this is different
-		        ///       from Base64 encoding.)</param >
-		        ///     <returns type="String" />
-		        /// </signature>
-		        /// <signature>
-		        ///     <summary>Convert Array of bytes to a Base64 string.</summary>
-		        ///     <param name="data" type="Uint8Array">Byte values (numbers 0-255)</param>
-		        ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding (this is different
-		        ///       from Base64 encoding.)</param >
-		        ///     <returns type="String" />
-		        /// </signature>
-		        /// <signature>
-		        ///     <summary>Convert Array of bytes to a Base64 string.</summary>
-		        ///     <param name="data" type="ArrayBuffer">Byte values (numbers 0-255)</param>
-		        ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding
-		        ///       (this is different from Base64 encoding.)</param >
-		        ///     <returns type="String" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Convert Array of bytes to a Base64 string.</summary>
+                ///     <param name="data" type="Array">Byte values (numbers 0-255)</param>
+                ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding (this is different
+                ///       from Base64 encoding.)</param >
+                ///     <returns type="String" />
+                /// </signature>
+                /// <signature>
+                ///     <summary>Convert Array of bytes to a Base64 string.</summary>
+                ///     <param name="data" type="Uint8Array">Byte values (numbers 0-255)</param>
+                ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding (this is different
+                ///       from Base64 encoding.)</param >
+                ///     <returns type="String" />
+                /// </signature>
+                /// <signature>
+                ///     <summary>Convert Array of bytes to a Base64 string.</summary>
+                ///     <param name="data" type="ArrayBuffer">Byte values (numbers 0-255)</param>
+                ///     <param name="base64Url" type="Boolean" optional="true">Return Base64Url encoding
+                ///       (this is different from Base64 encoding.)</param >
+                ///     <returns type="String" />
+                /// </signature>
 
                 var dataType = getObjectType(data);
 
@@ -111,9 +111,9 @@ function requireUtilities() {
                     char2 = input[i + 1];
                     char3 = input[i + 2];
 
-		            // Encode three bytes over four 6-bit values.
-		            // [A7,A6,A5,A4,A3,A2,A1,A0][B7,B6,B5,B4,B3,B2,B1,B0][C7,C6,C5,C4,C3,C2,C1,C0].
-		            // [A7,A6,A5,A4,A3,A2][A1,A0,B7,B6,B5,B4][B3,B2,B1,B0,C7,C6][C5,C4,C3,C2,C1,C0].
+                    // Encode three bytes over four 6-bit values.
+                    // [A7,A6,A5,A4,A3,A2,A1,A0][B7,B6,B5,B4,B3,B2,B1,B0][C7,C6,C5,C4,C3,C2,C1,C0].
+                    // [A7,A6,A5,A4,A3,A2][A1,A0,B7,B6,B5,B4][B3,B2,B1,B0,C7,C6][C5,C4,C3,C2,C1,C0].
 
                     // 'enc1' = high 6-bits from char1
                     enc1 = char1 >> 2;
@@ -152,11 +152,11 @@ function requireUtilities() {
             }
 
             function base64ToBytes(encodedString) {
-		        /// <signature>
-		        ///     <summary>Converts a Base64/Base64Url string to an Array</summary>
-		        ///     <param name="encodedString" type="String">A Base64/Base64Url encoded string</param>
-		        ///     <returns type="Array" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts a Base64/Base64Url string to an Array</summary>
+                ///     <param name="encodedString" type="String">A Base64/Base64Url encoded string</param>
+                ///     <returns type="Array" />
+                /// </signature>
 
                 // This could be encoded as base64url (different from base64)
                 encodedString = encodedString.replace(/-/g, "+").replace(/_/g, "/");
@@ -182,9 +182,9 @@ function requireUtilities() {
                     enc3 = encodingChars.indexOf(encodedString.charAt(i + 2));
                     enc4 = encodingChars.indexOf(encodedString.charAt(i + 3));
 
-		            // Convert four 6-bit values to three 8-bit characters.
-		            // [A7,A6,A5,A4,A3,A2][A1,A0, B7,B6,B5,B4][B3,B2,B1,B0, C7,C6][C5,C4,C3,C2,C1,C0].
-		            // [A7,A6,A5,A4,A3,A2, A1,A0][B7,B6,B5,B4, B3,B2,B1,B0][C7,C6, C5,C4,C3,C2,C1,C0].
+                    // Convert four 6-bit values to three 8-bit characters.
+                    // [A7,A6,A5,A4,A3,A2][A1,A0, B7,B6,B5,B4][B3,B2,B1,B0, C7,C6][C5,C4,C3,C2,C1,C0].
+                    // [A7,A6,A5,A4,A3,A2, A1,A0][B7,B6,B5,B4, B3,B2,B1,B0][C7,C6, C5,C4,C3,C2,C1,C0].
 
                     // 'char1' = all 6 bits of enc1 + 2 high-bits of enc2.
                     char1 = (enc1 << 2) | (enc2 >> 4);
@@ -215,23 +215,23 @@ function requireUtilities() {
             }
 
             function getObjectType(object) {
-		        /// <signature>
-		        ///     <summary>Returns the name of an object type</summary>
-		        ///     <param name="object" type="Object"></param>
-		        ///     <returns type="String" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Returns the name of an object type</summary>
+                ///     <param name="object" type="Object"></param>
+                ///     <returns type="String" />
+                /// </signature>
 
                 return Object.prototype.toString.call(object).slice(8, -1);
             }
 
             function bytesToHexString(bytes, separate) {
-		        /// <signature>
-		        ///     <summary>Converts an Array of bytes values (0-255) to a Hex string</summary>
-		        ///     <param name="bytes" type="Array"/>
-		        ///     <param name="separate" type="Boolean" optional="true">Inserts a separator for display purposes
-		        ///       (default = false)</param >
-		        ///     <returns type="String" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts an Array of bytes values (0-255) to a Hex string</summary>
+                ///     <param name="bytes" type="Array"/>
+                ///     <param name="separate" type="Boolean" optional="true">Inserts a separator for display purposes
+                ///       (default = false)</param >
+                ///     <returns type="String" />
+                /// </signature>
 
                 var result = "";
                 if (typeof separate === "undefined") {
@@ -272,11 +272,11 @@ function requireUtilities() {
             }
 
             function hexToBytesArray(hexString) {
-		        /// <signature>
-		        ///     <summary>Converts a Hex-String to an Array of byte values (0-255)</summary>
-		        ///     <param name="hexString" type="String"/>
-		        ///     <returns type="Array" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts a Hex-String to an Array of byte values (0-255)</summary>
+                ///     <param name="hexString" type="String"/>
+                ///     <returns type="Array" />
+                /// </signature>
 
                 hexString = hexString.replace(/\-/g, "");
 
@@ -290,11 +290,11 @@ function requireUtilities() {
             }
 
             function clone(object) {
-		        /// <signature>
-		        ///     <summary>Creates a shallow clone of an Object</summary>
-		        ///     <param name="object" type="Object"/>
-		        ///     <returns type="Object" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Creates a shallow clone of an Object</summary>
+                ///     <param name="object" type="Object"/>
+                ///     <returns type="Object" />
+                /// </signature>
 
                 var newObject = {};
                 for (var propertyName in object) {
@@ -306,15 +306,15 @@ function requireUtilities() {
             }
 
             function unpackData(base64String, arraySize, toUint32s) {
-		        /// <signature>
-		        ///     <summary>Unpacks Base64 encoded data into arrays of data.</summary>
-		        ///     <param name="base64String" type="String">Base64 encoded data</param>
-		        ///     <param name="arraySize" type="Number" optional="true">Break data into sub-arrays of a given
-		        ///       length</param >
-		        ///     <param name="toUint32s" type="Boolean" optional="true">Treat data as 32-bit data instead of byte
-		        ///       data</param >
-		        ///     <returns type="Array" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Unpacks Base64 encoded data into arrays of data.</summary>
+                ///     <param name="base64String" type="String">Base64 encoded data</param>
+                ///     <param name="arraySize" type="Number" optional="true">Break data into sub-arrays of a given
+                ///       length</param >
+                ///     <param name="toUint32s" type="Boolean" optional="true">Treat data as 32-bit data instead of byte
+                ///       data</param >
+                ///     <returns type="Array" />
+                /// </signature>
 
                 var bytes = base64ToBytes(base64String),
                     data = [],
@@ -347,11 +347,11 @@ function requireUtilities() {
             }
 
             function int32ArrayToBytes(int32Array) {
-		        /// <signature>
-		        ///     <summary>Converts an Array 32-bit numbers to an Array bytes</summary>
-		        ///     <param name="int32Array" type="Array">Array of 32-bit numbers</param>
-		        ///     <returns type="Array" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts an Array 32-bit numbers to an Array bytes</summary>
+                ///     <param name="int32Array" type="Array">Array of 32-bit numbers</param>
+                ///     <returns type="Array" />
+                /// </signature>
 
                 var result = [];
                 for (var i = 0; i < int32Array.length; i++) {
@@ -361,14 +361,14 @@ function requireUtilities() {
             }
 
             function xorVectors(a, b, res) {
-		        /// <signature>
-		        ///     <summary>Exclusive OR (XOR) two arrays.</summary>
-		        ///     <param name="a" type="Array">Input array.</param>
-		        ///     <param name="b" type="Array">Input array.</param>
-		        ///     <param name="c" type="Array" optional="true">Optional result array.</param>
-		        ///     <returns type="Array">XOR of the two arrays. The length is minimum of the two input array lengths.
-		        ///     </returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Exclusive OR (XOR) two arrays.</summary>
+                ///     <param name="a" type="Array">Input array.</param>
+                ///     <param name="b" type="Array">Input array.</param>
+                ///     <param name="c" type="Array" optional="true">Optional result array.</param>
+                ///     <returns type="Array">XOR of the two arrays. The length is minimum of the two input array lengths.
+                ///     </returns>
+                /// </signature>
 
                 var length = Math.min(a.length, b.length),
                     res = res || new Array(length);
@@ -379,12 +379,12 @@ function requireUtilities() {
             }
 
             function getVector(length, fillValue) {
-		        /// <signature>
-		        ///     <summary>Get an array filled with zeros (or optional fillValue.)</summary>
-		        ///     <param name="length" type="Number">Requested array length.</param>
-		        ///     <param name="fillValue" type="Number" optional="true"></param>
-		        ///     <returns type="Array"></returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Get an array filled with zeros (or optional fillValue.)</summary>
+                ///     <param name="length" type="Number">Requested array length.</param>
+                ///     <param name="fillValue" type="Number" optional="true"></param>
+                ///     <returns type="Array"></returns>
+                /// </signature>
 
                 // Use a default value of zero
                 if (isNaN(fillValue)) { fillValue = 0; }
@@ -397,11 +397,11 @@ function requireUtilities() {
             }
 
             function toArray(typedArray) {
-		        /// <signature>
-		        ///     <summary>Converts a UInt8Array to a regular JavaScript Array</summary>
-		        ///     <param name="typedArray" type="UInt8Array"></param>
-		        ///     <returns type="Array"></returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts a UInt8Array to a regular JavaScript Array</summary>
+                ///     <param name="typedArray" type="UInt8Array"></param>
+                ///     <returns type="Array"></returns>
+                /// </signature>
 
                 // If undefined or null return an empty array
                 if (!typedArray) {
@@ -438,13 +438,13 @@ function requireUtilities() {
             }
 
             function padEnd(array, value, finalLength) {
-		        /// <signature>
-		        ///     <summary>Pads the end of an array with a specified value</summary>
-		        ///     <param name="array" type="Array"></param>
-		        ///     <param name="value" type="Number">The value to pad to the array</param>
-		        ///     <param name="finalLength" type="Number">The final resulting length with padding</param>
-		        ///     <returns type="Array"></returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Pads the end of an array with a specified value</summary>
+                ///     <param name="array" type="Array"></param>
+                ///     <param name="value" type="Number">The value to pad to the array</param>
+                ///     <param name="finalLength" type="Number">The final resulting length with padding</param>
+                ///     <returns type="Array"></returns>
+                /// </signature>
 
                 while (array.length < finalLength) {
                     array.push(value);
@@ -454,13 +454,13 @@ function requireUtilities() {
             }
 
             function padFront(array, value, finalLength) {
-		        /// <signature>
-		        ///     <summary>Pads the front of an array with a specified value</summary>
-		        ///     <param name="array" type="Array"></param>
-		        ///     <param name="value" type="Number">The value to pad to the array</param>
-		        ///     <param name="finalLength" type="Number">The final resulting length with padding</param>
-		        ///     <returns type="Array"></returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Pads the front of an array with a specified value</summary>
+                ///     <param name="array" type="Array"></param>
+                ///     <param name="value" type="Number">The value to pad to the array</param>
+                ///     <param name="finalLength" type="Number">The final resulting length with padding</param>
+                ///     <returns type="Array"></returns>
+                /// </signature>
 
                 while (array.length < finalLength) {
                     array.unshift(value);
@@ -470,12 +470,12 @@ function requireUtilities() {
             }
 
             function arraysEqual(array1, array2) {
-		        /// <signature>
-		        ///     <summary>Checks if two Arrays are equal by comparing their values.</summary>
-		        ///     <param name="array1" type="Array"></param>
-		        ///     <param name="array2" type="Array"></param>
-		        ///     <returns type="Array"></returns>
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Checks if two Arrays are equal by comparing their values.</summary>
+                ///     <param name="array1" type="Array"></param>
+                ///     <param name="array2" type="Array"></param>
+                ///     <returns type="Array"></returns>
+                /// </signature>
 
                 var result = true;
 
@@ -506,13 +506,13 @@ function requireUtilities() {
             }
 
             function stringToBytes(text) {
-		        /// <signature>
-		        ///     <summary>Converts a String to an Array of byte values (0-255).
-		        ///              Supports UTF-8 encoding.
-		        ///     </summary>
-		        ///     <param name="text" type="String"/>
-		        ///     <returns type="Array" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts a String to an Array of byte values (0-255).
+                ///              Supports UTF-8 encoding.
+                ///     </summary>
+                ///     <param name="text" type="String"/>
+                ///     <returns type="Array" />
+                /// </signature>
 
                 var encodedBytes = [];
 
@@ -545,11 +545,11 @@ function requireUtilities() {
             }
 
             function bytesToString(textBytes) {
-		        /// <signature>
-		        ///     <summary>Converts an Array of byte values (0-255) to a String (Supports UTF-8 encoding)</summary>
-		        ///     <param name="textBytes" type="Array"/>
-		        ///     <returns type="String" />
-		        /// </signature>
+                /// <signature>
+                ///     <summary>Converts an Array of byte values (0-255) to a String (Supports UTF-8 encoding)</summary>
+                ///     <param name="textBytes" type="Array"/>
+                ///     <returns type="String" />
+                /// </signature>
 
                 var result = "",
                     charCode;
@@ -607,7 +607,7 @@ function requireUtilities() {
 
             function isInteger(value) {
                 return typeof value === "number" && isFinite(value) && Math.floor(value) === value;
-            }		    
+            }
             function createProperty(parentObject, propertyName, initialValue, getterFunction, setterFunction) {
                 /// <param name="parentObject" type="Object"/>
                 /// <param name="propertyName" type="String"/>
@@ -665,7 +665,7 @@ function requireUtilities() {
         {
             module.exports = msrcryptoUtilities;
         }
-		/* end-commonjs-block */
+        /* end-commonjs-block */
     }(utilities));
     return utilitiesExports;
 }
@@ -677,26 +677,26 @@ var cryptoMath = {
 };
 
 (function (module, exports) {
-	//*******************************************************************************
-	//
-	//    Copyright 2020 Microsoft
-	//
-	//    Licensed under the Apache License, Version 2.0 (the "License");
-	//    you may not use this file except in compliance with the License.
-	//    You may obtain a copy of the License at
-	//
-	//        http://www.apache.org/licenses/LICENSE-2.0
-	//
-	//    Unless required by applicable law or agreed to in writing, software
-	//    distributed under the License is distributed on an "AS IS" BASIS,
-	//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	//    See the License for the specific language governing permissions and
-	//    limitations under the License.
-	//
-	//*******************************************************************************
+    //*******************************************************************************
+    //
+    //    Copyright 2020 Microsoft
+    //
+    //    Licensed under the Apache License, Version 2.0 (the "License");
+    //    you may not use this file except in compliance with the License.
+    //    You may obtain a copy of the License at
+    //
+    //        http://www.apache.org/licenses/LICENSE-2.0
+    //
+    //    Unless required by applicable law or agreed to in writing, software
+    //    distributed under the License is distributed on an "AS IS" BASIS,
+    //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    //    See the License for the specific language governing permissions and
+    //    limitations under the License.
+    //
+    //*******************************************************************************
 
-	// tslint:disable: no-bitwise
-	// tslint:disable: no-shadowed-variable
+    // tslint:disable: no-bitwise
+    // tslint:disable: no-shadowed-variable
 
     function msrcryptoMath() {
         // 'number' of bits per digit. Must be even.
@@ -742,12 +742,12 @@ var cryptoMath = {
         }
 
         function stringToDigits(numberStr, radix) {
-	        /// <summary>Parse a String in a given base into a little endian digit array.</summary>
-	        /// <param name="number" type="String">Input unsigned integer in a string.</param>
-	        /// <param name="radix" optional="true" integer="true">
-	        /// <![CDATA[ Radix of the input. Must be >=2 and <=36. Default = 10. ]]>
-	        /// </param>
-	        /// <returns type="Array">Array of digits in little endian; [0] is LSW.</returns>
+            /// <summary>Parse a String in a given base into a little endian digit array.</summary>
+            /// <param name="number" type="String">Input unsigned integer in a string.</param>
+            /// <param name="radix" optional="true" integer="true">
+            /// <![CDATA[ Radix of the input. Must be >=2 and <=36. Default = 10. ]]>
+            /// </param>
+            /// <returns type="Array">Array of digits in little endian; [0] is LSW.</returns>
 
             // skip leading and trailing whitespace.
             numberStr = numberStr.replace(/^\s+|\s+$/g, "");
@@ -773,10 +773,10 @@ var cryptoMath = {
         }
 
         function digitsToString(digits, radix) {
-	        /// <summary>Convert a big-endian byte array to a number in string in radix.</summary>
-	        /// <param name="digits" type="Digits">A big integer as a little-endian digit array.</param>
-	        /// <param name="radix" optional="true" integer="true">Radix from 2 to 26. Default = 10.</param>
-	        /// <returns type="String">The number in base radix as a string.</returns>
+            /// <summary>Convert a big-endian byte array to a number in string in radix.</summary>
+            /// <param name="digits" type="Digits">A big integer as a little-endian digit array.</param>
+            /// <param name="radix" optional="true" integer="true">Radix from 2 to 26. Default = 10.</param>
+            /// <returns type="String">The number in base radix as a string.</returns>
 
             radix = radix || 10;
             if (DIGIT_BASE <= radix) {
@@ -843,10 +843,10 @@ var cryptoMath = {
         }
 
         function computeBitArray(bytes) {
-	        /// <summary>Given an array of bytes in big-endian format, compute UInt8Array with
-	        /// one element for each bit (0 or 1), in little-endian order.</summary>
-	        /// <param name="bytes" type="Digits">An array of bytes in big-endian format.</param>
-	        /// <returns type="Digits">An array of 0's and 1's representing the bits in little-endian.</returns>
+            /// <summary>Given an array of bytes in big-endian format, compute UInt8Array with
+            /// one element for each bit (0 or 1), in little-endian order.</summary>
+            /// <param name="bytes" type="Digits">An array of bytes in big-endian format.</param>
+            /// <returns type="Digits">An array of 0's and 1's representing the bits in little-endian.</returns>
 
             var out = createArray(bytes.length * 8);
             var bitLength = 0;
@@ -887,9 +887,9 @@ var cryptoMath = {
         }
 
         function highestSetBit(bytes) {
-	        /// <summary>Returns the (1 indexed) index of the highest set bit.</summary>
-	        /// <param name="bytes" type="Array">A big-endian big integer byte array.</param>
-	        /// <returns type="Number">The index of the highest bit.</returns>
+            /// <summary>Returns the (1 indexed) index of the highest set bit.</summary>
+            /// <param name="bytes" type="Array">A big-endian big integer byte array.</param>
+            /// <returns type="Number">The index of the highest bit.</returns>
 
             var i = 0;
             var bitLength = 0;
@@ -917,10 +917,10 @@ var cryptoMath = {
         }
 
         function fixedWindowRecode(digits, windowSize, t) {
-	        /// <summary></summary>
-	        /// <param name="digits" type="Array">Digits to recode</param>
-	        /// <param name="windowSize" type="Number">Window size</param>
-	        /// <returns type="Array">Recoded digits</returns>}
+            /// <summary></summary>
+            /// <param name="digits" type="Array">Digits to recode</param>
+            /// <param name="windowSize" type="Number">Window size</param>
+            /// <returns type="Array">Recoded digits</returns>}
 
             // Make a copy of digits because we are going to modify it with shifts below.
             digits = digits.slice();
@@ -1020,9 +1020,9 @@ var cryptoMath = {
         }
 
         function bytesToDigits(bytes) {
-	        /// <summary>Convert an unsigned number from big-endian bytes to little endian digits.</summary>
-	        /// <param name="bytes" type="Bytes">The number in unsigned big-endian byte format.</param>
-	        /// <returns type="Array">The digits in little-endian.</returns>
+            /// <summary>Convert an unsigned number from big-endian bytes to little endian digits.</summary>
+            /// <param name="bytes" type="Bytes">The number in unsigned big-endian byte format.</param>
+            /// <returns type="Array">The digits in little-endian.</returns>
 
             // Construct scaler for DIGIT_NUM_BYTES, so I don't have to multiply in the loop
             var arrayLength = Math.floor((bytes.length + DIGIT_NUM_BYTES - 1) / DIGIT_NUM_BYTES);
@@ -1054,14 +1054,14 @@ var cryptoMath = {
         }
 
         function digitsToBytes(digits, trim, minTrimLength) {
-	        /// <summary>Construct a big endian array of bytes from a little-endian array of digits.
-	        /// Always returns at least one byte and trims leading zeros.</summary>
-	        /// <param name="digits" type="Array">The digits in little-endian.</param>
-	        /// <param name="trim" type="Boolean" optional="true">Remove the leading zeros from the result
-	        ///     (default true)</param >
-	        /// <param name="minTrimLength" type="Number" optional="true">Minimum length to trim down to.
-	        ///     Valid only if trim is true.Default = 1.</param >
-	        /// <returns type="Array">Encoded bytes in big-endian format.</returns>
+            /// <summary>Construct a big endian array of bytes from a little-endian array of digits.
+            /// Always returns at least one byte and trims leading zeros.</summary>
+            /// <param name="digits" type="Array">The digits in little-endian.</param>
+            /// <param name="trim" type="Boolean" optional="true">Remove the leading zeros from the result
+            ///     (default true)</param >
+            /// <param name="minTrimLength" type="Number" optional="true">Minimum length to trim down to.
+            ///     Valid only if trim is true.Default = 1.</param >
+            /// <returns type="Array">Encoded bytes in big-endian format.</returns>
 
             var i, j, byte1;
             var bytes = [0];
@@ -1094,11 +1094,11 @@ var cryptoMath = {
         }
 
         function intToDigits(value, numDigits) {
-	        /// <summary>Construct an array of digits from a positive integer.</summary>
-	        /// <param name="value" type="Number" integer="true">A positive integer to be converted to digit form.</param>
-	        /// <param name="numDigits" type="Number" optional="true" integer="true">The number of digits to use
-	        ///     for the digit form.</param >
-	        /// <returns type="Array">The given integer in digit form.</returns>
+            /// <summary>Construct an array of digits from a positive integer.</summary>
+            /// <param name="value" type="Number" integer="true">A positive integer to be converted to digit form.</param>
+            /// <param name="numDigits" type="Number" optional="true" integer="true">The number of digits to use
+            ///     for the digit form.</param >
+            /// <returns type="Array">The given integer in digit form.</returns>
 
             if (typeof numDigits === "undefined") {
                 if (value <= 1) {
@@ -1155,15 +1155,15 @@ var cryptoMath = {
         }
 
         function normalizeDigitArray(digits, length, pad) {
-	        /// <summary>Normalize a digit array by truncating any leading zeros and adjusting its length.
-	        /// Set the length if given, and pad it with zeros to that length of padding is requested.</summary>
-	        /// <remarks>Normalization results with a zero-indexed length of the array such that the MSW is not zero.
-	        /// If the final array length is zero and no non-zero digits are found, assign digits[0]=0 and set length to 1.
-	        /// Optionally, pad with zeros to the given length, and set the array length.</remarks>
-	        /// <param name="digits" type="Array">Digit array.</param>
-	        /// <param name="length" type="Number" integer="true" optional="true">Output length to pad with zeros.</param>
-	        /// <param name="pad" type="Boolean" optional="true">Pad with zeros to length if true [false].</param>
-	        /// <returns type="Array">Resized digits array; same input object.</returns>
+            /// <summary>Normalize a digit array by truncating any leading zeros and adjusting its length.
+            /// Set the length if given, and pad it with zeros to that length of padding is requested.</summary>
+            /// <remarks>Normalization results with a zero-indexed length of the array such that the MSW is not zero.
+            /// If the final array length is zero and no non-zero digits are found, assign digits[0]=0 and set length to 1.
+            /// Optionally, pad with zeros to the given length, and set the array length.</remarks>
+            /// <param name="digits" type="Array">Digit array.</param>
+            /// <param name="length" type="Number" integer="true" optional="true">Output length to pad with zeros.</param>
+            /// <param name="pad" type="Boolean" optional="true">Pad with zeros to length if true [false].</param>
+            /// <returns type="Array">Resized digits array; same input object.</returns>
 
             // Trim. Find the trimmed length and the position to start padding from (if padding is requested).
             var i = mswIndex(digits);
@@ -1188,17 +1188,17 @@ var cryptoMath = {
         }
 
         function shiftRight(source, destination, bits, length) {
-	        /// <summary>Shift a big integer to the right by the given number of bits or 1 if bits is not specified,
-	        /// effectively dividing by two (or 2^bits) and ignoring the remainder.</summary>
-	        /// <param name="source" type="Array">Source digit array.</param>
-	        /// <param name="destination" type="Array">Destination digit array. May be the same as source.</param>
-	        /// <param name="bits" integer="true" optional="true">Number of bits to shift, must be less than DIGIT_BITS
-	        ///     and greater or equal to zero.Default is 1.</param >
-	        /// <param name="length" optional="true" integer="true">Number of items to shift from he source array.
-	        ///     Default is source.length.</param >
-	        /// <remarks>This is a numerical shift. Integers are stored in arrays in little-endian format.
-	        /// Thus, this function shifts an array from higher order indices into lower indices. [0] is LSW.
-	        /// </remarks>
+            /// <summary>Shift a big integer to the right by the given number of bits or 1 if bits is not specified,
+            /// effectively dividing by two (or 2^bits) and ignoring the remainder.</summary>
+            /// <param name="source" type="Array">Source digit array.</param>
+            /// <param name="destination" type="Array">Destination digit array. May be the same as source.</param>
+            /// <param name="bits" integer="true" optional="true">Number of bits to shift, must be less than DIGIT_BITS
+            ///     and greater or equal to zero.Default is 1.</param >
+            /// <param name="length" optional="true" integer="true">Number of items to shift from he source array.
+            ///     Default is source.length.</param >
+            /// <remarks>This is a numerical shift. Integers are stored in arrays in little-endian format.
+            /// Thus, this function shifts an array from higher order indices into lower indices. [0] is LSW.
+            /// </remarks>
 
             if (bits === undefined) {
                 bits = 1;
@@ -1220,15 +1220,15 @@ var cryptoMath = {
         }
 
         function shiftLeft(source, destination, bits, length) {
-	        /// <summary>Shift a number array to the left by given bits, i.e., multiply by 2^bits.</summary>
-	        /// <param name="source" type="Array">Source digit array.</param>
-	        /// <param name="destination" type="Array">Destination digit array. May be the same as source.</param>
-	        /// <param name="bits" integer="true" optional="true">Number of bits to shift, must be less than DIGIT_BITS
-	        ///     and greater or equal to zero.Default is 1.</param >
-	        /// <param name="length" optional="true" integer="true">Number of items to shift from he source array.
-	        ///     Default is source.length.</param >
-	        /// <remarks>An additional MSW digit may be added if the leftshift out from the current MSW produces a
-	        ///     non - zero result. [0] is LSW.</remarks >
+            /// <summary>Shift a number array to the left by given bits, i.e., multiply by 2^bits.</summary>
+            /// <param name="source" type="Array">Source digit array.</param>
+            /// <param name="destination" type="Array">Destination digit array. May be the same as source.</param>
+            /// <param name="bits" integer="true" optional="true">Number of bits to shift, must be less than DIGIT_BITS
+            ///     and greater or equal to zero.Default is 1.</param >
+            /// <param name="length" optional="true" integer="true">Number of items to shift from he source array.
+            ///     Default is source.length.</param >
+            /// <remarks>An additional MSW digit may be added if the leftshift out from the current MSW produces a
+            ///     non - zero result. [0] is LSW.</remarks >
 
             if (bits === undefined) {
                 bits = 1;
@@ -1250,17 +1250,17 @@ var cryptoMath = {
             destination[0] = (source[0] << bits) & DIGIT_MASK;
         }
 
-	    //// //// //// //// //// //// //// //// //// //// //// //// //// /
-	    // Low level math routines
-	    //// //// //// //// //// //// //// //// //// //// //// //// //// /
+        //// //// //// //// //// //// //// //// //// //// //// //// //// /
+        // Low level math routines
+        //// //// //// //// //// //// //// //// //// //// //// //// //// /
 
         function add(addend1, addend2, sum) {
-	        /// <summary>Add two arrays of digits into a third array: sum = addend1 + addend2. Carry is recorded
-	        ///     in the output if there is one.</summary >
-	        /// <param name="addend1" type="Array">The first addend.</param>
-	        /// <param name="addend2" type="Array">The second added.</param>
-	        /// <param name="sum" type="Array">The output sum buffer addend1 + addend2.</param>
-	        /// <returns type="Number" integer="true">If carry out then 1, otherwise 0.</returns>
+            /// <summary>Add two arrays of digits into a third array: sum = addend1 + addend2. Carry is recorded
+            ///     in the output if there is one.</summary >
+            /// <param name="addend1" type="Array">The first addend.</param>
+            /// <param name="addend2" type="Array">The second added.</param>
+            /// <param name="sum" type="Array">The output sum buffer addend1 + addend2.</param>
+            /// <returns type="Number" integer="true">If carry out then 1, otherwise 0.</returns>
 
             // Determine which is shorter
             var shortArray = addend1;
@@ -1299,13 +1299,13 @@ var cryptoMath = {
         }
 
         function subtract(minuend, subtrahend, difference) {
-	        /// <summary>Subtraction: difference = minuend - subtrahend. Condition: minuend.length &lt;=
-	        ///     subtrahend.length.</summary >
-	        /// <param name="minuend" type="Array">Minuend.</param>
-	        /// <param name="subtrahend" type="Array">Subtrahend.</param>
-	        /// <param name="difference" type="Array">The difference.</param>
-	        /// <returns type="Number" integer="true">Returns -1 if there is a borrow (minuend &lt; subtrahend),
-	        ///     or 0 if there isn't (minuend &gt;= subtrahend).</returns>
+            /// <summary>Subtraction: difference = minuend - subtrahend. Condition: minuend.length &lt;=
+            ///     subtrahend.length.</summary >
+            /// <param name="minuend" type="Array">Minuend.</param>
+            /// <param name="subtrahend" type="Array">Subtrahend.</param>
+            /// <param name="difference" type="Array">The difference.</param>
+            /// <returns type="Number" integer="true">Returns -1 if there is a borrow (minuend &lt; subtrahend),
+            ///     or 0 if there isn't (minuend &gt;= subtrahend).</returns>
 
             var s = subtrahend.length;
             if (minuend.length < subtrahend.length) {
@@ -1505,14 +1505,14 @@ var cryptoMath = {
 
         // tslint:disable-next-line: variable-name
         function reduce(number, modulus, remainder, temp1, temp2) {
-	        /// <summary>Integer reduction by a modulus to compute number mod modulus. This function uses division,
-	        /// and should not be used for repetitive operations.</summary>
-	        /// <param name="number" type="Array">Input number to reduce.</param>
-	        /// <param name="modulus" type="Array">Modulus to reduce the input by.</param>
-	        /// <param name="remainder" type="Array">Output remainder = number mod modulus.</param>
-	        /// <param name="temp1" type="Array" optional="true">Temporary space, optional.</param>
-	        /// <param name="temp2" type="Array" optional="true">Temporary space, optional.</param>
-	        /// <returns type="Array">The resulting remainder is in 0..modulus-1; same as "remainder".</returns>
+            /// <summary>Integer reduction by a modulus to compute number mod modulus. This function uses division,
+            /// and should not be used for repetitive operations.</summary>
+            /// <param name="number" type="Array">Input number to reduce.</param>
+            /// <param name="modulus" type="Array">Modulus to reduce the input by.</param>
+            /// <param name="remainder" type="Array">Output remainder = number mod modulus.</param>
+            /// <param name="temp1" type="Array" optional="true">Temporary space, optional.</param>
+            /// <param name="temp2" type="Array" optional="true">Temporary space, optional.</param>
+            /// <returns type="Array">The resulting remainder is in 0..modulus-1; same as "remainder".</returns>
 
             // TODO: More efficient reduction implementation
             var quotient = [];
@@ -1522,16 +1522,16 @@ var cryptoMath = {
         }
 
         function modMul(multiplicand, /*@dynamic*/ multiplier, modulus, product, temp1, temp2) {
-	        /// <summary>Modular multiplication of two numbers for a modulus. This function uses multiply and divide method,
-	        /// and should not be used for repetitive operations.
-	        /// product can be same as multiplicand and multiplier.</summary>
-	        /// <param name="multiplicand" type="Array">Multiplicand.</param>
-	        /// <param name="multiplier">Multiplier.</param>
-	        /// <param name="modulus" type="Array">Modulus to reduce the product.</param>
-	        /// <param name="product" type="Array">Output product = multiplicand * multiplier mod modulus.</param>
-	        /// <param name="temp1" type="Array" optional="true">Scratch space (optional).</param>
-	        /// <param name="temp2" type="Array" optional="true">Scratch space (optional).</param>
-	        /// <returns type="Array">The resulting product in in 0..modulus-1; same as product.</returns>
+            /// <summary>Modular multiplication of two numbers for a modulus. This function uses multiply and divide method,
+            /// and should not be used for repetitive operations.
+            /// product can be same as multiplicand and multiplier.</summary>
+            /// <param name="multiplicand" type="Array">Multiplicand.</param>
+            /// <param name="multiplier">Multiplier.</param>
+            /// <param name="modulus" type="Array">Modulus to reduce the product.</param>
+            /// <param name="product" type="Array">Output product = multiplicand * multiplier mod modulus.</param>
+            /// <param name="temp1" type="Array" optional="true">Scratch space (optional).</param>
+            /// <param name="temp2" type="Array" optional="true">Scratch space (optional).</param>
+            /// <returns type="Array">The resulting product in in 0..modulus-1; same as product.</returns>
 
             var quotient = [];
             multiply(multiplicand, multiplier, quotient);
@@ -1735,14 +1735,14 @@ var cryptoMath = {
         }
 
         function modInvCT(a, n, aInv, pad) {
-	        /// <summary>Modular multiplicative inverse a^-1 mod n.</summary>
-	        /// <param name="a" type="Array">The number to invert. Condition: a &lt; n, or the result would be
-	        ///     n ^ -1 mod a.</param >
-	        /// <param name="n" type="Array">The modulus.</param>
-	        /// <param name="aInv" type="Array" optional="true">a^-1 mod n (optional).</param>
-	        /// <param name="pad" type="Boolean" optional="true">True to pad the returned value to the length of the
-	        ///     modulus(optional).</param >
-	        /// <returns type="Array">a^-1 mod n. Same as the aInv parameter if the parameter is specified.</returns>
+            /// <summary>Modular multiplicative inverse a^-1 mod n.</summary>
+            /// <param name="a" type="Array">The number to invert. Condition: a &lt; n, or the result would be
+            ///     n ^ -1 mod a.</param >
+            /// <param name="n" type="Array">The modulus.</param>
+            /// <param name="aInv" type="Array" optional="true">a^-1 mod n (optional).</param>
+            /// <param name="pad" type="Boolean" optional="true">True to pad the returned value to the length of the
+            ///     modulus(optional).</param >
+            /// <returns type="Array">a^-1 mod n. Same as the aInv parameter if the parameter is specified.</returns>
 
             // Constant time but slower modInv
             var nMinus2 = [];
@@ -1754,14 +1754,14 @@ var cryptoMath = {
         }
 
         function modExp(base, exponent, modulus, result) {
-	        /// <summary>Modular exponentiation in an integer group.</summary>
-	        /// <param name="base" type="Array">The base of the exponentiation.</param>
-	        /// <param name="exponent" type="Array">The exponent.</param>
-	        /// <param name="modulus" type="Array">Modulus to reduce the result.</param>
-	        /// <param name="result" type="Array" optional="true">Output element that takes the modular exponentiation
-	        ///     result(optional).</param >
-	        /// <returns type="Array">Modular exponentiation result, same as <param name="result"/> if not null,
-	        ///     or a new object.</returns >
+            /// <summary>Modular exponentiation in an integer group.</summary>
+            /// <param name="base" type="Array">The base of the exponentiation.</param>
+            /// <param name="exponent" type="Array">The exponent.</param>
+            /// <param name="modulus" type="Array">Modulus to reduce the result.</param>
+            /// <param name="result" type="Array" optional="true">Output element that takes the modular exponentiation
+            ///     result(optional).</param >
+            /// <returns type="Array">Modular exponentiation result, same as <param name="result"/> if not null,
+            ///     or a new object.</returns >
 
             result = result || [];
 
@@ -1786,11 +1786,11 @@ var cryptoMath = {
         }
 
         function MontgomeryMultiplier(modulus, context) {
-	        /// <summary>Construct a new montgomeryMultiplier object with the given modulus.</summary>
-	        /// <param name="modulus" type="Array">A prime modulus in little-endian digit form</param>
-	        /// <remarks>Montgomery Multiplier class
-	        /// This class implements high performance montgomery multiplication using
-	        /// CIOS, as well as modular exponentiation.</remarks>
+            /// <summary>Construct a new montgomeryMultiplier object with the given modulus.</summary>
+            /// <param name="modulus" type="Array">A prime modulus in little-endian digit form</param>
+            /// <remarks>Montgomery Multiplier class
+            /// This class implements high performance montgomery multiplication using
+            /// CIOS, as well as modular exponentiation.</remarks>
 
             function computeM0Prime(m0) {
                 /// <summary>Compute m' = -(m^-1) mod b, 24 bit digits. Based on Tolga Acar's code.</summary>
@@ -1816,13 +1816,13 @@ var cryptoMath = {
             }
 
             function montgomeryMultiply(multiplicand, multiplier, result, ctx) {
-	            /// <summary>Montgomery multiplication with the CIOS method.</summary>
-	            /// <param name="multiplicand" type="Array">Multiplicand.</param>
-	            /// <param name="multiplier" type="Array">Multiplier.</param>
-	            /// <param name="result" type="Array">Computed result multiplicand * multiplier * r^-1 mod n.</param>
-	            /// <param name="ctx" type="MontgomeryMultiplier" optional="true">Context (optional = this).</param>
+                /// <summary>Montgomery multiplication with the CIOS method.</summary>
+                /// <param name="multiplicand" type="Array">Multiplicand.</param>
+                /// <param name="multiplier" type="Array">Multiplier.</param>
+                /// <param name="result" type="Array">Computed result multiplicand * multiplier * r^-1 mod n.</param>
+                /// <param name="ctx" type="MontgomeryMultiplier" optional="true">Context (optional = this).</param>
 
-	            // uses new temp for results so we can mult result
+                // uses new temp for results so we can mult result
 
                 ctx = ctx || this;
 
@@ -1884,8 +1884,8 @@ var cryptoMath = {
             }
 
             function convertToMontgomeryForm( /*@type(Digits)*/ digits) {
-	            /// <summary>Convert the digits in standard form to Montgomery residue representation.</summary>
-	            /// <param name="digits" type="Array">Input digits to convert, and also the output converted digits.</param>
+                /// <summary>Convert the digits in standard form to Montgomery residue representation.</summary>
+                /// <param name="digits" type="Array">Input digits to convert, and also the output converted digits.</param>
 
                 // Pad missing digits with zeros
                 if (digits.length < this.s) {
@@ -1928,12 +1928,12 @@ var cryptoMath = {
             }
 
             function modExp(base, exponent, result, skipSideChannel) {
-	            /// <summary>Compute base to exponent mod m into result.</summary>
-	            /// <param name="base" type="Array">Base of length s in the context.</param>
-	            /// <param name="exponent" type="Array">Exponent.</param>
-	            /// <param name="result" type="Array">Output as base raised to exponent, and reduced to the modulus
-	            ///     in the context.</param >
-	            /// <returns type="Array">result base^exponent mod m; the same result object.</returns>
+                /// <summary>Compute base to exponent mod m into result.</summary>
+                /// <param name="base" type="Array">Base of length s in the context.</param>
+                /// <param name="exponent" type="Array">Exponent.</param>
+                /// <param name="result" type="Array">Output as base raised to exponent, and reduced to the modulus
+                ///     in the context.</param >
+                /// <returns type="Array">result base^exponent mod m; the same result object.</returns>
 
                 skipSideChannel = !!skipSideChannel;
 
@@ -2006,10 +2006,10 @@ var cryptoMath = {
             }
 
             function reduce(x, result) {
-	            // Barrett Reduction
+                // Barrett Reduction
 
-	            // Requires mu = b^2k/m. mu is precomputed when MontgomeryMultiplier is initialized.
-	            // Therefore this will only reduce by the modulus used for initialization.
+                // Requires mu = b^2k/m. mu is precomputed when MontgomeryMultiplier is initialized.
+                // Therefore this will only reduce by the modulus used for initialization.
 
                 var k = this.m.length,
                     q1, q2, q3,
@@ -2096,7 +2096,7 @@ var cryptoMath = {
             // if a context is supplied, use it's values - if not, generate a new context
             context = context || computeContext(modulus);
 
-	        // set the member values from the context
+            // set the member values from the context
 
             // Modulus
             var m = context.m;
@@ -2174,15 +2174,15 @@ var cryptoMath = {
         }
 
         function IntegerGroup(modulusBytes) {
-	        /// <summary>Construct a new IntegerGroup object with the given modulus.</summary>
-	        /// <param name="modulusBytes" type="Array">A big-endian number to represent the modulus in a
-	        ///     byte array.</param >
-	        /// <remarks>This class represents the set of integers mod n. It is meant to be used in
-	        /// a variety of situations, for example to perform operations in the additive
-	        /// or multiplicative groups mod n. The modulus can be an arbitrary integer and
-	        /// in the case that it is a prime p then the integer group is the field Fp. The
-	        /// user should be aware of what type of object the given modulus produces, and
-	        /// thus which operations are valid.</remarks>
+            /// <summary>Construct a new IntegerGroup object with the given modulus.</summary>
+            /// <param name="modulusBytes" type="Array">A big-endian number to represent the modulus in a
+            ///     byte array.</param >
+            /// <remarks>This class represents the set of integers mod n. It is meant to be used in
+            /// a variety of situations, for example to perform operations in the additive
+            /// or multiplicative groups mod n. The modulus can be an arbitrary integer and
+            /// in the case that it is a prime p then the integer group is the field Fp. The
+            /// user should be aware of what type of object the given modulus produces, and
+            /// thus which operations are valid.</remarks>
 
             // Modulus
             // tslint:disable-next-line: variable-name
@@ -2240,18 +2240,18 @@ var cryptoMath = {
             }
 
             function equals(otherGroup) {
-	            /// <summary>Return true if the given object is equivalent to this one.</summary>
-	            /// <param name="otherGroup" type="IntegerGroup"/>)
-	            /// <returns type="Boolean">True if the given objects are equivalent.</returns>
+                /// <summary>Return true if the given object is equivalent to this one.</summary>
+                /// <param name="otherGroup" type="IntegerGroup"/>)
+                /// <returns type="Boolean">True if the given objects are equivalent.</returns>
 
                 return compareDigits(this.m_modulus, otherGroup.m_modulus) === 0;
             }
 
             function add(addend1, addend2, sum) {
-	            /// <summary>Add this element to another element.</summary>
-	            /// <param name="addend1" type="integerGroupElement"/>
-	            /// <param name="addend2" type="integerGroupElement"/>
-	            /// <param name="sum" type="integerGroupElement"/>
+                /// <summary>Add this element to another element.</summary>
+                /// <param name="addend1" type="integerGroupElement"/>
+                /// <param name="addend2" type="integerGroupElement"/>
+                /// <param name="sum" type="integerGroupElement"/>
 
                 var i;
                 var s = this.m_digitWidth;
@@ -2273,10 +2273,10 @@ var cryptoMath = {
             }
 
             function subtract(leftElement, rightElement, outputElement) {
-	            /// <summary>Subtract an element from another element.</summary>
-	            /// <param name="leftElement" type="integerGroupElement"/>
-	            /// <param name="rightElement" type="integerGroupElement"/>
-	            /// <param name="outputElement" type="integerGroupElement"/>
+                /// <summary>Subtract an element from another element.</summary>
+                /// <param name="leftElement" type="integerGroupElement"/>
+                /// <param name="rightElement" type="integerGroupElement"/>
+                /// <param name="outputElement" type="integerGroupElement"/>
 
                 var i, s = this.m_digitWidth;
                 var result = outputElement.m_digits;
@@ -2301,24 +2301,24 @@ var cryptoMath = {
             }
 
             function multiply(multiplicand, multiplier, product) {
-	            /// <summary>Multiply an element by another element in the integer group.</summary>
-	            /// <param name="multiplicand" type="integerGroupElement">Multiplicand.</param>
-	            /// <param name="multiplier" type="integerGroupElement">Multiplier.</param>
-	            /// <param name="product" type="integerGroupElement">Product reduced by the group modulus.</param>
-	            /// <returns type="Array">Same as <param name="product"/>.</returns>
+                /// <summary>Multiply an element by another element in the integer group.</summary>
+                /// <param name="multiplicand" type="integerGroupElement">Multiplicand.</param>
+                /// <param name="multiplier" type="integerGroupElement">Multiplier.</param>
+                /// <param name="product" type="integerGroupElement">Product reduced by the group modulus.</param>
+                /// <returns type="Array">Same as <param name="product"/>.</returns>
 
                 return cryptoMath.modMul(multiplicand.m_digits, multiplier.m_digits, this.m_modulus,
                     product.m_digits, temp0, temp1);
             }
 
             function modexp(valueElement, exponent, outputElement) {
-	            /// <summary>Modular exponentiation in an integer group.</summary>
-	            /// <param name="valueElement" type="integerGroupElement">The base input to the exponentiation.</param>
-	            /// <param name="exponent" type="Array">The exponent is an unsigned integer.</param>
-	            /// <param name="outputElement" type="integerGroupElement" optional="true">Output element that takes
-	            //      the modular exponentiation result.</param >
-	            /// <returns type="integerGroupElement">Computed result. Same as <param name="outputElement"/>
-	            ///     if not null, a new object otherwise.</returns >
+                /// <summary>Modular exponentiation in an integer group.</summary>
+                /// <param name="valueElement" type="integerGroupElement">The base input to the exponentiation.</param>
+                /// <param name="exponent" type="Array">The exponent is an unsigned integer.</param>
+                /// <param name="outputElement" type="integerGroupElement" optional="true">Output element that takes
+                //      the modular exponentiation result.</param >
+                /// <returns type="integerGroupElement">Computed result. Same as <param name="outputElement"/>
+                ///     if not null, a new object otherwise.</returns >
 
                 outputElement = outputElement || integerGroupElement([], this);
 
@@ -2343,31 +2343,31 @@ var cryptoMath = {
             }
 
             function integerGroupElement(digits, group) {
-	            /// <summary>integerGroupElement inner class.
-	            /// Create a new integer element mod n.
-	            /// </summary>
-	            /// <param name="digits" type="Array">
-	            /// An array of digits representing the element.
-	            /// </param>
-	            /// <param name="group" type="IntegerGroup">
-	            /// The parent group to which this element belongs.
-	            /// </param>
+                /// <summary>integerGroupElement inner class.
+                /// Create a new integer element mod n.
+                /// </summary>
+                /// <param name="digits" type="Array">
+                /// An array of digits representing the element.
+                /// </param>
+                /// <param name="group" type="IntegerGroup">
+                /// The parent group to which this element belongs.
+                /// </param>
 
-	            // The value given in digits
-	            // must be &gt;= 0 and &;lt; modulus. Note that the constructor should not be
-	            // visible to the user, user should use group.createElementFromDigits(). This way we
-	            // can use any digit size and endian-ness we wish internally, operating in
-	            // our chosen representation until such time as the user wishes to produce
-	            // a byte array as output, which will be done by calling
-	            // toByteArrayUnsigned(). Note that other properties and methods are meant
-	            // to be "public" of course and thus callable by the user.
+                // The value given in digits
+                // must be &gt;= 0 and &;lt; modulus. Note that the constructor should not be
+                // visible to the user, user should use group.createElementFromDigits(). This way we
+                // can use any digit size and endian-ness we wish internally, operating in
+                // our chosen representation until such time as the user wishes to produce
+                // a byte array as output, which will be done by calling
+                // toByteArrayUnsigned(). Note that other properties and methods are meant
+                // to be "public" of course and thus callable by the user.
 
                 return {
                     // Variables
                     m_digits: digits,
                     m_group: group,
 
-	                // Functions
+                    // Functions
                     equals: function (element) {
                         /// <summary>Compare an elements to this for equality.</summary>
                         /// <param name="element" type="integerGroupElement">Element to compare.</param>
@@ -2436,7 +2436,7 @@ var cryptoMath = {
             gcd: gcd,
 
             createArray: createArray,
-	        //fetchBits: fetchBits
+            //fetchBits: fetchBits
 
             // Used by tests only
             sequenceEqual: sequenceEqual,
@@ -2451,27 +2451,27 @@ var cryptoMath = {
     {
         module.exports = cryptoMath;
     }
-	/* end-commonjs-block */
+    /* end-commonjs-block */
 }(cryptoMath));
 
 (function (module, exports) {
-	//*******************************************************************************
-	//
-	//    Copyright 2020 Microsoft
-	//
-	//    Licensed under the Apache License, Version 2.0 (the "License");
-	//    you may not use this file except in compliance with the License.
-	//    You may obtain a copy of the License at
-	//
-	//        http://www.apache.org/licenses/LICENSE-2.0
-	//
-	//    Unless required by applicable law or agreed to in writing, software
-	//    distributed under the License is distributed on an "AS IS" BASIS,
-	//    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-	//    See the License for the specific language governing permissions and
-	//    limitations under the License.
-	//
-	//*******************************************************************************
+    //*******************************************************************************
+    //
+    //    Copyright 2020 Microsoft
+    //
+    //    Licensed under the Apache License, Version 2.0 (the "License");
+    //    you may not use this file except in compliance with the License.
+    //    You may obtain a copy of the License at
+    //
+    //        http://www.apache.org/licenses/LICENSE-2.0
+    //
+    //    Unless required by applicable law or agreed to in writing, software
+    //    distributed under the License is distributed on an "AS IS" BASIS,
+    //    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    //    See the License for the specific language governing permissions and
+    //    limitations under the License.
+    //
+    //*******************************************************************************
 
     /* commonjs-block */
     var cryptoMath;
@@ -2480,15 +2480,15 @@ var cryptoMath = {
         msrcryptoUtilities = requireUtilities();
         cryptoMath = cryptoMathExports;
     }
-	/* end-commonjs-block */
+    /* end-commonjs-block */
 
-	// tslint:disable: no-bitwise
+    // tslint:disable: no-bitwise
 
-	/// cryptoECC.js ==================================================================================
-	/// Implementation of Elliptic Curve math routines for cryptographic applications.
+    /// cryptoECC.js ==================================================================================
+    /// Implementation of Elliptic Curve math routines for cryptographic applications.
 
     function MsrcryptoECC() {
-	    /// <summary>Elliptic Curve Cryptography (ECC) functions.</summary>
+        /// <summary>Elliptic Curve Cryptography (ECC) functions.</summary>
 
         var btd = cryptoMath.bytesToDigits;
 
@@ -2516,13 +2516,13 @@ var cryptoMath = {
         }
 
         var EllipticCurveFp = function (p1, a1, b1, order, gx, gy) {
-	        /// <param name="p1" type="Digits"/>
-	        /// <param name="a1" type="Digits"/>
-	        /// <param name="b1" type="Digits"/>
-	        /// <param name="order" type="Digits"/>
-	        /// <param name="gx" type="Digits"/>
-	        /// <param name="gy" type="Digits"/>
-	        /// <returns type="EllipticCurveFp"/>
+            /// <param name="p1" type="Digits"/>
+            /// <param name="a1" type="Digits"/>
+            /// <param name="b1" type="Digits"/>
+            /// <param name="order" type="Digits"/>
+            /// <param name="gx" type="Digits"/>
+            /// <param name="gy" type="Digits"/>
+            /// <returns type="EllipticCurveFp"/>
 
             var fieldStorageBitLength = p1.length;
 
@@ -2573,7 +2573,7 @@ var cryptoMath = {
 
         var createTedCurve = function (curveData) {
 
-	        //var btd = cryptoMath.bytesToDigits;
+            //var btd = cryptoMath.bytesToDigits;
 
             var newCurve = new EllipticCurveFp(
                 btd(curveData.p), // P
@@ -2599,13 +2599,13 @@ var cryptoMath = {
         };
 
         var EllipticCurvePointFp = function (curve, isInfinity, x, y, z, isInMontgomeryForm) {
-	        /// <param name="curve" type="EllipticCurveFp"/>
-	        /// <param name="isInfinity" type="Boolean"/>
-	        /// <param name="x" type="Digits"/>
-	        /// <param name="y" type="Digits"/>
-	        /// <param name="z" type="Digits" optional="true"/>
-	        /// <param name="isInMontgomeryForm" type="Boolean" optional="true"/>
-	        /// <returns type="EllipticCurvePointFp"/>
+            /// <param name="curve" type="EllipticCurveFp"/>
+            /// <param name="isInfinity" type="Boolean"/>
+            /// <param name="x" type="Digits"/>
+            /// <param name="y" type="Digits"/>
+            /// <param name="z" type="Digits" optional="true"/>
+            /// <param name="isInMontgomeryForm" type="Boolean" optional="true"/>
+            /// <returns type="EllipticCurvePointFp"/>
 
             var returnObj;
 
@@ -2619,7 +2619,7 @@ var cryptoMath = {
             }
 
             function equals(/*@type(EllipticCurvePointFp)*/ellipticCurvePointFp) {
-	            /// <param name="ellipticCurvePointFp" type="EllipticCurvePointFp"/>
+                /// <param name="ellipticCurvePointFp" type="EllipticCurvePointFp"/>
 
                 // If null
                 if (!ellipticCurvePointFp) {
@@ -2631,7 +2631,7 @@ var cryptoMath = {
                     return true;
                 }
 
-	            // Otherwise its member-wise comparison
+                // Otherwise its member-wise comparison
 
                 if (returnObj.z === null && ellipticCurvePointFp.z !== null) {
                     return false;
@@ -2654,8 +2654,8 @@ var cryptoMath = {
             }
 
             function copyTo(/*@type(EllipticCurvePointFp)*/ source, /*@type(EllipticCurvePointFp)*/ destination) {
-	            /// <param name="source" type="EllipticCurvePointFp"/>
-	            /// <param name="destination" type="EllipticCurvePointFp"/>
+                /// <param name="source" type="EllipticCurvePointFp"/>
+                /// <param name="destination" type="EllipticCurvePointFp"/>
 
                 destination.curve = source.curve;
                 destination.x = source.x.slice();
@@ -2828,8 +2828,8 @@ var cryptoMath = {
             }
 
             function doubleAequalsNeg3(point, outputPoint) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 // If point = infinity then outputPoint := infinity.
                 if (point.isInfinity) {
@@ -2896,8 +2896,8 @@ var cryptoMath = {
             }
 
             function doubleAequals0(point, outputPoint) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 // If point = infinity then outputPoint := infinity.
                 if (point.isInfinity) {
@@ -2955,12 +2955,12 @@ var cryptoMath = {
             // size 2^(w-2) filled with pre-computed values for
             // P, 3P, 5P, ... Etc.
             function generatePrecomputationTable(w, generatorPoint) {
-	            /// <summary>Given a point P on an elliptic curve, return a table of
-	            /// size 2^(w-2) filled with pre-computed values for
-	            /// P, 3P, 5P, ... Etc.</summary>
-	            /// <param name="w" type="Array">Window size</param>
-	            /// <param name="generatorPoint" type="EllipticCurvePointFp"></param>
-	            /// <returns type="Array">Precomputation table</returns>
+                /// <summary>Given a point P on an elliptic curve, return a table of
+                /// size 2^(w-2) filled with pre-computed values for
+                /// P, 3P, 5P, ... Etc.</summary>
+                /// <param name="w" type="Array">Window size</param>
+                /// <param name="generatorPoint" type="EllipticCurvePointFp"></param>
+                /// <returns type="Array">Precomputation table</returns>
 
                 var validationPoint = generatorPoint.clone();
                 convertToStandardForm(validationPoint);
@@ -2999,8 +2999,8 @@ var cryptoMath = {
             }
 
             function double(point, outputPoint) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 if (typeof point === "undefined") {
                     throw new Error("point undefined");
@@ -3009,9 +3009,9 @@ var cryptoMath = {
                     throw new Error("outputPoint undefined");
                 }
 
-	            //// if (!point.curve.equals(outputPoint.curve)) {
-	            ////    throw new Error("point and outputPoint must be from the same curve object.");
-	            //// }
+                //// if (!point.curve.equals(outputPoint.curve)) {
+                ////    throw new Error("point and outputPoint must be from the same curve object.");
+                //// }
 
                 if (point.isAffine) {
                     throw new Error("Given point was in Affine form. Use convertToJacobian() first.");
@@ -3033,9 +3033,9 @@ var cryptoMath = {
             }
 
             function mixedDoubleAdd(jacobianPoint, affinePoint, outputPoint) {
-	            /// <param name="jacobianPoint" type="EllipticCurvePointFp"/>
-	            /// <param name="affinePoint" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="jacobianPoint" type="EllipticCurvePointFp"/>
+                /// <param name="affinePoint" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 if (jacobianPoint.isInfinity) {
                     affinePoint.copy(outputPoint);
@@ -3048,10 +3048,10 @@ var cryptoMath = {
                     return;
                 }
 
-	            // Ok then we do the full double and add.
+                // Ok then we do the full double and add.
 
-	            // Note: in pseudo-code the uppercase X,Y,Z is Jacobian point, lower
-	            // case x, y, z is Affine point.
+                // Note: in pseudo-code the uppercase X,Y,Z is Jacobian point, lower
+                // case x, y, z is Affine point.
 
                 // 't5:=Z1^ 2;'
                 montgomerySquare(jacobianPoint.z, temp5);
@@ -3117,17 +3117,17 @@ var cryptoMath = {
                 // 't3:=t3-t0;'
                 modSub(temp3, temp0, temp3);
 
-	            //if t3 eq 0 then
-	            //    return 0,1,0;
-	            //end if;
-	            //var temp3isZero = cryptoMath.isZero(temp3);
+                //if t3 eq 0 then
+                //    return 0,1,0;
+                //end if;
+                //var temp3isZero = cryptoMath.isZero(temp3);
 
-	            // for (var i = 0; i < temp3.length; i++) {
-	            //     if (temp3[i] !== 0) {
-	            //         temp3isZero = false;
-	            //         break;
-	            //     }
-	            // }
+                // for (var i = 0; i < temp3.length; i++) {
+                //     if (temp3[i] !== 0) {
+                //         temp3isZero = false;
+                //         break;
+                //     }
+                // }
 
                 if (cryptoMath.isZero(temp3)) {
                     for (i = 0; i < outputPoint.x.length; i++) {
@@ -3188,9 +3188,9 @@ var cryptoMath = {
             }
 
             function mixedAdd(jacobianPoint, affinePoint, outputPoint) {
-	            /// <param name="jacobianPoint" type="EllipticCurvePointFp"/>
-	            /// <param name="affinePoint" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="jacobianPoint" type="EllipticCurvePointFp"/>
+                /// <param name="affinePoint" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 if (jacobianPoint === null) {
                     throw new Error("jacobianPoint");
@@ -3211,19 +3211,19 @@ var cryptoMath = {
 
                 if (jacobianPoint.isAffine) {
                     throw new Error(
-	                    "Given jacobianPoint was in Affine form. Use ConvertToJacobian()\
+                        "Given jacobianPoint was in Affine form. Use ConvertToJacobian()\
 	                     before calling DoubleJacobianAddAffinePoints().");
                 }
 
                 if (!affinePoint.isAffine) {
                     throw new Error(
-	                    "Given affinePoint was in Jacobian form. Use ConvertToAffine() before \
+                        "Given affinePoint was in Jacobian form. Use ConvertToAffine() before \
 	                     calling DoubleJacobianAddAffinePoints().");
                 }
 
                 if (outputPoint.isAffine) {
                     throw new Error(
-	                    "Given jacobianPoint was in Jacobian form. Use ConvertToJacobian() before \
+                        "Given jacobianPoint was in Jacobian form. Use ConvertToJacobian() before \
 	                     calling DoubleJacobianAddAffinePoints().");
                 }
 
@@ -3246,18 +3246,18 @@ var cryptoMath = {
                     return;
                 }
 
-	            // Ok then we do the full double and add.
+                // Ok then we do the full double and add.
 
-	            // Note: in pseudo-code the uppercase X1,Y1,Z1 is Jacobian point,
-	            // lower case x2, y2, z2 is Affine point.
+                // Note: in pseudo-code the uppercase X1,Y1,Z1 is Jacobian point,
+                // lower case x2, y2, z2 is Affine point.
 
-	            //if (X1 eq 0) and (Y1 eq 1) and (Z1 eq 0) then
-	            //    z2 := ToMontgomery(1,prime,rr,m,RR);
-	            //    return x2,y2;
-	            //end if;
-	            //if (x2 eq 0) and (y2 eq 1) then
-	            //    return X1,Y1,Z1;
-	            //end if;
+                //if (X1 eq 0) and (Y1 eq 1) and (Z1 eq 0) then
+                //    z2 := ToMontgomery(1,prime,rr,m,RR);
+                //    return x2,y2;
+                //end if;
+                //if (x2 eq 0) and (y2 eq 1) then
+                //    return X1,Y1,Z1;
+                //end if;
 
                 // 't1 := Z1^2;'.
                 montgomerySquare(jacobianPoint.z, temp1);
@@ -3346,9 +3346,9 @@ var cryptoMath = {
             }
 
             function scalarMultiply(k, point, outputPoint, multiplyBy4) {
-	            /// <param name="k" type="Digits"/>
-	            /// <param name="point" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="k" type="Digits"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 // Special case for the point at infinity or k == 0
                 if (point.isInfinity || cryptoMath.isZero(k)) {
@@ -3418,9 +3418,9 @@ var cryptoMath = {
             }
 
             function scalarMultiplyW(k, point, outputPoint) {
-	            /// <param name="k" type="Digits"/>
-	            /// <param name="point" type="EllipticCurvePointFp"/>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp"/>
+                /// <param name="k" type="Digits"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="outputPoint" type="EllipticCurvePointFp"/>
 
                 // The point should be in Montgomery form.
                 var validationPoint = point.clone();
@@ -3503,8 +3503,8 @@ var cryptoMath = {
             }
 
             function negate(point, outputPoint) {
-	            /// <param name="point" type="EllipticCurvePointFp">Input point to negate.</param>
-	            /// <param name="outputPoint" type="EllipticCurvePointFp">(x, p - y).</param>
+                /// <param name="point" type="EllipticCurvePointFp">Input point to negate.</param>
+                /// <param name="outputPoint" type="EllipticCurvePointFp">(x, p - y).</param>
 
                 if (point !== outputPoint) {
                     point.copy(outputPoint);
@@ -3513,7 +3513,7 @@ var cryptoMath = {
             }
 
             function convertToMontgomeryForm(point) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
 
                 if (point.isInMontgomeryForm) {
                     throw new Error("The given point is already in Montgomery form.");
@@ -3537,7 +3537,7 @@ var cryptoMath = {
             }
 
             function convertToStandardForm(point) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
 
                 if (!point.isInMontgomeryForm) {
                     throw new Error("The given point is not in montgomery form.");
@@ -3560,7 +3560,7 @@ var cryptoMath = {
             }
 
             function convertToAffineForm(point) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
 
                 if (point.isInfinity) {
                     point.z = null;
@@ -3569,7 +3569,7 @@ var cryptoMath = {
                     return;
                 }
 
-	            // DETERMINE 1/Z IN MONTGOMERY FORM --------------------------------
+                // DETERMINE 1/Z IN MONTGOMERY FORM --------------------------------
 
                 // Call out to the basic inversion function, not the one in this class.
                 cryptoMath.modInv(point.z, curve.p, conversionTemp2, true);
@@ -3581,7 +3581,7 @@ var cryptoMath = {
                     conversionTemp1 = swap;
                 }
 
-	            // CONVERT TO AFFINE COORDS ----------------------------------------
+                // CONVERT TO AFFINE COORDS ----------------------------------------
 
                 // 'temp0 <- 1/z^2'
                 montgomerySquare(conversionTemp2, conversionTemp0);
@@ -3614,7 +3614,7 @@ var cryptoMath = {
             }
 
             function convertToJacobianForm(point) {
-	            /// <param name="point" type="EllipticCurvePointFp"/>
+                /// <param name="point" type="EllipticCurvePointFp"/>
 
                 if (!point.isAffine) {
                     throw new Error("The given point is not in Affine form.");
@@ -3638,10 +3638,10 @@ var cryptoMath = {
             }
 
             function validatePoint(point) {
-	            /// <summary>
-	            /// Point validation
-	            //  Check if point P=(x,y) lies on the curve and if x,y are in [0, p-1]
-	            /// </summary>
+                /// <summary>
+                /// Point validation
+                //  Check if point P=(x,y) lies on the curve and if x,y are in [0, p-1]
+                /// </summary>
 
                 if (point.isInfinity) {
                     return false;
@@ -3664,7 +3664,7 @@ var cryptoMath = {
                 return true;
             }
 
-	        /// Ted functions
+            /// Ted functions
 
             function validatePointTed(point) {
 
@@ -3700,8 +3700,8 @@ var cryptoMath = {
 
             function generatePrecomputationTableTed(npoints, point) {
 
-	            // Precomputation function, points are stored using representation (X,Y,Z,dT)
-	            // Twisted Edwards a=1 curve
+                // Precomputation function, points are stored using representation (X,Y,Z,dT)
+                // Twisted Edwards a=1 curve
 
                 var Q = point.clone(),
                     P2 = Q.clone(),
@@ -3787,9 +3787,9 @@ var cryptoMath = {
 
                     var L = tableLookupTed(precomputationTable, position);
 
-	                // subtract if k is negative - constant time
-	                // modSub(point.curve.p, L.x, [tempk, L.x][kisNeg]);
-	                // modSub(point.curve.p, L.td, [tempk, L.td][kisNeg]);
+                    // subtract if k is negative - constant time
+                    // modSub(point.curve.p, L.x, [tempk, L.x][kisNeg]);
+                    // modSub(point.curve.p, L.td, [tempk, L.td][kisNeg]);
 
                     var mask = -(kDigits[i] >>> 31);
 
@@ -3899,8 +3899,8 @@ var cryptoMath = {
 
             function addTed(point1 /*Q*/, point2 /*P*/, outputPoint) {
 
-	            // var modulus = point1.curve.p;
-	            // var temp1 = [];
+                // var modulus = point1.curve.p;
+                // var temp1 = [];
 
                 if (typeof point1.ta === "undefined") {
                     throw new Error("Point1 should be in Extended Projective form.");
@@ -3938,14 +3938,14 @@ var cryptoMath = {
 
             function addTedExtended(qq /*Q*/, point2 /*P*/, outputPoint) {
 
-	            // Complete point addition P = P+Q, including the cases P!=Q, P=Q, P=-Q, P=neutral and Q=neutral
-	            // Twisted Edwards a=1 curve
-	            // Inputs: P = (X1,Y1,Z1,Ta,Tb), where T1 = Ta*Tb, corresponding to extended twisted
-	            //             Edwards coordinates(X1: Y1: Z1: T1)
-	            //         Q = (X2,Y2,Z2,dT2), corresponding to extended twisted Edwards coordinates
-	            //             (X2: Y2: Z2: T2)
-	            // Output: P = (X1,Y1,Z1,Ta,Tb), where T1 = Ta*Tb, corresponding to extended twisted
-	            //             Edwards coordinates(X1: Y1: Z1: T1)
+                // Complete point addition P = P+Q, including the cases P!=Q, P=Q, P=-Q, P=neutral and Q=neutral
+                // Twisted Edwards a=1 curve
+                // Inputs: P = (X1,Y1,Z1,Ta,Tb), where T1 = Ta*Tb, corresponding to extended twisted
+                //             Edwards coordinates(X1: Y1: Z1: T1)
+                //         Q = (X2,Y2,Z2,dT2), corresponding to extended twisted Edwards coordinates
+                //             (X2: Y2: Z2: T2)
+                // Output: P = (X1,Y1,Z1,Ta,Tb), where T1 = Ta*Tb, corresponding to extended twisted
+                //             Edwards coordinates(X1: Y1: Z1: T1)
 
                 var cm = cryptoMath;
                 var modulus = point2.curve.p;
@@ -4004,9 +4004,9 @@ var cryptoMath = {
             }
 
             function convertTedToWeierstrass(tedPoint, wPoint) {
-	            /// <summary></summary>
-	            /// <param name="tedPoint" type=""></param>
-	            /// <param name="outputPoint" type=""></param>
+                /// <summary></summary>
+                /// <param name="tedPoint" type=""></param>
+                /// <param name="outputPoint" type=""></param>
 
                 var a = tedPoint.curve.a.slice(),
                     d = tedPoint.curve.d.slice(),
@@ -4169,10 +4169,10 @@ var cryptoMath = {
 
                 convertToJacobianForm: convertToJacobianForm,
 
-	            // For tests
+                // For tests
                 generatePrecomputationTable: function (w, generatorPoint) {
-	                /// <param name="w" type="Number"/>
-	                /// <param name="generatorPoint" type="EllipticCurvePointFp"/>
+                    /// <param name="w" type="Number"/>
+                    /// <param name="generatorPoint" type="EllipticCurvePointFp"/>
 
                     return generatePrecomputationTable(w, generatorPoint);
                 }
@@ -4190,8 +4190,8 @@ var cryptoMath = {
                 methods.convertWeierstrassToTed = convertWeierstrassToTed;
                 methods.validatePoint = validatePointTed;
                 methods.generatePrecomputationTable = function (w, generatorPoint) {
-	                /// <param name="w" type="Number"/>
-	                /// <param name="generatorPoint" type="EllipticCurvePointFp"/>
+                    /// <param name="w" type="Number"/>
+                    /// <param name="generatorPoint" type="EllipticCurvePointFp"/>
 
                     return generatePrecomputationTableTed(w, generatorPoint);
                 };
@@ -4212,12 +4212,12 @@ var cryptoMath = {
         var sec1EncodingFp = function () {
             return {
                 encodePoint: function (/*@type(EllipticCurvePointFp)*/ point) {
-	                /// <summary>Encode an EC point without compression.
-	                /// This function encodes a given points into a bytes array containing 0x04 | X | Y, where
-	                ///      X and Y are big endian bytes of x and y coordinates.</summary >
-	                /// <param name="point" type="EllipticCurvePointFp">Input EC point to encode.</param>
-	                /// <returns type="Array">A bytes array containing 0x04 | X | Y, where X and Y are big endian
-	                ///     encoded x and y coordinates.</returns >
+                    /// <summary>Encode an EC point without compression.
+                    /// This function encodes a given points into a bytes array containing 0x04 | X | Y, where
+                    ///      X and Y are big endian bytes of x and y coordinates.</summary >
+                    /// <param name="point" type="EllipticCurvePointFp">Input EC point to encode.</param>
+                    /// <returns type="Array">A bytes array containing 0x04 | X | Y, where X and Y are big endian
+                    ///     encoded x and y coordinates.</returns >
 
                     if (!point) {
                         throw new Error("point");
@@ -4258,8 +4258,8 @@ var cryptoMath = {
 
                 },
                 decodePoint: function (encoded, curve) {
-	                /// <param name="encoded" type="Digits"/>
-	                /// <param name="curve" type="EllipticCurveFp"/>
+                    /// <param name="encoded" type="Digits"/>
+                    /// <param name="curve" type="EllipticCurveFp"/>
 
                     if (encoded.length < 1) {
                         throw new Error("Byte array must have non-zero length");
@@ -4296,7 +4296,7 @@ var cryptoMath = {
         };
 
         var ModularSquareRootSolver = function (modulus) {
-	        /// <param name="modulus" type="Digits"/>
+            /// <param name="modulus" type="Digits"/>
 
             // The modulus we are going to use.
             var p = modulus;
@@ -4333,10 +4333,10 @@ var cryptoMath = {
             var temp1 = new Array(p.length);
 
             function squareRootNistCurves(a) {
-	            /// <summary>Given a number a, returns a solution x to x^2 = a (mod p).</summary>
-	            /// <param name="a" type="Array">An integer a.</param>
-	            /// <returns type="Array">The square root of the number a modulo p, if it exists,
-	            /// otherwise null.</returns>
+                /// <summary>Given a number a, returns a solution x to x^2 = a (mod p).</summary>
+                /// <param name="a" type="Array">An integer a.</param>
+                /// <returns type="Array">The square root of the number a modulo p, if it exists,
+                /// otherwise null.</returns>
 
                 // beta = a^k mod n where k=(n+1)/4 for n == 3 mod 4, thus a^(1/2) mod n
                 var beta = cryptoMath.intToDigits(0, 16);
@@ -4366,16 +4366,16 @@ var cryptoMath = {
                     }
                 },
 
-	            // Given an integer a, this routine returns the Jacobi symbol (a/p),
-	            // where p is the modulus given in the constructor, which for p an
-	            // odd prime is also the Legendre symbol. From "Prime Numbers, A
-	            // Computational Perspective" by Crandall and Pomerance, alg. 2.3.5.
-	            // The Legendre symbol is defined as:
-	            //   0   if a === 0 mod p.
-	            //   1   if a is a quadratic residue (mod p).
-	            //   -1  if a is a quadratic non-reside (mod p).
+                // Given an integer a, this routine returns the Jacobi symbol (a/p),
+                // where p is the modulus given in the constructor, which for p an
+                // odd prime is also the Legendre symbol. From "Prime Numbers, A
+                // Computational Perspective" by Crandall and Pomerance, alg. 2.3.5.
+                // The Legendre symbol is defined as:
+                //   0   if a === 0 mod p.
+                //   1   if a is a quadratic residue (mod p).
+                //   -1  if a is a quadratic non-reside (mod p).
                 jacobiSymbol: function (a) {
-	                /// <param name="a">An integer a.</param>
+                    /// <param name="a">An integer a.</param>
 
                     var modEightMask = 0x7,
                         modFourMask = 0x3,
@@ -4481,7 +4481,7 @@ var cryptoMath = {
     {
         module.exports = cryptoECC;
     }
-	/* end-commonjs-block */
+    /* end-commonjs-block */
 }(cryptoECC$1));
 
 //*******************************************************************************
@@ -7191,17 +7191,17 @@ function write(buffer, value, offset, isLE, mLen, nBytes) {
             c /= 2;
         }
 
-      if (e + eBias >= eMax) {
-          m = 0;
-          e = eMax;
-      } else if (e + eBias >= 1) {
-          m = (value * c - 1) * Math.pow(2, mLen);
-          e = e + eBias;
-      } else {
-          m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-          e = 0;
-      }
-  }
+        if (e + eBias >= eMax) {
+            m = 0;
+            e = eMax;
+        } else if (e + eBias >= 1) {
+            m = (value * c - 1) * Math.pow(2, mLen);
+            e = e + eBias;
+        } else {
+            m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
+            e = 0;
+        }
+    }
 
     for (; mLen >= 8; buffer[offset + i] = m & 0xff, i += d, m /= 256, mLen -= 8) { }
 
@@ -7477,13 +7477,13 @@ function fromObject(that, obj) {
         var len = checked(obj.length) | 0;
         that = createBuffer(that, len);
 
-      if (that.length === 0) {
-          return that
-      }
+        if (that.length === 0) {
+            return that
+        }
 
-      obj.copy(that, 0, 0, len);
-      return that
-  }
+        obj.copy(that, 0, 0, len);
+        return that
+    }
 
     if (obj) {
         if ((typeof ArrayBuffer !== 'undefined' &&
@@ -7494,10 +7494,10 @@ function fromObject(that, obj) {
             return fromArrayLike(that, obj)
         }
 
-      if (obj.type === 'Buffer' && isArray(obj.data)) {
-          return fromArrayLike(that, obj.data)
-      }
-  }
+        if (obj.type === 'Buffer' && isArray(obj.data)) {
+            return fromArrayLike(that, obj.data)
+        }
+    }
 
     throw new TypeError('First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.')
 }
@@ -7636,8 +7636,8 @@ Buffer.byteLength = byteLength;
 function slowToString(encoding, start, end) {
     var loweredCase = false;
 
-  // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
-  // property of a typed array.
+    // No need to verify that "this.length <= MAX_UINT32" since it's a read-only
+    // property of a typed array.
 
     // This behaves neither like String nor Uint8Array in that we set start/end
     // to their upper/lower bounds if the value passed is out of range.
@@ -7675,32 +7675,32 @@ function slowToString(encoding, start, end) {
             case 'hex':
                 return hexSlice(this, start, end)
 
-        case 'utf8':
-        case 'utf-8':
-            return utf8Slice(this, start, end)
+            case 'utf8':
+            case 'utf-8':
+                return utf8Slice(this, start, end)
 
-        case 'ascii':
-            return asciiSlice(this, start, end)
+            case 'ascii':
+                return asciiSlice(this, start, end)
 
-        case 'latin1':
-        case 'binary':
-            return latin1Slice(this, start, end)
+            case 'latin1':
+            case 'binary':
+                return latin1Slice(this, start, end)
 
-        case 'base64':
-            return base64Slice(this, start, end)
+            case 'base64':
+                return base64Slice(this, start, end)
 
-        case 'ucs2':
-        case 'ucs-2':
-        case 'utf16le':
-        case 'utf-16le':
-            return utf16leSlice(this, start, end)
+            case 'ucs2':
+            case 'ucs-2':
+            case 'utf16le':
+            case 'utf-16le':
+                return utf16leSlice(this, start, end)
 
-          default:
-              if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-              encoding = (encoding + '').toLowerCase();
-              loweredCase = true;
-      }
-  }
+            default:
+                if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+                encoding = (encoding + '').toLowerCase();
+                loweredCase = true;
+        }
+    }
 }
 
 // The property is used by `Buffer.isBuffer` and `is-buffer` (in Safari 5-7) to detect
@@ -7892,8 +7892,8 @@ function bidirectionalIndexOf(buffer, val, byteOffset, encoding, dir) {
                 return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset)
             }
         }
-      return arrayIndexOf(buffer, [val], byteOffset, encoding, dir)
-  }
+        return arrayIndexOf(buffer, [val], byteOffset, encoding, dir)
+    }
 
     throw new TypeError('val must be string, number or Buffer')
 }
@@ -8056,33 +8056,33 @@ Buffer.prototype.write = function write(string, offset, length, encoding) {
             case 'hex':
                 return hexWrite(this, string, offset, length)
 
-        case 'utf8':
-        case 'utf-8':
-            return utf8Write(this, string, offset, length)
+            case 'utf8':
+            case 'utf-8':
+                return utf8Write(this, string, offset, length)
 
-        case 'ascii':
-            return asciiWrite(this, string, offset, length)
+            case 'ascii':
+                return asciiWrite(this, string, offset, length)
 
-        case 'latin1':
-        case 'binary':
-            return latin1Write(this, string, offset, length)
+            case 'latin1':
+            case 'binary':
+                return latin1Write(this, string, offset, length)
 
-        case 'base64':
-            // Warning: maxLength not taken into account in base64Write
-            return base64Write(this, string, offset, length)
+            case 'base64':
+                // Warning: maxLength not taken into account in base64Write
+                return base64Write(this, string, offset, length)
 
-        case 'ucs2':
-        case 'ucs-2':
-        case 'utf16le':
-        case 'utf-16le':
-            return ucs2Write(this, string, offset, length)
+            case 'ucs2':
+            case 'ucs-2':
+            case 'utf16le':
+            case 'utf-16le':
+                return ucs2Write(this, string, offset, length)
 
-          default:
-              if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
-              encoding = ('' + encoding).toLowerCase();
-              loweredCase = true;
-      }
-  }
+            default:
+                if (loweredCase) throw new TypeError('Unknown encoding: ' + encoding)
+                encoding = ('' + encoding).toLowerCase();
+                loweredCase = true;
+        }
+    }
 };
 
 Buffer.prototype.toJSON = function toJSON() {
@@ -8113,62 +8113,62 @@ function utf8Slice(buf, start, end) {
                 : (firstByte > 0xBF) ? 2
                     : 1;
 
-      if (i + bytesPerSequence <= end) {
-          var secondByte, thirdByte, fourthByte, tempCodePoint;
+        if (i + bytesPerSequence <= end) {
+            var secondByte, thirdByte, fourthByte, tempCodePoint;
 
-        switch (bytesPerSequence) {
-            case 1:
-                if (firstByte < 0x80) {
-                    codePoint = firstByte;
-                }
-                break
-            case 2:
-                secondByte = buf[i + 1];
-                if ((secondByte & 0xC0) === 0x80) {
-                    tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F);
-                    if (tempCodePoint > 0x7F) {
-                        codePoint = tempCodePoint;
+            switch (bytesPerSequence) {
+                case 1:
+                    if (firstByte < 0x80) {
+                        codePoint = firstByte;
                     }
-                }
-                break
-            case 3:
-                secondByte = buf[i + 1];
-                thirdByte = buf[i + 2];
-                if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
-                    tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F);
-                    if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
-                        codePoint = tempCodePoint;
+                    break
+                case 2:
+                    secondByte = buf[i + 1];
+                    if ((secondByte & 0xC0) === 0x80) {
+                        tempCodePoint = (firstByte & 0x1F) << 0x6 | (secondByte & 0x3F);
+                        if (tempCodePoint > 0x7F) {
+                            codePoint = tempCodePoint;
+                        }
                     }
-                }
-                break
-            case 4:
-                secondByte = buf[i + 1];
-                thirdByte = buf[i + 2];
-                fourthByte = buf[i + 3];
-                if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
-                    tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F);
-                    if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
-                        codePoint = tempCodePoint;
+                    break
+                case 3:
+                    secondByte = buf[i + 1];
+                    thirdByte = buf[i + 2];
+                    if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80) {
+                        tempCodePoint = (firstByte & 0xF) << 0xC | (secondByte & 0x3F) << 0x6 | (thirdByte & 0x3F);
+                        if (tempCodePoint > 0x7FF && (tempCodePoint < 0xD800 || tempCodePoint > 0xDFFF)) {
+                            codePoint = tempCodePoint;
+                        }
                     }
-                }
+                    break
+                case 4:
+                    secondByte = buf[i + 1];
+                    thirdByte = buf[i + 2];
+                    fourthByte = buf[i + 3];
+                    if ((secondByte & 0xC0) === 0x80 && (thirdByte & 0xC0) === 0x80 && (fourthByte & 0xC0) === 0x80) {
+                        tempCodePoint = (firstByte & 0xF) << 0x12 | (secondByte & 0x3F) << 0xC | (thirdByte & 0x3F) << 0x6 | (fourthByte & 0x3F);
+                        if (tempCodePoint > 0xFFFF && tempCodePoint < 0x110000) {
+                            codePoint = tempCodePoint;
+                        }
+                    }
+            }
         }
+
+        if (codePoint === null) {
+            // we did not generate a valid codePoint so insert a
+            // replacement char (U+FFFD) and advance only 1 byte
+            codePoint = 0xFFFD;
+            bytesPerSequence = 1;
+        } else if (codePoint > 0xFFFF) {
+            // encode to utf16 (surrogate pair dance)
+            codePoint -= 0x10000;
+            res.push(codePoint >>> 10 & 0x3FF | 0xD800);
+            codePoint = 0xDC00 | codePoint & 0x3FF;
+        }
+
+        res.push(codePoint);
+        i += bytesPerSequence;
     }
-
-      if (codePoint === null) {
-          // we did not generate a valid codePoint so insert a
-          // replacement char (U+FFFD) and advance only 1 byte
-          codePoint = 0xFFFD;
-          bytesPerSequence = 1;
-      } else if (codePoint > 0xFFFF) {
-          // encode to utf16 (surrogate pair dance)
-          codePoint -= 0x10000;
-          res.push(codePoint >>> 10 & 0x3FF | 0xD800);
-          codePoint = 0xDC00 | codePoint & 0x3FF;
-      }
-
-      res.push(codePoint);
-      i += bytesPerSequence;
-  }
 
     return decodeCodePointsArray(res)
 }
@@ -8568,8 +8568,8 @@ Buffer.prototype.writeIntLE = function writeIntLE(value, offset, byteLength, noA
     if (!noAssert) {
         var limit = Math.pow(2, 8 * byteLength - 1);
 
-      checkInt(this, value, offset, byteLength, limit - 1, -limit);
-  }
+        checkInt(this, value, offset, byteLength, limit - 1, -limit);
+    }
 
     var i = 0;
     var mul = 1;
@@ -8591,8 +8591,8 @@ Buffer.prototype.writeIntBE = function writeIntBE(value, offset, byteLength, noA
     if (!noAssert) {
         var limit = Math.pow(2, 8 * byteLength - 1);
 
-      checkInt(this, value, offset, byteLength, limit - 1, -limit);
-  }
+        checkInt(this, value, offset, byteLength, limit - 1, -limit);
+    }
 
     var i = byteLength - 1;
     var mul = 1;
@@ -8861,72 +8861,72 @@ function utf8ToBytes(string, units) {
     for (var i = 0; i < length; ++i) {
         codePoint = string.charCodeAt(i);
 
-      // is surrogate component
-      if (codePoint > 0xD7FF && codePoint < 0xE000) {
-          // last char was a lead
-          if (!leadSurrogate) {
-              // no lead yet
-              if (codePoint > 0xDBFF) {
-                  // unexpected trail
-                  if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
-                  continue
-              } else if (i + 1 === length) {
-                  // unpaired lead
-                  if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
-                  continue
-              }
+        // is surrogate component
+        if (codePoint > 0xD7FF && codePoint < 0xE000) {
+            // last char was a lead
+            if (!leadSurrogate) {
+                // no lead yet
+                if (codePoint > 0xDBFF) {
+                    // unexpected trail
+                    if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+                    continue
+                } else if (i + 1 === length) {
+                    // unpaired lead
+                    if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+                    continue
+                }
 
-          // valid lead
-          leadSurrogate = codePoint;
+                // valid lead
+                leadSurrogate = codePoint;
 
-          continue
-      }
+                continue
+            }
 
-        // 2 leads in a row
-        if (codePoint < 0xDC00) {
+            // 2 leads in a row
+            if (codePoint < 0xDC00) {
+                if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+                leadSurrogate = codePoint;
+                continue
+            }
+
+            // valid surrogate pair
+            codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000;
+        } else if (leadSurrogate) {
+            // valid bmp char, but last char was a lead
             if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
-            leadSurrogate = codePoint;
-            continue
         }
 
-        // valid surrogate pair
-        codePoint = (leadSurrogate - 0xD800 << 10 | codePoint - 0xDC00) + 0x10000;
-    } else if (leadSurrogate) {
-        // valid bmp char, but last char was a lead
-        if ((units -= 3) > -1) bytes.push(0xEF, 0xBF, 0xBD);
+        leadSurrogate = null;
+
+        // encode utf8
+        if (codePoint < 0x80) {
+            if ((units -= 1) < 0) break
+            bytes.push(codePoint);
+        } else if (codePoint < 0x800) {
+            if ((units -= 2) < 0) break
+            bytes.push(
+                codePoint >> 0x6 | 0xC0,
+                codePoint & 0x3F | 0x80
+            );
+        } else if (codePoint < 0x10000) {
+            if ((units -= 3) < 0) break
+            bytes.push(
+                codePoint >> 0xC | 0xE0,
+                codePoint >> 0x6 & 0x3F | 0x80,
+                codePoint & 0x3F | 0x80
+            );
+        } else if (codePoint < 0x110000) {
+            if ((units -= 4) < 0) break
+            bytes.push(
+                codePoint >> 0x12 | 0xF0,
+                codePoint >> 0xC & 0x3F | 0x80,
+                codePoint >> 0x6 & 0x3F | 0x80,
+                codePoint & 0x3F | 0x80
+            );
+        } else {
+            throw new Error('Invalid code point')
+        }
     }
-
-      leadSurrogate = null;
-
-      // encode utf8
-      if (codePoint < 0x80) {
-          if ((units -= 1) < 0) break
-          bytes.push(codePoint);
-      } else if (codePoint < 0x800) {
-          if ((units -= 2) < 0) break
-          bytes.push(
-              codePoint >> 0x6 | 0xC0,
-              codePoint & 0x3F | 0x80
-          );
-      } else if (codePoint < 0x10000) {
-          if ((units -= 3) < 0) break
-          bytes.push(
-              codePoint >> 0xC | 0xE0,
-              codePoint >> 0x6 & 0x3F | 0x80,
-              codePoint & 0x3F | 0x80
-          );
-      } else if (codePoint < 0x110000) {
-          if ((units -= 4) < 0) break
-          bytes.push(
-              codePoint >> 0x12 | 0xF0,
-              codePoint >> 0xC & 0x3F | 0x80,
-              codePoint >> 0x6 & 0x3F | 0x80,
-              codePoint & 0x3F | 0x80
-          );
-      } else {
-          throw new Error('Invalid code point')
-      }
-  }
 
     return bytes
 }
@@ -8946,12 +8946,12 @@ function utf16leToBytes(str, units) {
     for (var i = 0; i < str.length; ++i) {
         if ((units -= 2) < 0) break
 
-      c = str.charCodeAt(i);
-      hi = c >> 8;
-      lo = c % 256;
-      byteArray.push(lo);
-      byteArray.push(hi);
-  }
+        c = str.charCodeAt(i);
+        hi = c >> 8;
+        lo = c % 256;
+        byteArray.push(lo);
+        byteArray.push(hi);
+    }
 
     return byteArray
 }
@@ -9974,11 +9974,11 @@ const fromBase64Url = (b64) => Buffer.from(b64, 'base64');
 // expiration functions
 var ExpirationType;
 (function (ExpirationType) {
-    ExpirationType[ExpirationType["sec"] = 0] = "sec";
-    ExpirationType[ExpirationType["hour"] = 1] = "hour";
-    ExpirationType[ExpirationType["day"] = 2] = "day";
-    ExpirationType[ExpirationType["week"] = 3] = "week";
-    ExpirationType[ExpirationType["year"] = 4] = "year";
+    ExpirationType["sec"] = "sec";
+    ExpirationType["hour"] = "hour";
+    ExpirationType["day"] = "day";
+    ExpirationType["week"] = "week";
+    ExpirationType["year"] = "year";
 })(ExpirationType = ExpirationType || (ExpirationType = {}));
 const MS_PER_SECOND = 1000;
 const MS_PER_HOUR = MS_PER_SECOND * 60 * 60;
@@ -10073,7 +10073,7 @@ function encodeIPAsJWK(ip) {
         alg: descGqToUPAlg(ip.descGq),
         kid: toBase64Url(ip.UIDP),
         g0: toBase64Url(ip.g[0].getBytes()),
-        S: toBase64Url(ip.S)
+        spec: toBase64Url(ip.S)
     };
 }
 async function decodeJWKAsIP(jwk) {
@@ -10093,7 +10093,7 @@ async function decodeJWKAsIP(jwk) {
             break;
         default: throw `${jwk.alg} is not a valid algorithm`;
     }
-    const SBytes = fromBase64Url(jwk.S);
+    const SBytes = fromBase64Url(jwk.spec);
     const spec = JSON.parse(SBytes.toString());
     const n = spec.n;
     const groupParams = getEcGroup(descGq);
@@ -10135,17 +10135,6 @@ function parseJWS(jws) {
         throw "can't parse jws" + err;
     }
 }
-// export function sign(ip: IssuerParams, upt: UProveToken): string {
-//     return "";
-// }
-// export interface SignatureData {
-//     ip: IssuerParams,
-//     upJWS: UPJWS,
-//     uidt: Uint8Array
-// }
-// export async function verify(jws: string, ipResolver: (str: string) => Promise<IssuerParams>): Promise<SignatureData> {
-//     const upJws = parseJWS(jws);
-// }
 
 var upjf = /*#__PURE__*/Object.freeze({
     __proto__: null,
