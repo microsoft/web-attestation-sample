@@ -4,7 +4,7 @@
 /*
   Content-scripts do not support ESM imports.
   However, by adding additional scripts to the content_scripts section in the 
-  manifest.json, you can globaly include other scripts.
+  manifest.json, you can globally include other scripts.
   The ordering of the files in content_scripts determines the order of the loading.
 
   We list the following 'imports' to show what we're bringing in globally from an
@@ -78,23 +78,7 @@ function observe(pattern, callback) {
 
 // Start the observer, and process all nodes with text matching the pattern
 observe(PATTERN, (nodes) => {
-
-    nodes.forEach(node => {
-
-        // Replace the search text
-        node.textContent = node.textContent.replace(PATTERN, ' ');
-
-        // Clone the icon to create a new instance
-        const icon = iconWarning.cloneNode();
-
-        // Create a custom control that appears when the icon is clicked
-        new ExtensionControl('custom-control', icon);
-
-        // Insert the new node after the existing node
-        node.after(icon);
-
-    });
-
+    nodes.forEach(replaceWithIcon);
 });
 
 
@@ -113,7 +97,30 @@ const iconCheck = icon(CHECKMARK_URL);
 const iconInvalid = icon(INVALID_URL);
 const iconWarning = icon(WARNING_URL);
 
+function replaceWithIcon(node) {
 
+    const match = PATTERN.exec(node.textContent);
+
+    // the original text node gets the first half of the split and a new text node with the second half is created
+    // and auto-inserted after the first
+    const nodeSplit = node.splitText(match.index);
+
+    // replace the matched pattern in the new node
+    nodeSplit.textContent = nodeSplit.textContent.replace(PATTERN, '');
+
+    // Clone the icon to create a new instance
+    const icon = iconCheck.cloneNode();
+
+    // Create a custom control that appears when the icon is clicked
+    new ExtensionControl('custom-control', icon);
+
+    // Insert the new icon node after the original node
+    node.after(icon);
+
+}
+
+// do an initial scan of the document body for pages that are not dynamic
+findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon);
 
 
 // Keeping this code around for future reference
