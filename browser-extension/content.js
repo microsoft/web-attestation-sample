@@ -97,6 +97,7 @@ function replaceWithIcon(node) {
 
     // the actual tag from the page
     const tag = match[0];
+    // TODO (ljoy): call checkUWA to get the icon info
 
     // the original text node gets the first half of the split and a new text node with the second half is created
     // and auto-inserted after the first

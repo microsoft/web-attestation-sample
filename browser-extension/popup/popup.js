@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("url:", url);
 
     // enable the issue button if the current page is an issuer
-    if (url.endsWith("issuer.html")) {
+    if (url.endsWith("issuer.html")) { // TODO (ljoy): read meta tag info (here? from content.ts?)
       // this is an issuance page
       issueButton.disabled = false;
     } else if (url.endsWith("iamgreen.html"))
