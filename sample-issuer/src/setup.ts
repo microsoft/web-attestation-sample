@@ -46,7 +46,7 @@ void (async () => {
             default:
                 throw new Error(`Unsupported curve ${options.curve}`);
         }
-        const ikp = UPJF.createIssuerKeyAndParamsUPJF(descGq, { n: 0, expType: UPJF.ExpirationType.year }, undefined);
+        const ikp = UPJF.createIssuerKeyAndParamsUPJF(descGq, { n: 0, expType: UPJF.ExpirationType.day }, undefined);
         const jwk = UPJF.encodeIPAsJWK(ikp.ip);
 
         // write out updated JWKS

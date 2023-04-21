@@ -59,6 +59,9 @@ void (async () => {
         // verify the U-Prove tokens
         uproveKeysAndTokens.forEach((ukat) => {
             uprove.verifyTokenSignature(issuerParams, ukat.upt);
+            console.log(serialization.encodeUProveToken(ukat.upt));
+            
+            console.log(ukat.alphaInverse);
         });
 
         console.log("Success");
