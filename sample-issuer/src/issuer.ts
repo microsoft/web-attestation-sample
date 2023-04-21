@@ -88,8 +88,18 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
         } else {
             // initial token request
             // NOTE: user authentication is outside the scope of this sample, we assume
-            //       the user is authorized to obtain tokens
+            //       the user is authorized to obtain tokens. The refresh ID is used to 
+            //       identify the user in subsequent issuance calls.
             const msg = req.body as io.TokenRequestMessage;
+            let refreshID;
+            if (msg.rID) {
+                // TODO: check if the refresh ID is valid                
+                refreshID = msg.rID;
+            } else {
+                // create a random refresh ID to recognize the user in subsequent issuance calls
+                refreshID = crypto.randomBytes(64).toString("base64");    
+            }
+
             let n = 1;
             if (msg.n) {
                 // issue the requested number of tokens (up to our max count)
@@ -100,6 +110,8 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
             }
             // create a random session ID to recognize the user session on the second call
             const sessionID = crypto.randomBytes(32).toString("base64");
+
+            
 
             // create the token information object; this will be included in every token and will be visible
             // to Verifiers
@@ -115,6 +127,7 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
 
             response = {
                 sID: sessionID,
+                rID: refreshID,
                 TI: Buffer.from(TI).toString("base64"),
                 msg: message1,
             };

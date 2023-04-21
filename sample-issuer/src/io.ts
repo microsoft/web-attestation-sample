@@ -6,25 +6,27 @@ export interface IssuerParamsJWKS {
 
 // initial token request from client (Prover)
 export interface TokenRequestMessage {
-    n: number;
+    n?: number; // number of tokens requested
+    rID?: string; // refresh ID
 }
 
 // first issuance message from Issuer
 export interface FirstIssuanceMessage {
-    sID: string;
-    TI: string;
+    sID: string; // session ID
+    rID: string; // refresh ID
+    TI: string; // Token Information
     msg: serialization.FirstIssuanceMessageJSON;
 }
 
 // second issuance message from client (Prover)
 export interface SecondIssuanceMessage {
-    sID: string;
+    sID: string; // session ID
     msg: serialization.SecondIssuanceMessageJSON;
 }
 
 // third issuance message from Issuer
 export interface ThirdIssuanceMessage {
-    sID: string;
+    sID: string; // session ID
     msg: serialization.ThirdIssuanceMessageJSON;
 }
 
