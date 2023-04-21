@@ -5,9 +5,9 @@ export function getIssuerParams(issuerUrl) {
     return {
         "kty": "UP",
         "alg": "UP256",
-        "kid": "ATSQlvZAMV6-w_ZoN5ZtxrSZkCVo9lNfbRRAqvwPOow",
-        "g0": "BEzY_UArgtIb8wfhZLXZzPE_zaUaq4o_ilZun0mY_-LINtGZszeQ77R8qjvcABtgTFzHYsfMOozlPdhAGaAjBO0",
-        "spec": "eyJuIjowLCJleHBUeXBlIjoieWVhciJ9"
+        "kid": "mxANd6pAbiO2DoL2qB1jpaeHRkjpFZXyFXkLmv6U79Y",
+        "g0": "BCBrrePM00SFz4NL7kTnM9WbXGcYQTCNf7fXbeK7t7oCnKptIoqMchNJBeEGetdOBvDLUp5HkFxy9u2T6oxug9w",
+        "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5In0"
     }
 }
 

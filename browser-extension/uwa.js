@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import { presentToken, verifyTokenPresentation } from "./tokens.js";
+
 const uwaScheme = "uwa://";
 
 function base64UrlEncode(str) {
@@ -13,52 +15,49 @@ function base64UrlDecode(str) {
     return window.atob(base64);
 }
 
-export function createUWA(attestationData, proofOfPossessionData) {
-    // NOTE: TEMPLATE CODE, NOT COMPLETE FUNCTIONALITY
+/**
+ * Creates a UWA.
+ * @param {*} issuerUrl the token issuer identifier 
+ * @param {*} scope the attestation scope
+ * @returns the UWA string
+ */
+export async function createUWA(issuerUrl, scope) {
+    try {
+        const timestamp = new Date().toUTCString();
+        
+        // create the U-Prove token presentation as a JWS
+        const jws = await presentToken(issuerUrl, scope, timestamp);
 
-    // create the attestation JWS
-    const attJws = base64UrlEncode(JSON.stringify(attestationData));
-
-    // create the proof of possession JWS
-    const popJws = base64UrlEncode(JSON.stringify(proofOfPossessionData));
-
-    return uwaScheme + attJws + ";" + popJws;
+        return uwaScheme + jws;
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
 }
 
-export function parseUWA(uwa) {
-    // NOTE: TEMPLATE CODE, NOT COMPLETE FUNCTIONALITY
-    
+/**
+ * Parses and validates a UWA string
+ * @param {*} uwa the UWA string
+ * @returns the UWA data (scope, timestamp, issuer, and info)
+ */
+export async function parseUWA(uwa) {
     // parse the uwa string
     if (uwa.indexOf(uwaScheme) === -1) {
         // not a uwa string  
-        return undefined;
+        throw "invalid uwa string";
     } else {
-        // split the uwa string into attestation JWS and proof of possession JWS
-        const [attJws, popJws] = uwa.slice(uwaScheme.length).split(';');
-        if (!attJws || !popJws) {
-            // invalid uwa string
-            return undefined;
-        }
-
-        // parse the attestation JWS
-        const attestationData = JSON.parse(base64UrlDecode(attJws));
-        if (!attestationData || !attestationData.issuer) {
-            // invalid attestation JWS
-            return undefined;
-        }
-
-        // parse the proof of possession JWS
-        const proofOfPossessionData = JSON.parse(base64UrlDecode(popJws));
-        if (!proofOfPossessionData || !proofOfPossessionData.scope || !proofOfPossessionData.date || !proofOfPossessionData.info) {
-            // invalid proof of possession JWS
-            return undefined;
-        }
-
-        return {
-            issuer: attestationData.issuer,
-            scope: proofOfPossessionData.scope,
-            date: proofOfPossessionData.date,
-            info: proofOfPossessionData.info
+        try {
+            const { issuer, scope, timestamp, info } = await verifyTokenPresentation(uwa.substring(uwaScheme.length));
+            
+            return {
+                issuer,
+                scope,
+                timestamp,
+                info
+            }
+        } catch (e) {
+            console.error(e);
+            throw "invalid uwa string: " + e;
         }
     }
 }

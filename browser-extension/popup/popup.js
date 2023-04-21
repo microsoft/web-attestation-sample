@@ -3,20 +3,21 @@
 
 import { storeTokens } from "../tokenStore.js";
 import { getTokens } from "../tokens.js";
+import { createUWA } from "../uwa.js";
 
 // web attestation map
 let waMap = new Map();
 console.log("Initializing waMap", waMap);
-waMap.set("Contoso", { "info": "Level 3" });
-waMap.set("Example", { "info": "Example claim" });
-waMap.set("Fabrikam", { "info": "is human" });
+waMap.set("https://contoso.com", { "info": "Level 3" });
+waMap.set("https://example.com", { "info": "Example claim" });
+waMap.set("https://fabrikam.com", { "info": "is human" });
 
 // trusted issuer map
 let issuerMap = new Map();
 console.log("Initializing issuerMap", issuerMap);
-issuerMap.set("Example", { "url": "https://example.com/" });
-issuerMap.set("Contoso", { "url": "https://contoso.com/" });
-issuerMap.set("Fabrikam", { "url": "https://fabrikam.com" });
+issuerMap.set("https://example.com", { "url": "https://example.com/" });
+issuerMap.set("https://contoso.com", { "url": "https://contoso.com/" });
+issuerMap.set("https://fabrikam.com", { "url": "https://fabrikam.com" });
 issuerMap.set("test", { "url": " http://localhost:8080" });
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -160,9 +161,9 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("waMap after updateWaTokens:", waMap);
 
     const issuerUrl = "http://localhost:8080";
-    let {tokens, refreshID} = await getTokens(issuerUrl);
+    let {tokens, refreshID, expiration} = await getTokens(issuerUrl);
     if (tokens) {
-      storeTokens(issuerUrl, refreshID, tokens);
+      storeTokens(issuerUrl, refreshID, expiration, tokens);
     }
     console.log(tokens);
   });
@@ -182,11 +183,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // present an attestation to the current page
-  presentButton.addEventListener('click', function () {
-    scopeText.textContent = 'URL: ' + url.split('/').slice(-2).join('/');
-    var date = new Date().toISOString();
-    timeText.textContent = 'Time: ' + date;
-    var wa = "uwa://eyJpc3N1ZXIiOiJDb21tdW5pdHlYWVoifQ;eyJzY29wZSI6Imh0dHBzOi8vc29jaWFsLmNvbS8iLCJkYXRlIjoiMjAyMS0wNC0xMyIsImluZm8iOiJNZW1iZXIgc2luY2UgMjAxMSJ9";
+  presentButton.addEventListener('click', async function () {
+    const scope = url.split('/').slice(-2).join('/'); // TODO: fix this beyond demo files; just use new URL(url).path
+    scopeText.textContent = 'URL: ' + scope;
+    const wa = await createUWA(selectedIssuer, scope);
     waText.textContent = wa;
     waLabel.style.display = 'inline-block';
     waText.style.display = 'block';

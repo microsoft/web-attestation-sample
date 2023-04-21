@@ -9969,8 +9969,11 @@ var serialization = /*#__PURE__*/Object.freeze({
     encodeUProveToken: encodeUProveToken
 });
 
-const toBase64Url = (a) => Buffer.from(a).toString('base64url');
+// TODO: fix this, fails in browser ( Unknown encoding: base64url )
+// const toBase64Url = (a) => Buffer.from(a).toString('base64url');
+const toBase64Url = (a) => btoa(a).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 const fromBase64Url = (b64) => Buffer.from(b64, 'base64');
+
 // expiration functions
 var ExpirationType;
 (function (ExpirationType) {
