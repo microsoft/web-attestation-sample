@@ -14,10 +14,17 @@
 
 */
 
-const CHECKMARK_URL = chrome.runtime.getURL("icons/checkmark.svg");
-const INVALID_URL = chrome.runtime.getURL("icons/invalid.svg");
-const WARNING_URL = chrome.runtime.getURL("icons/warning.svg");
+
 const PATTERN = /uwa:\/\/\S+/g;
+
+
+const metaElements = document.querySelectorAll('meta');
+metaElements.forEach(meta => {
+    const name = meta.getAttribute('name');
+    const content = meta.getAttribute('content');
+    console.log(name, content);
+});
+const descriptionMeta = document.querySelector('meta[name="description"]');
 
 
 // Walks a node tree matching nodes containing specific text
@@ -82,40 +89,29 @@ observe(PATTERN, (nodes) => {
 });
 
 
-// Create an instance of an image element
-const icon = (path) => {
-    const img = document.createElement('img');
-    img.style.height = "1em";
-    img.style.width = "1em";
-    img.setAttribute("src", path);
-    return img;
-}
 
-
-// Create an instance of each icon
-const iconCheck = icon(CHECKMARK_URL);
-const iconInvalid = icon(INVALID_URL);
-const iconWarning = icon(WARNING_URL);
 
 function replaceWithIcon(node) {
 
     const match = PATTERN.exec(node.textContent);
 
+    // the actual tag from the page
+    const tag = match[0];
+
     // the original text node gets the first half of the split and a new text node with the second half is created
     // and auto-inserted after the first
     const nodeSplit = node.splitText(match.index);
 
-    // replace the matched pattern in the new node
+    // remove the matched pattern in the new node
     nodeSplit.textContent = nodeSplit.textContent.replace(PATTERN, '');
 
-    // Clone the icon to create a new instance
-    const icon = iconCheck.cloneNode();
-
-    // Create a custom control that appears when the icon is clicked
-    new ExtensionControl('custom-control', icon);
-
     // Insert the new icon node after the original node
-    node.after(icon);
+    node.after(ExtensionControl.verified('issuer.com', 'scope.com', '4/20/2023 12:22:00', 'mucho informacion').icon);
+    node.after(ExtensionControl.untrusted('issuer.com', issuer => {
+        console.log(`add issuer: ${issuer}`);
+    }).icon);
+    node.after(ExtensionControl.invalid('This is a detailed error message.').icon);
+
 
 }
 
