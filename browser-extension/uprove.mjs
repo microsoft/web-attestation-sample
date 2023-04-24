@@ -10128,9 +10128,9 @@ function parseJWS(jws) {
     }
     try {
         const upJws = {
-            header: JSON.parse(Buffer.from(parts[0], 'base64url').toString('utf8')),
-            payload: Buffer.from(parts[1], 'base64url'),
-            sig: JSON.parse(Buffer.from(parts[2], 'base64url').toString('utf8'))
+            header: JSON.parse(Buffer.from(parts[0], 'base64').toString('utf8')), // TODO: FIXME was 'base64url' but fails in the browser
+            payload: Buffer.from(parts[1], 'base64'), // TODO: FIXME was 'base64url' but fails in the browser
+            sig: JSON.parse(Buffer.from(parts[2], 'base64').toString('utf8')) // TODO: FIXME was 'base64url' but fails in the browser
         };
         return upJws;
     }

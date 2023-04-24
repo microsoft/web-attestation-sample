@@ -23,10 +23,8 @@ function base64UrlDecode(str) {
  */
 export async function createUWA(issuerUrl, scope) {
     try {
-        const timestamp = new Date().toUTCString();
-        
         // create the U-Prove token presentation as a JWS
-        const jws = await presentToken(issuerUrl, scope, timestamp);
+        const jws = await presentToken(issuerUrl, scope);
 
         return uwaScheme + jws;
     } catch (e) {

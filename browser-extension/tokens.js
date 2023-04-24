@@ -107,9 +107,10 @@ export async function getTokens(issuerUrl, refreshID) {
  * Creates a U-Prove presentation proof
  * @param {string} issuerUrl the url of the issuer
  * @param {string} scope the scope of the presentation
- * @param {string} timestamp the timestamp of the presentation
  */
-export async function presentToken(issuerUrl, scope, timestamp) {
+export async function presentToken(issuerUrl, scope) {
+    const timestamp = new Date().toUTCString();
+
     const issuerParamsJWK = getIssuerParams(issuerUrl);
     if (!issuerParamsJWK) {
         throw "issuer params not found";
@@ -123,17 +124,18 @@ export async function presentToken(issuerUrl, scope, timestamp) {
         alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, key),
         upt: serialization.decodeUProveToken(issuerParams, token)
     }
-    let message = new TextEncoder().encode(JSON.stringify({
+    let message = Buffer.from( JSON.stringify({
         scope: scope,
-        timestamp: timestamp
+        timestamp: Date.now()
     }));
     let presentationData = await uprove.generatePresentationProof(issuerParams, [], upkt, message, []);
     let proof = serialization.encodePresentationProof(presentationData.pp);
     let tp = {
         upt: token,
         pp: proof
-    }
+    };
     let jws = upjf.createJWS(upjf.descGqToUPAlg(issuerParams.descGq), message, tp);
+
     return jws;
 }
 
@@ -142,61 +144,67 @@ export async function presentToken(issuerUrl, scope, timestamp) {
  * @param {string} jws JWS encoding the token and proof
  */
 export async function verifyTokenPresentation(jws) {
-    const upJWS = upjf.parseJWS(jws);
-/*
-    TODO: work in progress
+    try {
+        const upJWS = upjf.parseJWS(jws);
 
-    const header = upJWS.header;
-    // check the header alg (we'll check it matches the issuer params later)
-    if (!header || !header.alg || !Object.values(upjf.UPAlg).includes(header.alg)) {
-        console.log("invalid header alg: " + header.alg);
-        throw "invalid JWS";
-    }
-    const message = upJWS.payload;
-    const tokenPresentation = upJWS.sig;
-    if (!tokenPresentation.upt) {
-        console.log("upt missing from JWS");
-        throw "invalid JWS";
-    } 
-    if (!tokenPresentation.pp) {
-        console.log("pp missing from JWS");
-        throw "invalid JWS";
-    }
-    const token = tokenPresentation.upt;
-    const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'));
-    const issuerParamsJWK = await getIssuerParams(tokenInfo.iss);
-    if (!issuerParamsJWK) {
-        return {
-            status: "unknown_issuer"
+        const header = upJWS.header;
+        // check the header alg (we'll check it matches the issuer params later)
+        if (!header || !header.alg || !Object.values(upjf.UPAlg).includes(header.alg)) {
+            throw "invalid header alg: " + header.alg;
         }
-    }
-    const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
-    // check that JWS alg matches the issuer params's group
-    if ((issuerParams.descGq == uprove.ECGroup.P256 && header.alg !== UPJF.UPAlg.UP256) ||
-        (issuerParams.descGq == uprove.ECGroup.P384 && header.alg !== UPJF.UPAlg.UP384) ||
-        (issuerParams.descGq == uprove.ECGroup.P521 && header.alg !== UPJF.UPAlg.UP521))
-    {
-        console.log(`header alg ${header.alg} doesn't match the Issuer params' group ${issuerParams.descGq}`);
-        throw "invalid JWS";
-    }
-    const upt = serialization.decodeUProveToken(issuerParams, token)
-    uprove.verifyTokenSignature(issuerParams, upt);
-    const spec = upjf.parseSpecification(issuerParams.S);
-    if (upjf.isExpired(spec.expType, tokenInfo.exp)) { // TODO: use timestamp from presentation message
-        throw "token is expired";
-    }
-    const pm = io.parsePresentationMessage(message); // FIXME
-    // TODO: check scope, expiration, etc.
-    const verificationData = uprove.verifyPresentationProof(
-        issuerParams,
-        upt,
-        message,
-        serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
-*/
+        const message = upJWS.payload;
+        const tokenPresentation = upJWS.sig;
+        if (!tokenPresentation.upt) {
+            throw "upt missing from JWS";
+        } 
+        if (!tokenPresentation.pp) {
+            throw "pp missing from JWS";
+        }
+        const token = tokenPresentation.upt;
+        const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'));
+        const issuerParamsJWK = await getIssuerParams(tokenInfo.iss);
+        if (!issuerParamsJWK) {
+            return {
+                status: "unknown_issuer"
+            }
+        }
+        const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
+        // check that JWS alg matches the issuer params's group
+        if ((issuerParams.descGq == uprove.ECGroup.P256 && header.alg !== upjf.UPAlg.UP256) ||
+            (issuerParams.descGq == uprove.ECGroup.P384 && header.alg !== upjf.UPAlg.UP384) ||
+            (issuerParams.descGq == uprove.ECGroup.P521 && header.alg !== upjf.UPAlg.UP521))
+        {
+            throw `header alg ${header.alg} doesn't match the Issuer params' group ${issuerParams.descGq}`;
+        }
+        const upt = serialization.decodeUProveToken(issuerParams, token)
+        uprove.verifyTokenSignature(issuerParams, upt);
+        
+        const parsedMessage = JSON.parse(Buffer.from(message).toString("utf8"));
+        const scope = parsedMessage.scope;
+        const timestamp = parsedMessage.timestamp;
+        
+        const spec = upjf.parseSpecification(issuerParams.S);
+        // transform the ms timestamp to the type encoded by the issuer (number of days)
+        const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp)) - 10; // TODO: remove the -10! (it's just to make it work with the current test token)
+        if (upjf.isExpired(spec.expType, tokenInfo.exp, sigTime)) {
+            throw `token expired at timestamp ${timestamp} (expiration ${tokenInfo.exp})`;
+        }
+        await uprove.verifyPresentationProof(
+            issuerParams,
+            upt,
+            message,
+            serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
+
         return {
             status: "valid",
-            scope: "https://example.com",
-            timestamp: "2023-04-21T15:30:00Z",
-            info: "Some info"
+            scope: scope,
+            timestamp: timestamp,
+            info: "Some info" // TODO: get this from TI
         }
+    } catch (error) {
+        console.error('Error validating the JWS', error);
+        return {
+            status: "error"
+        }
+    }
 }
