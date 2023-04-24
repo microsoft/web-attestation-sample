@@ -25,8 +25,8 @@ async function sendIssuanceMessage(issuanceUrl, message) {
 
 /**
  * Obtain U-Prove tokens from the issuerUrl, using the refreshID if provided
- * @param {*} issuerUrl the url of the issuer
- * @param {*} refreshID the refresh ID received from the issuer
+ * @param {string} issuerUrl the url of the issuer
+ * @param {string} refreshID the refresh ID received from the issuer
  * @returns a token batch, a new refreshID, and the expiration date of the tokens
  */
 export async function getTokens(issuerUrl, refreshID) {
@@ -105,10 +105,9 @@ export async function getTokens(issuerUrl, refreshID) {
 
 /**
  * Creates a U-Prove presentation proof
- * @param {*} scope the scope of the presentation
- * @param {*} timestamp the timestamp of the presentation
- * @param {*} key the token private key
- * @param {*} token the U-Prove token
+ * @param {string} issuerUrl the url of the issuer
+ * @param {string} scope the scope of the presentation
+ * @param {string} timestamp the timestamp of the presentation
  */
 export async function presentToken(issuerUrl, scope, timestamp) {
     const issuerParamsJWK = getIssuerParams(issuerUrl);
@@ -140,7 +139,7 @@ export async function presentToken(issuerUrl, scope, timestamp) {
 
 /**
  * Verifies a U-Prove token presentation
- * @param {*} jws JWS encoding the token and proof
+ * @param {string} jws JWS encoding the token and proof
  */
 export async function verifyTokenPresentation(jws) {
     const upJWS = upjf.parseJWS(jws);

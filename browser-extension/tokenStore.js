@@ -11,9 +11,9 @@ export async function updateTokens() {
 
 /**
  * Store tokens in the store
- * @param {*} issuerUrl the url of the issuer
- * @param {*} refreshID the refresh ID received from the issuer 
- * @param {*} exp the expiration time of the tokens
+ * @param {string} issuerUrl the url of the issuer
+ * @param {string} refreshID the refresh ID received from the issuer 
+ * @param {number} exp the expiration time of the tokens
  * @param {*} tokens batch of tokens obtained from the issuer
  */
 export async function storeTokens(issuerUrl, refreshID, exp, tokens) {
@@ -23,7 +23,7 @@ export async function storeTokens(issuerUrl, refreshID, exp, tokens) {
 
 /**
  * Returns and deletes a token from the store
- * @param {*} issuerUrl the url of the issuer
+ * @param {string} issuerUrl the url of the issuer
  */
 export async function popToken(issuerUrl) {
     // TODO

@@ -17,8 +17,8 @@ function base64UrlDecode(str) {
 
 /**
  * Creates a UWA.
- * @param {*} issuerUrl the token issuer identifier 
- * @param {*} scope the attestation scope
+ * @param {string} issuerUrl the token issuer identifier 
+ * @param {string} scope the attestation scope
  * @returns the UWA string
  */
 export async function createUWA(issuerUrl, scope) {
@@ -37,7 +37,7 @@ export async function createUWA(issuerUrl, scope) {
 
 /**
  * Parses and validates a UWA string
- * @param {*} uwa the UWA string
+ * @param {string} uwa the UWA string
  * @returns the UWA data (scope, timestamp, issuer, and info)
  */
 export async function parseUWA(uwa) {
