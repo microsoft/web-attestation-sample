@@ -33,7 +33,7 @@ export async function getTokens(issuerUrl, refreshID) {
     console.log("getTokens called", issuerUrl);
     try {
         // obtain issuer params from the issuer store
-        let jwk = getIssuerParams(issuerUrl);
+        let jwk = await getIssuerParams(issuerUrl);
         if (!jwk) {
             // first need to obtain the params from the issuer
             const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
@@ -116,7 +116,7 @@ export async function getTokens(issuerUrl, refreshID) {
 export async function presentToken(issuerUrl, scope) {
     const timestamp = new Date().toUTCString();
 
-    const issuerParamsJWK = getIssuerParams(issuerUrl);
+    const issuerParamsJWK = await getIssuerParams(issuerUrl);
     if (!issuerParamsJWK) {
         throw "issuer params not found";
     }

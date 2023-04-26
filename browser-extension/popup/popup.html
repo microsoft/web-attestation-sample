@@ -8,15 +8,16 @@
   <body>
     <div>
       <button class="tab active" data-tab="tokens">Tokens</button>
-      <button class="tab" data-tab="issuer">Issuer</button>
+      <button class="tab" data-tab="issuers">Issuers</button>
       <button class="tab" data-tab="about">About</button>
+      <button class="tab" data-tab="debug">Debug</button>
     </div>
     <div>
       <div id="tokens" class="tab-content active-content">
         <h1>Tokens</h1>
         <div id="no-tokens-div">
           <p>
-            <p>You currently have no attestation tokens. Visit participating issuers to obtain some.</p>
+            You currently have no attestation tokens. Visit participating issuers to obtain some.
           </p>
         </div>
         <div id="has-tokens-div">
@@ -45,13 +46,19 @@
           <textarea id="wa-text" readonly style="display: none;"></textarea>
         </p>
       </div>
-      <div id="issuer" class="tab-content">
-        <h1>Trusted Issuer</h1>
+      <div id="issuers" class="tab-content">
+        <h1>Trusted Issuers</h1>
+        <div id="no-trusted-issuers-div">
+          <p>
+            You currently have no trusted issuers.
+          </p>
+        </div>
+        <div id="has-trusted-issuers-div">
         <p>This is the Issuer tab content.</p>
         <table id="issuer-table">
           <thead>
             <tr>
-              <th>Name</th>
+              <!-- <th>Name</th> we only display the url for now -->
               <th>URL</th>
             </tr>
           </thead>
@@ -59,10 +66,18 @@
             <!-- Rows will be dynamically added using JavaScript -->
           </tbody>
         </table>
+        </div>
       </div>
       <div id="about" class="tab-content">
         <h1>User-centric Web Attestation Web Browser Extension</h1>
         <p>This is a proof-of-concept browser extension for a User-centric Web Attestation system. See the <a href="https://github.com/microsoft/web-attestation-sample">github page</a> for details.</p>
+      </div>
+      <div id="debug" class="tab-content">
+        <h1>Debug</h1>
+        <p><button id="delete-tokens-button">Delete all tokens</button></p>
+        <p><button id="delete-issuers-button">Delete all issuers</button></p>
+        <p>Issuer URL: <input type="text" id="add-issuer-text">
+        <button id="add-issuer-button">Add issuer</button></p>
       </div>
     </div>
   </body>

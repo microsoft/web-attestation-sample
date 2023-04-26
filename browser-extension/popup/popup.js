@@ -2,16 +2,9 @@
 // Licensed under the MIT license.
 
 import { storeTokens, listTokenIssuers, clearTokens } from "../tokenStore.js";
+import { listIssuers, clearIssuerParams } from "../issuerStore.js";
 import { getTokens } from "../tokens.js";
 import { createUWA } from "../uwa.js";
-
-// trusted issuer map
-let issuerMap = new Map();
-console.log("Initializing issuerMap", issuerMap);
-issuerMap.set("https://example.com", { "url": "https://example.com/" });
-issuerMap.set("https://contoso.com", { "url": "https://contoso.com/" });
-issuerMap.set("https://fabrikam.com", { "url": "https://fabrikam.com" });
-issuerMap.set("test", { "url": " http://localhost:8080" });
 
 document.addEventListener("DOMContentLoaded", function () {
   // Add event listeners to switch tabs
@@ -27,6 +20,9 @@ document.addEventListener("DOMContentLoaded", function () {
       tab.classList.add("active");
       const tabContentId = tab.getAttribute("data-tab");
       document.getElementById(tabContentId).classList.add("active-content");
+      if (tabContentId === "issuers") {
+        updateIssuers();
+      }
     });
   });
 
@@ -40,6 +36,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var issueButton = document.getElementById('issue-button');
   var presentButton = document.getElementById('present-button');
+  var deleteIssuersButton = document.getElementById('delete-issuers-button');
+  var deleteTokensButton = document.getElementById('delete-tokens-button');
+  // FIXME: TODO: implement addIssuer button
   var copyButton = document.getElementById('copy-button');
   var scopeText = document.getElementById('scope-text');
   var timeText = document.getElementById('time-text');
@@ -71,10 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   const updateWaTokens = async () => {
-    document.getElementById('issuer-table');
-
     const tokenIssuers = await listTokenIssuers() || [];
-    var hasTokens = tokenIssuers.length > 0;
+    const hasTokens = tokenIssuers.length > 0;
     document.getElementById("no-tokens-div").style.display = hasTokens ? "none" : "block";
     document.getElementById("has-tokens-div").style.display = hasTokens ? "block" : "none";
 
@@ -106,8 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  const updateIssuers = () => {
-    console.log("updateIssuers() called, issuerMap:", issuerMap);
+  const updateIssuers = async () => {
+    console.log("updateIssuers called");
+    const issuers = await listIssuers() || [];
+    const hasIssuers = issuers.length > 0;
+    document.getElementById("no-trusted-issuers-div").style.display = hasIssuers ? "none" : "block";
+    document.getElementById("has-trusted-issuers-div").style.display = hasIssuers ? "block" : "none";
+
     // update table
     // clear the waTable
     var issuerTable = document.getElementById('issuer-table');
@@ -115,15 +117,15 @@ document.addEventListener("DOMContentLoaded", function () {
       issuerTable.deleteRow(1);
     }
     // populate the issuerTable
-    for (const [issuer, value] of issuerMap.entries()) {
+    for (const issuer of issuers) {
       const row = issuerTable.insertRow(-1);
 
       // Add cells for the "Name"
       const issuerCell = row.insertCell(0);
       issuerCell.textContent = issuer;
 
-      const urlCell = row.insertCell(1);
-      urlCell.textContent = value['url'];
+      // const urlCell = row.insertCell(1);
+      // urlCell.textContent = value['url'];
     }
   }
 
@@ -170,7 +172,15 @@ document.addEventListener("DOMContentLoaded", function () {
     document.execCommand("copy");
   });
 
-  updateIssuers();
+  deleteIssuersButton.addEventListener('click', async function () {
+    await clearIssuerParams();
+    updateIssuers();
+  });
+
+  deleteTokensButton.addEventListener('click', async function () {
+    await clearTokens();
+    updateWaTokens();
+  });
 });
 
 // requests issuer url from tab
@@ -180,4 +190,5 @@ async function getTabIssuerUrl(tab) {
       resolve(response.value);
     });
   }).catch((err) => { throw new Error(`Error checking tab issuer url. ${err}`) })
+
 }

@@ -41,6 +41,7 @@ export async function storeTokens(issuerUrl, refreshID, exp, newTokens) {
 
 /**
  * Returns the list of issuers for which tokens are stored
+ * @returns the list of issuers
  */
 export async function listTokenIssuers() {
   console.log("listTokenIssuers called");
@@ -57,6 +58,7 @@ export async function listTokenIssuers() {
 /**
  * Returns and deletes a token from the store
  * @param {string} issuerUrl the url of the issuer
+ * @returns a JSON encoded token
  */
 
 export async function popToken(issuerUrl) {
