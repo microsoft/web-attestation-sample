@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+const TOKEN_STORE_KEY = "tokenStore";
+
 /**
  * Updates the store by obtaining new tokens if they are few left or expired.
  */
@@ -14,7 +16,7 @@ export async function updateTokens() {
  */
 export async function clearTokens() {
   console.log("clearTokens called");
-  chrome.storage.local.remove("tokenStore");
+  chrome.storage.local.remove(TOKEN_STORE_KEY);
 }
 
 /**
@@ -26,7 +28,7 @@ export async function clearTokens() {
  */
 export async function storeTokens(issuerUrl, refreshID, exp, newTokens) {
   console.log("storeTokens called", issuerUrl, refreshID, exp, newTokens);
-  chrome.storage.local.get(["tokenStore"]).then((result) => {
+  chrome.storage.local.get([TOKEN_STORE_KEY]).then((result) => {
     let tokenStore = result.tokenStore || {};
     let issuerData = tokenStore[issuerUrl] || {refreshID: null, tokens: []};
     issuerData.refreshID = refreshID;
@@ -43,7 +45,7 @@ export async function storeTokens(issuerUrl, refreshID, exp, newTokens) {
 export async function listTokenIssuers() {
   console.log("listTokenIssuers called");
   return new Promise((resolve) => {
-    chrome.storage.local.get(["tokenStore"], (result) => {
+    chrome.storage.local.get([TOKEN_STORE_KEY], (result) => {
       let tokenStore = result.tokenStore || {};
       let issuers = Object.keys(tokenStore) || [];
       resolve(issuers);
@@ -60,7 +62,7 @@ export async function listTokenIssuers() {
 export async function popToken(issuerUrl) {
   console.log("popToken called", issuerUrl);
   return new Promise((resolve) => {
-    chrome.storage.local.get(["tokenStore"], (result) => {
+    chrome.storage.local.get([TOKEN_STORE_KEY], (result) => {
       let tokenStore = result.tokenStore || {};
       let issuerData = tokenStore[issuerUrl] || { refreshID: null, tokens: [] };
       if (issuerData.tokens.length > 0) {
