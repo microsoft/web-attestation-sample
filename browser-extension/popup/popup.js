@@ -1,16 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { storeTokens } from "../tokenStore.js";
+import { storeTokens, listTokenIssuers, clearTokens } from "../tokenStore.js";
 import { getTokens } from "../tokens.js";
 import { createUWA } from "../uwa.js";
-
-// web attestation map
-let waMap = new Map();
-console.log("Initializing waMap", waMap);
-waMap.set("https://contoso.com", { "info": "Level 3" });
-waMap.set("https://example.com", { "info": "Example claim" });
-waMap.set("https://fabrikam.com", { "info": "is human" });
 
 // trusted issuer map
 let issuerMap = new Map();
@@ -65,20 +58,17 @@ document.addEventListener("DOMContentLoaded", function () {
     if (url.endsWith("issuer.html")) { // TODO (ljoy): read meta tag info (here? from content.ts?)
       // this is an issuance page
       issueButton.disabled = false;
-    } else if (url.endsWith("iamgreen.html"))
-      waMap.set("CommunityXYZ", { "info": "Member since 2011" });
-    else {
+    } else {
       issueButton.disabled = true;
     }
     updateWaTokens();
   });
 
-  const updateWaTokens = () => {
-    console.log("updateWaTokens() called, waMap:", waMap);
-    console.log("current tab url:", url);
+  const updateWaTokens = async () => {
     document.getElementById('issuer-table');
 
-    var hasTokens = waMap.size > 0;
+    const tokenIssuers = await listTokenIssuers() || [];
+    var hasTokens = tokenIssuers.length > 0;
     document.getElementById("no-tokens-div").style.display = hasTokens ? "none" : "block";
     document.getElementById("has-tokens-div").style.display = hasTokens ? "block" : "none";
 
@@ -90,8 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
       waTable.deleteRow(1);
     }
     // populate the waTable
-    for (const [issuer, value] of waMap.entries()) {
-      // if (value['count'] > 0) {
+    tokenIssuers.forEach(issuer => {
       const row = waTable.insertRow(-1);
 
       // Add cells for the "Select" checkbox
@@ -101,22 +90,18 @@ document.addEventListener("DOMContentLoaded", function () {
       selectInput.name = 'selected-row';
       selectCell.appendChild(selectInput);
 
-      // Add cells for the "Issuer", "Info" data
+      // Add cells for the "Issuer"
       const issuerCell = row.insertCell(1);
       issuerCell.textContent = issuer;
 
-      const infoCell = row.insertCell(2);
-      infoCell.textContent = value['info'];
-    }
-
-    // update storage
-    chrome.storage.sync.set({ waMap: JSON.stringify([...waMap]) }, function () {
-      console.log('waMap saved to storage' + JSON.stringify([...waMap]));
+      // Add cells for the "Info" FIXME: don't have this for now
+      // const infoCell = row.insertCell(2);
+      // infoCell.textContent = value['info'];
     });
-  }
+ }
 
   const updateIssuers = () => {
-    console.log("updateTrustedIssuers() called, issuerMap:", issuerMap);
+    console.log("updateIssuers() called, issuerMap:", issuerMap);
     // update table
     // clear the waTable
     var issuerTable = document.getElementById('issuer-table');
@@ -136,36 +121,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
   }
 
-  // get waMap from storage
-  chrome.storage.sync.get(['waMap'], function (result) {
-    console.log('waMap retrieved from storage' + result.waMap);
-    if (result.waMap) {
-      waMap = new Map(JSON.parse(result.waMap));
-    } else {
-      waMap = new Map();
-    }
-  });
-
-  //    updateWaTokens();
-
   // get a web attestation from the current page
   issueButton.addEventListener('click', async function () {
-    console.log("issueButton clicked. waMap:", waMap);
-    waMap.set("CommunityXYZ", {
-      "info": "Member since 2011",
-      "count": 10
-    });
-
-    console.log("waMap after set:", waMap);
-    updateWaTokens();
-    console.log("waMap after updateWaTokens:", waMap);
-
-    const issuerUrl = "http://localhost:8080";
+    const issuerUrl = "http://localhost:8080"; // TODO: FIXME, get from current page
     let {tokens, refreshID, expiration} = await getTokens(issuerUrl);
     if (tokens) {
       storeTokens(issuerUrl, refreshID, expiration, tokens);
+      updateWaTokens();
     }
-    console.log(tokens);
   });
 
   // Add a change event listener to the table

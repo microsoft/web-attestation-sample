@@ -90,7 +90,12 @@ export async function getTokens(issuerUrl, refreshID) {
         const msg3 = serialization.decodeThirdIssuanceMessage(issuerParams, thirdMsg.msg);
 
         // create the U-Prove tokens
-        const tokens = prover.createTokens(msg3);
+        const tokens = prover.createTokens(msg3).map((upkt) => {
+            return {
+                key: upjf.encodePrivateKeyAsBase64Url(upkt.alphaInverse),
+                token: serialization.encodeUProveToken(upkt.upt)
+            }
+        });
         console.log("tokens", tokens);
 
         return {
@@ -116,13 +121,13 @@ export async function presentToken(issuerUrl, scope) {
         throw "issuer params not found";
     }
     const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
-    const {key, token} = await popToken(issuerUrl);
-    if (!key || !token) {
+    const keyAndToken = await popToken(issuerUrl);
+    if (!keyAndToken) {
         throw "no token available";
     }
     let upkt = {
-        alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, key),
-        upt: serialization.decodeUProveToken(issuerParams, token)
+        alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, keyAndToken.key),
+        upt: serialization.decodeUProveToken(issuerParams, keyAndToken.token)
     }
     let message = Buffer.from( JSON.stringify({
         scope: scope,
@@ -131,7 +136,7 @@ export async function presentToken(issuerUrl, scope) {
     let presentationData = await uprove.generatePresentationProof(issuerParams, [], upkt, message, []);
     let proof = serialization.encodePresentationProof(presentationData.pp);
     let tp = {
-        upt: token,
+        upt: keyAndToken.token,
         pp: proof
     };
     let jws = upjf.createJWS(upjf.descGqToUPAlg(issuerParams.descGq), message, tp);

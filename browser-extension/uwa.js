@@ -5,16 +5,6 @@ import { presentToken, verifyTokenPresentation } from "./tokens.js";
 
 const uwaScheme = "uwa://";
 
-function base64UrlEncode(str) {
-    let base64 = window.btoa(str);
-    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  }
-
-function base64UrlDecode(str) {
-    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-    return window.atob(base64);
-}
-
 /**
  * Creates a UWA.
  * @param {string} issuerUrl the token issuer identifier 
