@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!tabIssuerUrl) return;
     let { tokens, refreshID, expiration } = await getTokens(tabIssuerUrl);
     if (tokens) {
-      storeTokens(issuerUrl, refreshID, expiration, tokens);
+      storeTokens(tabIssuerUrl, refreshID, expiration, tokens);
       updateWaTokens();
     }
   });
