@@ -50,18 +50,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // get current tab
   let url;
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-    url = tabs[0].url;
+
+  // issuer url of current tab. value will be undefined if not provided by page.
+  let tabIssuerUrl;
+
+  chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
+    const activeTab = tabs[0];
+    url = activeTab.url;
     console.log("url:", url);
 
-    // enable the issue button if the current page is an issuer
-    if (url.endsWith("issuer.html")) { // TODO (ljoy): read meta tag info (here? from content.ts?)
-      // this is an issuance page
-      issueButton.disabled = false;
-    } else {
-      issueButton.disabled = true;
-    }
-    updateWaTokens();
+    // enable the issue button if the current page provides an issuer url
+    tabIssuerUrl = await getTabIssuerUrl(activeTab);
+
+    console.debug(`tab: ${activeTab.title}  issuerUrl: ${tabIssuerUrl}`);
+
+    issueButton.disabled = !tabIssuerUrl;
+
+    await updateWaTokens();
+
   });
 
   const updateWaTokens = async () => {
@@ -98,7 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
       // const infoCell = row.insertCell(2);
       // infoCell.textContent = value['info'];
     });
- }
+  }
 
   const updateIssuers = () => {
     console.log("updateIssuers() called, issuerMap:", issuerMap);
@@ -123,8 +129,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // get a web attestation from the current page
   issueButton.addEventListener('click', async function () {
-    const issuerUrl = "http://localhost:8080"; // TODO: FIXME, get from current page
-    let {tokens, refreshID, expiration} = await getTokens(issuerUrl);
+    if (!tabIssuerUrl) return;
+    let { tokens, refreshID, expiration } = await getTokens(tabIssuerUrl);
     if (tokens) {
       storeTokens(issuerUrl, refreshID, expiration, tokens);
       updateWaTokens();
@@ -166,3 +172,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
   updateIssuers();
 });
+
+// requests issuer url from tab
+async function getTabIssuerUrl(tab) {
+  return new Promise((resolve, reject) => {
+    chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
+      resolve(response.value);
+    });
+  }).catch((err) => { throw new Error(`Error checking tab issuer url. ${err}`) })
+}

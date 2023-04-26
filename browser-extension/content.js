@@ -16,15 +16,14 @@
 
 
 const PATTERN = /uwa:\/\/\S+/g;
+const ISSUERURL = "uwaIssuerUrl";
 
 
-const metaElements = document.querySelectorAll('meta');
-metaElements.forEach(meta => {
-    const name = meta.getAttribute('name');
-    const content = meta.getAttribute('content');
-    console.log(name, content);
-});
-const descriptionMeta = document.querySelector('meta[name="description"]');
+// Check for uwa meta tag
+const uwaMeta = document.querySelector('meta[name="uwa"]');
+if (uwaMeta) {
+    sessionStorage.setItem(ISSUERURL, uwaMeta.content);
+}
 
 
 // Walks a node tree matching nodes containing specific text
@@ -51,7 +50,7 @@ function findElementsWithText(element, pattern) {
     return nodes;
 }
 
-// Wait for new nodes to be added to the DOM. Scans new nodes that match the
+// Wait for new nodes to be added to the DOM. Scans new nodes that match the 
 // regular-expression. Returns an array of node that match.
 function observe(pattern, callback) {
 
@@ -89,15 +88,12 @@ observe(PATTERN, (nodes) => {
 });
 
 
-
-
 function replaceWithIcon(node) {
 
     const match = PATTERN.exec(node.textContent);
 
     // the actual tag from the page
-    const tag = match[0];
-    // TODO (ljoy): call checkUWA to get the icon info
+    const uwaTag = match[0];
 
     // the original text node gets the first half of the split and a new text node with the second half is created
     // and auto-inserted after the first
@@ -106,18 +102,83 @@ function replaceWithIcon(node) {
     // remove the matched pattern in the new node
     nodeSplit.textContent = nodeSplit.textContent.replace(PATTERN, '');
 
-    // Insert the new icon node after the original node
-    node.after(ExtensionControl.verified('issuer.com', 'scope.com', '4/20/2023 12:22:00', 'mucho informacion').icon);
-    node.after(ExtensionControl.untrusted('issuer.com', issuer => {
-        console.log(`add issuer: ${issuer}`);
-    }).icon);
-    node.after(ExtensionControl.invalid('This is a detailed error message.').icon);
-
+    chrome.runtime.sendMessage({ text: "checkUWA", string: uwaTag }, (uwaData) => {
+        validationResponse(uwaData, node);
+    });
 
 }
 
 // do an initial scan of the document body for pages that are not dynamic
 findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon);
+
+
+function validationResponse(uwaData, node) {
+
+    if (uwaData) {
+        let BADGE_URL = CHECKMARK_URL;
+        let BADGE_TITLE = "Verified badge";
+
+
+        // check if web attestation is valid
+        if (uwaData.error) {
+            //BADGE_URL = INVALID_URL;
+            //BADGE_TITLE = "Invalid badge: " + uwaData.error;
+            node.after(ExtensionControl.invalid(uwaData.error).icon);
+
+        } else {
+
+            if (uwaData.issuer !== "https://example.com/") {
+                // check if issuer is trusted
+                if (uwaData.issuer === "The Good Place") {
+
+                    //BADGE_URL = WARNING_URL;
+                    //BADGE_TITLE = "Untrusted badge issuer: (details)";
+
+                    node.after(ExtensionControl.untrusted("The Good Place", issuer => {
+                        console.log(`add issuer: ${issuer}`);
+                    }).icon);
+
+                }
+
+                // check if scope is ok
+                const scope = uwaData.scope.split('/').slice(-2).join('/').replace(".html", "");
+                console.log("scope", scope);
+                if (currentUrl !== scope) {
+                    //BADGE_URL = INVALID_URL;
+                    //BADGE_TITLE = "Invalid badge: wrong scope";
+                    node.after(ExtensionControl.invalid("Invalid badge: wrong scope").icon);
+                }
+            } else {
+
+                // Insert the new icon node after the original node
+                node.after(ExtensionControl.verified(uwaData.issuer, uwaData.scope, uwaData.date, uwaData.info).icon);
+
+            }
+
+        }
+
+        // let checkmarkImage = `<img src="${BADGE_URL}" alt="checkmark" width="50" title="
+        // ${BADGE_TITLE} &#013;
+        // Issued by: ${uwaData.issuer} &#013;
+        // Scope: ${uwaData.scope} &#013;
+        // Attached on: ${uwaData.date} &#013;
+        // Info: ${uwaData.info} &#013;
+        // "/>`;
+
+        //console.log("checkmarkImage", checkmarkImage);
+        //document.body.innerHTML = document.body.innerHTML.replace(string, checkmarkImage);
+    } else {
+        // invalid web attestation, we won't render it
+    }
+}
+
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'getIssuerUrl') {
+        const value = sessionStorage.getItem(ISSUERURL);
+        sendResponse({ value: value });
+    }
+});  
 
 
 // Keeping this code around for future reference
