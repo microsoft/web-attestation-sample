@@ -14,4 +14,5 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg.text && (msg.text == "checkUWA")) {
         sendResponse(checkUWA(msg.string, sender.origin));
     }
+    return true;
 });

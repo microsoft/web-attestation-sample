@@ -188,7 +188,8 @@ class ExtensionControl /*extends HTMLElement*/ {
         var controlRect = this.root.getBoundingClientRect();
         var left = boundRect.left + window.pageXOffset - (controlRect.width / 2) + (boundRect.width / 2);
         var top = boundRect.top + window.pageYOffset + boundRect.height;
-        this.root.style.left = left + "px";
+        left = Math.max(left, 0);
+        this.root.style.left = Math.min(left, window.innerWidth - controlRect.width) + "px";
         this.root.style.top = top + "px";
     }
 
