@@ -190,7 +190,7 @@ export async function verifyTokenPresentation(jws) {
         
         const spec = upjf.parseSpecification(issuerParams.S);
         // transform the ms timestamp to the type encoded by the issuer (number of days)
-        const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp)) - 10; // TODO: remove the -10! (it's just to make it work with the current test token)
+        const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp));
         if (upjf.isExpired(spec.expType, tokenInfo.exp, sigTime)) {
             throw `token expired at timestamp ${timestamp} (expiration ${tokenInfo.exp})`;
         }
