@@ -67,9 +67,19 @@ export async function getTokens(issuerUrl, refreshID) {
         const actualNumberOfTokens = msg1.sA.length;
         const TI = Buffer.from(firstMsg.TI, "base64");
         const tokenInformation = upjf.parseTokenInformation(TI);
-        // TODO: check tokenInformation.iss matches issuerUrl, and tokenInformation.exp is not expired
+        // check tokenInformation.iss matches issuerUrl
+        if (tokenInformation.iss !== issuerUrl) {
+            throw "token information issuer mismatch: " + tokenInformation.iss + " != " + issuerUrl;
+        }
+        // check tokenInformation.exp is not expired    
+        const spec = upjf.parseSpecification(issuerParams.S);
+        const nowTime = upjf.msToTypedTime(spec.expType, Date.now());
+        if (upjf.isExpired(spec.expType, tokenInformation.exp, nowTime)) {
+            throw `token is expired`;
+        }
         const expiration = tokenInformation.exp;
 
+        // create the prover
         const prover = await uprove.Prover.create(issuerParams, [], TI, new Uint8Array(), actualNumberOfTokens);
 
         // prover creates the second message

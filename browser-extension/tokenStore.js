@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+import uproveModule from "./uprove.mjs";
+
+const { upjf } = uproveModule;
+
+
 const TOKEN_STORE_KEY = "tokenStore";
 
 /**
@@ -8,7 +13,35 @@ const TOKEN_STORE_KEY = "tokenStore";
  */
 export async function updateTokens() {
   console.log("updateToken called", new Date().toString());
-  // TODO
+  let now = Date.now();
+  chrome.storage.local.get([TOKEN_STORE_KEY], (result) => {
+    let tokenStore = result.tokenStore || {};
+    let issuers = Object.keys(tokenStore) || [];
+    issuers.forEach(async (issuerUrl) => {
+      console.log("updateToken for issuerUrl", issuerUrl);
+      let issuerData = tokenStore[issuerUrl];
+      let tokens = issuerData.tokens || [];
+      // remove expired tokens
+      tokens = tokens.filter(t => {
+        const expired = upjf.isExpired(upjf.ExpirationType.days, t.exp);
+        if (expired) {console.log("updateToken: token expired", t.token, t.exp)};
+        return !expired;
+      });
+      // if there are few tokens left, get more
+      if (tokens.length < 3) {
+        console.log("updateToken: getting more tokens", issuerUrl);
+        let freshTokens = await getTokens(issuerUrl, issuerData.refreshID);
+        freshTokens.forEach(t => { 
+          tokens.push({ exp: t.exp, t: t.t });
+          issuerData.refreshID = t.refreshID;
+        });
+      }
+      issuerData.tokens = tokens;
+      tokenStore[issuerUrl] = issuerData;
+    });
+    console.log("updateToken: tokenStore", tokenStore);
+    chrome.storage.local.set({ tokenStore: tokenStore });
+  });
 }
 
 /**
