@@ -139,6 +139,7 @@ class ExtensionControl /*extends HTMLElement*/ {
     icon;
     root;
     #shadowRoot;
+    #tag;
 
     constructor(element) {
         //super();
@@ -180,6 +181,7 @@ class ExtensionControl /*extends HTMLElement*/ {
 
     hide() {
         this.root.style.display = 'none';
+        document.removeEventListener('click', outsideOfControlClickHandler.bind(this));
         document.removeEventListener('click', outsideOfControlClickHandler.bind(this));
     }
 
@@ -240,7 +242,7 @@ class ExtensionControl /*extends HTMLElement*/ {
             button.style.display = "block";
 
             button.addEventListener('click', () => {
-                callback(issuer);
+                callback(control);
             })
         }
 
@@ -257,12 +259,16 @@ class ExtensionControl /*extends HTMLElement*/ {
         img.src = element.src;
         root.querySelector("#label").textContent = 'Invalid';
 
-        root.querySelector("#key1").textContent = 'Message';
-        root.querySelector("#value1").textContent = message;
-
         root.querySelector("#value4").parentNode.remove();
         root.querySelector("#value3").parentNode.remove();
         root.querySelector("#value2").parentNode.remove();
+
+        if (message) {
+            root.querySelector("#key1").textContent = 'Message';
+            root.querySelector("#value1").textContent = message;
+        } else {
+            root.querySelector("#value1").parentNode.remove();
+        }
 
         return control;
     }

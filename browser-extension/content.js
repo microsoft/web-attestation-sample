@@ -126,11 +126,25 @@ function validationResponse(uwaData, node, tag) {
 
             node.after(ExtensionControl.untrusted(
                 uwaData.issuer,
-                () => {
 
-                    chrome.runtime.sendMessage({ text: "getTokens", string: sessionStorage.getItem(ISSUERURL) }, (tokens) => {
-                        // TODO: should now be trusted, but we need to re-validate
-                    });
+                // Trust button was pressed
+                (untrustedControl) => {
+
+                    untrustedControl.hide()
+                    untrustedControl.icon.remove();
+
+                    getTokens(sessionStorage.getItem(ISSUERURL))
+                        .then(tokens => {
+
+                            chrome.runtime.sendMessage({ text: "checkUWA", string: tag }, (uwaData) => {
+                                validationResponse(uwaData, node, tag);
+                            });
+
+
+                        })
+                        .catch((/*no tokens*/) => {
+
+                        });
 
                 }).icon);
 
@@ -164,3 +178,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         sendResponse({ value: value });
     }
 });
+
+
+function getTokens(issuerUrl) {
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ text: "getTokens", string: issuerUrl }, (tokens) => tokens ? resolve(tokens) : reject());
+    });
+}
