@@ -1,10 +1,10 @@
 # User-centric Web Attestation Browser Extension
 
-This project contains a Edge/Chrome Browser Extension demonstrating the concept of privacy-preserving [User-centric Web Attestations](../doc/uwa-spec.md).
+This project contains a Edge/Chrome Browser Extension demonstrating the concept of privacy-preserving [User-centric Web Attestations (UWA)](../doc/uwa-spec.md).
 
 **NOTE**: This is sample code that shouldn't be used in production. The goal is to demonstrate the use of the U-Prove technology to create web attestations. More work would be needed to create a secure and usable browser extension.
 
-The [sample issuer](../sample-issuer/README.md) project can be used to create a sample issuer of web attestations.
+The [sample issuer](../sample-issuer/README.md) project can be used to create a sample issuer of web attestations; this project implements the User and Verifier role of the UWA framework.
 
 Using this browser extension, a user can
 1. Obtain U-Prove tokens from an attestation issuer. Tokens are stored in the browser extension, and are renewed automatically when they expire or when then run low.
@@ -20,7 +20,7 @@ This section describes the functionality of the browser extension available in i
 
 ### Token Issuance
 
-When visiting a web site that supports token issuance (containing a [uwa meta tag](../doc/uwa-spec.md#issuance)), a user can obtain tokens by clicking the `Get Tokens` button from the extension's Tokens tab. This will trigger the issuance of U-Prove tokens (user authentication to the issuance website is out-of-scope of this sample) which will be stored in the extensions local storage.
+When visiting a web site that supports token issuance (containing a [uwa meta tag](../doc/uwa-spec.md#issuer-setup)), a user can obtain tokens by clicking the `Get Tokens` button from the extension's Tokens tab. This will trigger the issuance of U-Prove tokens (user authentication to the issuance website is out-of-scope of this sample) which will be stored in the extensions local storage.
 
 The extension periodically updates the token store to renew expired tokens (which are valid for a day when using the [sample issuer](../sample-issuer/README.md)) or if the token count is too low.
 
