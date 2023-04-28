@@ -38,6 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var presentButton = document.getElementById('present-button');
   var deleteIssuersButton = document.getElementById('delete-issuers-button');
   var deleteTokensButton = document.getElementById('delete-tokens-button');
+  var updateTokensButton = document.getElementById('update-tokens-button');
   // FIXME: TODO: implement addIssuer button
   var copyButton = document.getElementById('copy-button');
   var scopeText = document.getElementById('scope-text');
@@ -134,8 +135,9 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!tabIssuerUrl) return;
     let { tokens, refreshID, expiration } = await getTokens(tabIssuerUrl);
     if (tokens) {
-      storeTokens(tabIssuerUrl, refreshID, expiration, tokens);
-      updateWaTokens();
+      storeTokens(tabIssuerUrl, refreshID, expiration, tokens).then(() => {
+        updateWaTokens();
+      });
     }
   });
 
@@ -179,6 +181,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   deleteTokensButton.addEventListener('click', async function () {
     await clearTokens();
+    updateWaTokens();
+  });
+
+  updateTokensButton.addEventListener('click', async function () {
+    await updateTokens();
     updateWaTokens();
   });
 });
