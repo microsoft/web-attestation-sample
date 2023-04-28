@@ -35,14 +35,7 @@ export async function parseUWA(uwa) {
         throw "invalid uwa string";
     } else {
         try {
-            const { issuer, scope, timestamp, info } = await verifyTokenPresentation(uwa.substring(uwaScheme.length));
-            
-            return {
-                issuer,
-                scope,
-                timestamp,
-                info
-            }
+            return await verifyTokenPresentation(uwa.substring(uwaScheme.length));
         } catch (e) {
             console.error(e);
             throw "invalid uwa string: " + e;

@@ -170,6 +170,7 @@ export async function verifyTokenPresentation(jws) {
         const issuerParamsJWK = await getIssuerParams(tokenInfo.iss);
         if (!issuerParamsJWK) {
             return {
+                issuer: tokenInfo.iss,
                 status: "unknown_issuer"
             }
         }
@@ -201,6 +202,7 @@ export async function verifyTokenPresentation(jws) {
             serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
 
         return {
+            issuer: tokenInfo.iss,
             status: "valid",
             scope: scope,
             timestamp: timestamp,

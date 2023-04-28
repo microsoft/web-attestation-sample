@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
+
+
 /*
   Content-scripts do not support ESM imports.
   However, by adding additional scripts to the content_scripts section in the 
@@ -103,7 +105,7 @@ function replaceWithIcon(node) {
     nodeSplit.textContent = nodeSplit.textContent.replace(PATTERN, '');
 
     chrome.runtime.sendMessage({ text: "checkUWA", string: uwaTag }, (uwaData) => {
-        validationResponse(uwaData, node);
+        validationResponse(uwaData, node, uwaTag);
     });
 
 }
@@ -112,13 +114,25 @@ function replaceWithIcon(node) {
 findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon);
 
 
-function validationResponse(uwaData, node) {
+function validationResponse(uwaData, node, tag) {
 
     if (uwaData) {
 
         // check if web attestation is valid
-        if (uwaData.error) {
+        if (uwaData.status === 'error') {
             node.after(ExtensionControl.invalid(uwaData.error).icon);
+
+        } else if (uwaData.status === 'unknown_issuer') {
+
+            node.after(ExtensionControl.untrusted(
+                uwaData.issuer,
+                () => {
+
+                    chrome.runtime.sendMessage({ text: "getTokens", string: sessionStorage.getItem(ISSUERURL) }, (tokens) => {
+                        // TODO: should now be trusted, but we need to re-validate
+                    });
+
+                }).icon);
 
         } else {
 
@@ -136,9 +150,6 @@ function validationResponse(uwaData, node) {
             // Insert the new icon node after the original node
             node.after(ExtensionControl.verified(
                 uwaData.issuer, uwaData.scope, dt, uwaData.info).icon);
-
-
-
         }
 
     } else {

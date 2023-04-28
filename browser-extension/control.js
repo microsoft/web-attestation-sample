@@ -217,6 +217,7 @@ class ExtensionControl /*extends HTMLElement*/ {
 
     static untrusted(issuer, callback) {
 
+        const pageHasIssuerUrl = sessionStorage.getItem(ISSUERURL);
         const element = icon(WARNING_URL);
         const control = new ExtensionControl(element);
         const root = control.#shadowRoot;
@@ -233,12 +234,15 @@ class ExtensionControl /*extends HTMLElement*/ {
         root.querySelector("#value3").parentNode.remove();
         root.querySelector("#value2").parentNode.remove();
 
-        const button = root.querySelector("#button");
-        button.style.display = "block";
 
-        button.addEventListener('click', () => {
-            callback(issuer);
-        })
+        if (pageHasIssuerUrl) {
+            const button = root.querySelector("#button");
+            button.style.display = "block";
+
+            button.addEventListener('click', () => {
+                callback(issuer);
+            })
+        }
 
         return control;
     }
