@@ -87,7 +87,6 @@ export async function listTokenIssuers() {
   });
 }
 
-
 /**
  * Returns and deletes a token from the store
  * @param {string} issuerUrl the url of the issuer

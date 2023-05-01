@@ -97,7 +97,7 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
                 refreshID = msg.rID;
             } else {
                 // create a random refresh ID to recognize the user in subsequent issuance calls
-                refreshID = crypto.randomBytes(64).toString("base64");    
+                refreshID = crypto.randomBytes(32).toString("base64");    
             }
 
             let n = 1;
@@ -110,8 +110,6 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
             }
             // create a random session ID to recognize the user session on the second call
             const sessionID = crypto.randomBytes(32).toString("base64");
-
-            
 
             // create the token information object; this will be included in every token and will be visible
             // to Verifiers
