@@ -15,13 +15,19 @@ The [U-Prove JSON Framework](https://github.com/microsoft/uprove-node-reference/
 
 ## Issuer setup
 
-The Issuer is identified by a URL `[ISSUER_URL]`. It creates its U-Prove Issuer Parameters encoded as a JSON Web Key as specified in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuer-parameters), to issue tokens with no attributes with expiration numbered in days; the `specJSON` object is therefore:
-```json
+The Issuer is identified by a URL `[ISSUER_URL]`. It creates its U-Prove Issuer parameters encoded as a JSON Web Key as specified in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuer-parameters), to issue tokens with no attributes with expiration numbered in days. The Issuer can encode a label into its issued tokens, the values of which are described in a `lblType` object encoded in its specification containing numerical keys and string values. The `specJSON` is therefore of this form:
+```
 {
     n: 0,
-    expType: "days"
+    expType: "days",
+    lblType:? {
+        1: <first type>,
+        2: <second type>,
+        ...
+    }
 }
 ```
+ 
 The Issuer publishes the public JWK set at a well-known URL `[ISSUER_URL]/.well-known/jwks.json`, and listens for token issuance requests at `[ISSUER_URL]/issue`.
 
 Issuers can add a `<meta name="uwa" content="[ISSUER_URL]">` HTML element on a web page to allow Users to discover its `[ISSUER_URL]`.
@@ -34,9 +40,9 @@ The U-Prove issuance protocol consists of four messages, described in the follow
 A User initiates the U-Prove token issuance by sending a token request message to the Issuer (using the POST method to `[ISSUER_URL]/issue`). User authentication is application and Issuer-specific, and therefore out-of-scope of this framework. The User must first obtain an authentic copy of the Issuer parameters from `[ISSUER_URL]/.well-known/jwks.json`.
 
 The token request message is a JSON object of this form:
-```JSON
+```
 {
-    n?: number
+    n?: number,
     rID?: string
 }
 ```
@@ -46,21 +52,21 @@ where:
 
 ### First issuance message
 
-The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, and sets the token expiration date (number of days since the Unix epoch). The `[ISSUER_URL]` and expiration value are then encoded in the U-Prove Token Information field, a JSON object of this form:
-```JSON
+The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, sets the token expiration date (number of days since the Unix epoch), and optionally sets the label value (one of the numeric keys contained in the `lblType` object in its parameters' specification field). The `[ISSUER_URL]`, expiration, and label values are then encoded in the U-Prove Token Information field, a JSON object of this form:
+```
 {
-    iss: string
-    exp: number
+    iss: string,
+    exp: number,
+    lbl: number
 }
 ```
 
 The Issuer then responds with the first issuance message of this form:
-
-```JSON
+```
 {
-    sID: string;
-    rID?: string;
-    TI: string;
+    sID: string,
+    rID?: string,
+    TI: string,
     msg: {
         sZ: string,
         sA: string[],
@@ -77,10 +83,9 @@ where:
 ### Second issuance message
 
 The User responds with the second issuance message of this form:
-
-```JSON
+```
 {
-    sID: string;
+    sID: string,
     msg: {
         sC: string[]
     }
@@ -93,10 +98,9 @@ where:
 ### Third issuance message
 
 Finally, the Issuer responds with the third issuance message of this form:
-
-```JSON
+```
 {
-    sID: string;
+    sID: string,
     msg: {
         sR: string[]
     }
@@ -111,7 +115,7 @@ The User then creates `N` U-Prove tokens than can be encoded in an application-s
 ## Web Attestation creation
 
 To create a web attestation, the User selects a U-Prove token, and signs a presentation message to create a U-Prove presentation proof encoded as a JSON Web Signature (JWS) as detailed in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#presentation-protocol). The presentation message is the UTF8 encoding of a JSON object of this form:
-```JSON
+```
     scope: string,
     timestamp: number
 ```

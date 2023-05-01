@@ -67,17 +67,21 @@ export async function getTokens(issuerUrl, refreshID) {
         const actualNumberOfTokens = msg1.sA.length;
         const TI = Buffer.from(firstMsg.TI, "base64");
         const tokenInformation = upjf.parseTokenInformation(TI);
-        // check tokenInformation.iss matches issuerUrl
+        // check that tokenInformation.iss matches issuerUrl
         if (tokenInformation.iss !== issuerUrl) {
             throw "token information issuer mismatch: " + tokenInformation.iss + " != " + issuerUrl;
         }
-        // check tokenInformation.exp is not expired    
+        // check that tokenInformation.exp is not expired    
         const spec = upjf.parseSpecification(issuerParams.S);
         const nowTime = upjf.msToTypedTime(spec.expType, Date.now());
         if (upjf.isExpired(spec.expType, tokenInformation.exp, nowTime)) {
             throw `token is expired`;
         }
         const expiration = tokenInformation.exp;
+        // check that the tokenInformation.lbl value is contained in the specification (protects the user against "tagging attacks")
+        if (!spec.lblType[tokenInformation.lbl]) {
+            throw "invalid lbl value: " + tokenInformation.lbl;
+        }
 
         // create the prover
         const prover = await uprove.Prover.create(issuerParams, [], TI, new Uint8Array(), actualNumberOfTokens);
@@ -179,11 +183,13 @@ export async function verifyTokenPresentation(jws) {
         const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'));
         const issuerParamsJWK = await getIssuerParams(tokenInfo.iss);
         if (!issuerParamsJWK) {
+            // unknown issuer; can't proceed with verification
             return {
                 issuer: tokenInfo.iss,
                 status: "unknown_issuer"
             }
         }
+        // parse the JSON Web Key as an Issuer parameters object
         const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
         // check that JWS alg matches the issuer params's group
         if ((issuerParams.descGq == uprove.ECGroup.P256 && header.alg !== upjf.UPAlg.UP256) ||
@@ -192,14 +198,19 @@ export async function verifyTokenPresentation(jws) {
         {
             throw `header alg ${header.alg} doesn't match the Issuer params' group ${issuerParams.descGq}`;
         }
+        // decode and verify the U-Prove token
         const upt = serialization.decodeUProveToken(issuerParams, token)
         uprove.verifyTokenSignature(issuerParams, upt);
         
+        // parse the presentation message's scope and timestamp
         const parsedMessage = JSON.parse(Buffer.from(message).toString("utf8"));
         const scope = parsedMessage.scope;
         const timestamp = parsedMessage.timestamp;
         
+        // parse the issuer parameters' specification encoding expiration and label types
         const spec = upjf.parseSpecification(issuerParams.S);
+        
+        // check the expiration
         // transform the ms timestamp to the type encoded by the issuer (number of days)
         const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp));
         if (upjf.isExpired(spec.expType, tokenInfo.exp, sigTime)) {
@@ -211,12 +222,15 @@ export async function verifyTokenPresentation(jws) {
             message,
             serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
 
+        // extract the label
+        const label = spec.lblType[tokenInfo.lbl];
+
         return {
             issuer: tokenInfo.iss,
             status: "valid",
             scope: scope,
             timestamp: timestamp,
-            info: "Some info" // TODO: get this from TI
+            info: label
         }
     } catch (error) {
         console.error('Error validating the JWS', error);

@@ -9,6 +9,7 @@ import { IssuerParamsJWKS } from "./io.js";
 import * as settings from "./settings.js";
 
 import { uprove, upjf as UPJF } from "uprove-node-reference";
+import { Specification } from "uprove-node-reference/js/src/upjf.js";
 
 const ECGroup = uprove.ECGroup;
 
@@ -46,7 +47,14 @@ void (async () => {
             default:
                 throw new Error(`Unsupported curve ${options.curve}`);
         }
-        const ikp = UPJF.createIssuerKeyAndParamsUPJF(descGq, { n: 0, expType: UPJF.ExpirationType.day }, undefined);
+        const ikp = UPJF.createIssuerKeyAndParamsUPJF(
+            descGq,
+            { 
+                n: 0, // no attributes
+                expType: UPJF.ExpirationType.day, // token expirations measured in days
+                lblType: settings.TOKEN_LABEL_TYPES, // valid token label types
+            } as Specification, 
+            undefined);
         const jwk = UPJF.encodeIPAsJWK(ikp.ip);
 
         // write out updated JWKS

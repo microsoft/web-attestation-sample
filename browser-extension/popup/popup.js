@@ -98,9 +98,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const issuerCell = row.insertCell(1);
       issuerCell.textContent = issuer;
 
-      // Add cells for the "Info" FIXME: don't have this for now
-      // const infoCell = row.insertCell(2);
-      // infoCell.textContent = value['info'];
+      // Add cells for the "Label"
+      const labelCell = row.insertCell(2);
+      labelCell.textContent = value['label'];
     });
   }
 
