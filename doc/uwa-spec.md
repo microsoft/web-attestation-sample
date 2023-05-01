@@ -46,7 +46,7 @@ where:
 
 ### First issuance message
 
-The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuse) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, and sets the token expiration date (number of days since the Unix epoch). The `[ISSUER_URL]` and expiration value are then encoded in the U-Prove Token Information field, a JSON object of this form:
+The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, and sets the token expiration date (number of days since the Unix epoch). The `[ISSUER_URL]` and expiration value are then encoded in the U-Prove Token Information field, a JSON object of this form:
 ```JSON
 {
     iss: string
