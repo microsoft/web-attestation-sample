@@ -36,6 +36,17 @@ Issuers can add a `<meta name="uwa" content="[ISSUER_URL]">` HTML element on a w
 
 The U-Prove issuance protocol consists of four messages, described in the following sections (see the [UPJF]([UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuance-protocol)) for more details).
 
+```mermaid
+sequenceDiagram
+    participant User
+    participant Issuer
+    User->>Issuer: token request message
+    Issuer->>User: first issuance message
+    User->>Issuer: second issuance message
+    Issuer->>User: third issuance message
+    User->>User: generate tokens
+```
+
 ### Token request message
 A User initiates the U-Prove token issuance by sending a token request message to the Issuer (using the POST method to `[ISSUER_URL]/issue`). User authentication is application and Issuer-specific, and therefore out-of-scope of this framework. The User must first obtain an authentic copy of the Issuer parameters from `[ISSUER_URL]/.well-known/jwks.json`.
 
