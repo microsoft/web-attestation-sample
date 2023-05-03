@@ -6,7 +6,9 @@
     "build": "tsc",
     "setup-issuer": "node js/setup.js",
     "deploy-issuer": "node js/issuer.js",
-    "test-issuer": "node js/test-issuer.js"
+    "test-issuer": "node js/test-issuer.js",
+    "test-uwa": "node js/test-uwa.js",
+    "parse-uwa": "node js/parse-uwa.js"
   },
   "license": "MIT",
   "dependencies": {
