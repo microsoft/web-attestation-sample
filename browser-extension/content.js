@@ -133,9 +133,12 @@ function validationResponse(uwaData, node, tag) {
                     untrustedControl.hide()
                     untrustedControl.icon.remove();
 
-                    getTokens(sessionStorage.getItem(ISSUERURL))
-                        .then(tokens => {
+                    // download issuer parameters into the issuerStore
+                    downLoadIssuerParams(uwaData.issuer)
+                        .then(() => {
 
+                            // re-validate tag now that the issuer parameters are stored
+                            // TODO: re-validate all tags on the page from this issuer
                             chrome.runtime.sendMessage({ text: "checkUWA", string: tag }, (uwaData) => {
                                 validationResponse(uwaData, node, tag);
                             });
@@ -180,8 +183,54 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 
-function getTokens(issuerUrl) {
+function downLoadIssuerParams(issuerUrl) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ text: "getTokens", string: issuerUrl }, (tokens) => tokens ? resolve(tokens) : reject());
+        chrome.runtime.sendMessage({ text: "downloadIssuerParams", string: issuerUrl }, (jwk) => jwk ? resolve(jwk) : reject());
     });
+}
+
+function onImageLoad(event) {
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    document.querySelectorAll('img').forEach(i => {
+
+        if (i.width < 100) {
+            return;
+        }
+
+        chrome.runtime.sendMessage({ text: "fetchImage", imageUrl: i.src }, (response) => {
+
+            const img = new Image();
+
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height);
+
+                if (result?.chunks?.[0]?.data === "uwa://") {
+                    const uwa = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`;
+                    console.log(uwa);
+                }
+
+            };
+
+            img.src = response.imageData;
+
+        });
+
+    });
+
+}
+
+window.addEventListener('load', onImageLoad, true);
+
+function toBase64Url(byteArray) {
+    const binaryString = byteArray.map(b => String.fromCharCode(b)).join('');
+    const base64 = btoa(binaryString);
+    const base64url = base64.replace('+', '-').replace('/', '_').replace(/=+$/, '');
+    return base64url;
 }

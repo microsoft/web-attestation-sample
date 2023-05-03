@@ -12,7 +12,7 @@ async function sendIssuanceMessage(issuanceUrl, message) {
     console.log("sending issuance message", message);
     const response = await fetch(issuanceUrl, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(message)
     });
     if (!response.ok) {
@@ -24,6 +24,27 @@ async function sendIssuanceMessage(issuanceUrl, message) {
 }
 
 /**
+ * Download issuer parameters from an issuer URL *
+ * @param {string} issuerUrl
+ * @returns {string} 
+ */
+export async function downloadIssuerParams(issuerUrl) {
+    let jwk;
+    // first need to obtain the params from the issuer
+    const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
+    if (jwksResp.ok) {
+        const jwks = await jwksResp.json();
+        jwk = jwks.keys[0]; // TODO: deal with more than one token
+        console.log("jwk", jwk);
+        if (jwk) {
+            setIssuerParams(issuerUrl, jwk);
+        }
+    }
+    // TODO: handle failure
+    return jwk;
+}
+
+/**
  * Obtain U-Prove tokens from the issuerUrl, using the refreshID if provided
  * @param {string} issuerUrl the url of the issuer
  * @param {string} refreshID the refresh ID received from the issuer
@@ -32,20 +53,8 @@ async function sendIssuanceMessage(issuanceUrl, message) {
 export async function getTokens(issuerUrl, refreshID) {
     console.log("getTokens called", issuerUrl);
     try {
-        // obtain issuer params from the issuer store
-        let jwk = await getIssuerParams(issuerUrl);
-        if (!jwk) {
-            // first need to obtain the params from the issuer
-            const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
-            if (jwksResp.ok) {
-                const jwks = await jwksResp.json();
-                jwk = jwks.keys[0]; // TODO: deal with more than one token
-                console.log("jwk", jwk);
-                if (jwk) {
-                    setIssuerParams(issuerUrl, jwk);
-                }
-            }
-        }
+        // obtain issuer params from the issuer store or issuer url
+        let jwk = await (getIssuerParams(issuerUrl) || downloadIssuerParams(issuerUrl));
 
         const issuanceUrl = issuerUrl + "/issue";
         const issuerParams = await upjf.decodeJWKAsIP(jwk);
@@ -139,7 +148,7 @@ export async function presentToken(issuerUrl, scope) {
         alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, keyAndToken.key),
         upt: serialization.decodeUProveToken(issuerParams, keyAndToken.token)
     }
-    let message = Buffer.from( JSON.stringify({
+    let message = Buffer.from(JSON.stringify({
         scope: scope,
         timestamp: Date.now()
     }));
@@ -171,7 +180,7 @@ export async function verifyTokenPresentation(jws) {
         const tokenPresentation = upJWS.sig;
         if (!tokenPresentation.upt) {
             throw "upt missing from JWS";
-        } 
+        }
         if (!tokenPresentation.pp) {
             throw "pp missing from JWS";
         }
@@ -188,17 +197,16 @@ export async function verifyTokenPresentation(jws) {
         // check that JWS alg matches the issuer params's group
         if ((issuerParams.descGq == uprove.ECGroup.P256 && header.alg !== upjf.UPAlg.UP256) ||
             (issuerParams.descGq == uprove.ECGroup.P384 && header.alg !== upjf.UPAlg.UP384) ||
-            (issuerParams.descGq == uprove.ECGroup.P521 && header.alg !== upjf.UPAlg.UP521))
-        {
+            (issuerParams.descGq == uprove.ECGroup.P521 && header.alg !== upjf.UPAlg.UP521)) {
             throw `header alg ${header.alg} doesn't match the Issuer params' group ${issuerParams.descGq}`;
         }
         const upt = serialization.decodeUProveToken(issuerParams, token)
         uprove.verifyTokenSignature(issuerParams, upt);
-        
+
         const parsedMessage = JSON.parse(Buffer.from(message).toString("utf8"));
         const scope = parsedMessage.scope;
         const timestamp = parsedMessage.timestamp;
-        
+
         const spec = upjf.parseSpecification(issuerParams.S);
         // transform the ms timestamp to the type encoded by the issuer (number of days)
         const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp));

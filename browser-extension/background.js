@@ -3,7 +3,7 @@
 
 import { updateTokens } from "./tokenStore.js";
 import { parseUWA } from "./uwa.js";
-import { getTokens } from "./tokens.js";
+import { downloadIssuerParams } from "./tokens.js";
 
 // Define the checkUPWA function
 async function checkUWA(string, scope) {
@@ -17,8 +17,26 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         checkUWA(msg.string, sender.origin).then(sendResponse);
     }
 
-    if (msg?.text == "getTokens") {
-        getTokens(msg.string).then(sendResponse);
+    if (msg?.text == "downloadIssuerParams") {
+        downloadIssuerParams(msg.string).then(sendResponse);
+    }
+
+    if (msg?.text === "fetchImage") {
+        fetch(msg.imageUrl)
+            .then((response) => response.blob())
+            .then((blob) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    sendResponse({ imageData: reader.result });
+                };
+                reader.readAsDataURL(blob);
+            })
+            .catch((error) => {
+                console.error("Error fetching image:", error);
+                sendResponse({ imageData: null });
+            });
+
+        return true; // Indicates that the response will be sent asynchronously
     }
 
     return true;
