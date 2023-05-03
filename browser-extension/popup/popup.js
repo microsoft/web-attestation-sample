@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { storeTokens, listTokenIssuers, clearTokens } from "../tokenStore.js";
+import { storeTokens, listTokenIssuers, clearTokens, updateTokens } from "../tokenStore.js";
 import { listIssuers, clearIssuerParams } from "../issuerStore.js";
 import { getTokens } from "../tokens.js";
 import { createUWA } from "../uwa.js";
@@ -98,9 +98,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const issuerCell = row.insertCell(1);
       issuerCell.textContent = issuer;
 
-      // Add cells for the "Label"
-      const labelCell = row.insertCell(2);
-      labelCell.textContent = value['label'];
+      // // Add cells for the "Label"
+      // const labelCell = row.insertCell(2);
+      // labelCell.textContent = value['label'];
     });
   }
 
@@ -133,9 +133,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // get a web attestation from the current page
   issueButton.addEventListener('click', async function () {
     if (!tabIssuerUrl) return;
-    let { tokens, refreshID, expiration } = await getTokens(tabIssuerUrl);
+    let { tokens, refreshID, expiration, kid } = await getTokens(tabIssuerUrl);
     if (tokens) {
-      storeTokens(tabIssuerUrl, refreshID, expiration, tokens).then(() => {
+      storeTokens(tabIssuerUrl, refreshID, expiration, kid, tokens).then(() => {
         updateWaTokens();
       });
     }

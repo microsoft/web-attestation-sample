@@ -28,7 +28,7 @@ The Issuer is identified by a URL `[ISSUER_URL]`. It creates its U-Prove Issuer 
 }
 ```
  
-The Issuer publishes the public JWK set at a well-known URL `[ISSUER_URL]/.well-known/jwks.json`, and listens for token issuance requests at `[ISSUER_URL]/issue`.
+The Issuer publishes the public JWK set at a well-known URL `[ISSUER_URL]/.well-known/jwks.json`, and listens for token issuance requests at `[ISSUER_URL]/issue`. As described in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuer-parameters), Issuers can rotate their keys by adding news parameters to the JWK set (while keeping the old ones to allow verification of web attestations created using them); they can also revoke keys by deleting the corresponding parameters.
 
 Issuers can add a `<meta name="uwa" content="[ISSUER_URL]">` HTML element on a web page to allow Users to discover its `[ISSUER_URL]`.
 
@@ -63,7 +63,7 @@ where:
 
 ### First issuance message
 
-The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, sets the token expiration date (number of days since the Unix epoch), and optionally sets the label value (one of the numeric keys contained in the `lblType` object in its parameters' specification field). The `[ISSUER_URL]`, expiration, and label values are then encoded in the U-Prove Token Information field, a JSON object of this form:
+The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, selects the parameters to use (identified by its identifier `kid`), sets the token expiration date (number of days since the Unix epoch), and optionally sets the label value (one of the numeric keys contained in the `lblType` object in its parameters' specification field). The `[ISSUER_URL]`, expiration, and label values are then encoded in the U-Prove Token Information field, a JSON object of this form:
 ```
 {
     iss: string,
@@ -77,6 +77,7 @@ The Issuer then responds with the first issuance message of this form:
 {
     sID: string,
     rID?: string,
+    kid: string,
     TI: string,
     msg: {
         sZ: string,
@@ -88,12 +89,13 @@ The Issuer then responds with the first issuance message of this form:
 where:
 * `sID` is the unique session identifier.
 * `rID` is the optional unique refresh identifier.
+* `kid` is the key identifier of the Issuer parameters to use.
 * `TI` is the base64 encoding of the U-Prove Token Information field.
 * `msg` is a JSON object containing the cryptographic values of the first U-Prove issuance message (one shared values `sz`, and `sA` and `sB` arrays of length `N`).
 
 ### Second issuance message
 
-The User responds with the second issuance message of this form:
+The User stores or updates the `rID` value, retrieves the parameters identified with `kid` from the Issuer JWK set (if not available locally, then from `[ISSUER_URL]/.well-known/jwks.json`), validates the content of the Token Information field `TI` (checks that `iss` matches `[ISSUER_URL]`, `exp` is valid, and that `lbl` is one of the values specified in the parameters), and responds with the second issuance message of this form:
 ```
 {
     sID: string,
@@ -103,7 +105,7 @@ The User responds with the second issuance message of this form:
 }
 ```
 where:
-* `sID` is the unique session identifier.
+* `sID` is the unique session identifier sent by the Issuer.
 * `msg` is a JSON object containing the cryptographic values of the second U-Prove issuance message (`sC` array of length `N`).
 
 ### Third issuance message
@@ -127,8 +129,10 @@ The User then creates `N` U-Prove tokens than can be encoded in an application-s
 
 To create a web attestation, the User selects a U-Prove token, and signs a presentation message to create a U-Prove presentation proof encoded as a JSON Web Signature (JWS) as detailed in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#presentation-protocol). The presentation message is the UTF8 encoding of a JSON object of this form:
 ```
+{
     scope: string,
     timestamp: number
+}
 ```
 where:
 * `scope` is the URL of the web page on which the attestation is attached.

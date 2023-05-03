@@ -19,7 +19,7 @@ const PRIVATE_KEY_PATH = "private/ip.key"; // created by the setup script
 
 // read the issuer parameters
 const jwksString = fs.readFileSync(ISSUER_PARAMS_PATH, "utf8");
-const jwk: upjf.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0]; // we assume there is one param in the key set
+const jwk: upjf.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0]; // TODO: add a config option to select the key
 const issuerParams = upjf.decodeJWKAsIP(jwk);
 console.log("Issuer parameters loaded from: " + ISSUER_PARAMS_PATH);
 
@@ -130,6 +130,7 @@ app.post(settings.ISSUANCE_SUFFIX, async (req, res) => {
             response = {
                 sID: sessionID,
                 rID: refreshID,
+                kid: jwk.kid,
                 TI: Buffer.from(TI).toString("base64"),
                 msg: message1,
             };

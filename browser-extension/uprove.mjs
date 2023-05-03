@@ -9821,16 +9821,14 @@ class Hash {
     }
 }
 
-const toB64 = (a) => Buffer.from(a).toString('base64');
-const fromB64 = (b64) => Buffer.from(b64, 'base64');
 function encodeIssuerParams(ip) {
     return {
-        UIDP: toB64(ip.UIDP),
+        UIDP: toBase64Url(ip.UIDP),
         dGq: ip.descGq,
         UIDH: ip.UIDH,
-        g0: toB64(ip.g[0].getBytes()),
+        g0: toBase64Url(ip.g[0].getBytes()),
         e: ip.e.map(e => e.b[0]),
-        S: toB64(ip.S)
+        S: toBase64Url(ip.S)
     };
 }
 async function decodeIssuerParams(ipJSON) {
@@ -9852,79 +9850,79 @@ async function decodeIssuerParams(ipJSON) {
     // const Zq = Gq.Zq;
     // g = [g0, g1, ... gn, gt]
     const g = groupParams.g.slice(0, n); // keep only n generators
-    g.unshift(Gq.getElement(fromB64(ipJSON.g0)));
+    g.unshift(Gq.getElement(fromBase64Url(ipJSON.g0)));
     g.push(groupParams.gt);
-    return await IssuerParams.create(fromB64(ipJSON.UIDP), descGq, ipJSON.UIDH, g, ipJSON.e.map(e => new Byte(e)), fromB64(ipJSON.S));
+    return await IssuerParams.create(fromBase64Url(ipJSON.UIDP), descGq, ipJSON.UIDH, g, ipJSON.e.map(e => new Byte(e)), fromBase64Url(ipJSON.S));
 }
 function encodeUProveToken(upt) {
     return {
-        UIDP: toB64(upt.UIDP),
-        h: toB64(upt.h.getBytes()),
-        TI: toB64(upt.TI),
-        PI: toB64(upt.PI),
-        sZp: toB64(upt.sZp.getBytes()),
-        sCp: toB64(upt.sCp.getBytes()),
-        sRp: toB64(upt.sRp.getBytes())
+        UIDP: toBase64Url(upt.UIDP),
+        h: toBase64Url(upt.h.getBytes()),
+        TI: toBase64Url(upt.TI),
+        PI: toBase64Url(upt.PI),
+        sZp: toBase64Url(upt.sZp.getBytes()),
+        sCp: toBase64Url(upt.sCp.getBytes()),
+        sRp: toBase64Url(upt.sRp.getBytes())
     };
 }
 function decodeUProveToken(ip, uptJSON) {
     const Gq = ip.Gq;
     const Zq = Gq.Zq;
     return {
-        UIDP: fromB64(uptJSON.UIDP),
-        h: Gq.getElement(fromB64(uptJSON.h)),
-        TI: fromB64(uptJSON.TI),
-        PI: fromB64(uptJSON.PI),
-        sZp: Gq.getElement(fromB64(uptJSON.sZp)),
-        sCp: Zq.getElement(fromB64(uptJSON.sCp)),
-        sRp: Zq.getElement(fromB64(uptJSON.sRp))
+        UIDP: fromBase64Url(uptJSON.UIDP),
+        h: Gq.getElement(fromBase64Url(uptJSON.h)),
+        TI: fromBase64Url(uptJSON.TI),
+        PI: fromBase64Url(uptJSON.PI),
+        sZp: Gq.getElement(fromBase64Url(uptJSON.sZp)),
+        sCp: Zq.getElement(fromBase64Url(uptJSON.sCp)),
+        sRp: Zq.getElement(fromBase64Url(uptJSON.sRp))
     };
 }
 function encodeFirstIssuanceMessage(m1) {
     return {
-        sZ: toB64(m1.sZ.getBytes()),
-        sA: m1.sA.map(sigmaA => toB64(sigmaA.getBytes())),
-        sB: m1.sB.map(sigmaB => toB64(sigmaB.getBytes())),
+        sZ: toBase64Url(m1.sZ.getBytes()),
+        sA: m1.sA.map(sigmaA => toBase64Url(sigmaA.getBytes())),
+        sB: m1.sB.map(sigmaB => toBase64Url(sigmaB.getBytes())),
     };
 }
 function decodeFirstIssuanceMessage(ip, m1JSON) {
     const Gq = ip.Gq;
     return {
-        sZ: Gq.getElement(fromB64(m1JSON.sZ)),
-        sA: m1JSON.sA.map(sigmaA => Gq.getElement(fromB64(sigmaA))),
-        sB: m1JSON.sB.map(sigmaB => Gq.getElement(fromB64(sigmaB)))
+        sZ: Gq.getElement(fromBase64Url(m1JSON.sZ)),
+        sA: m1JSON.sA.map(sigmaA => Gq.getElement(fromBase64Url(sigmaA))),
+        sB: m1JSON.sB.map(sigmaB => Gq.getElement(fromBase64Url(sigmaB)))
     };
 }
 function encodeSecondIssuanceMessage(m2) {
     return {
-        sC: m2.sC.map(sigmaC => toB64(sigmaC.getBytes()))
+        sC: m2.sC.map(sigmaC => toBase64Url(sigmaC.getBytes()))
     };
 }
 function decodeSecondIssuanceMessage(ip, m2JSON) {
     const Zq = ip.Gq.Zq;
     return {
-        sC: m2JSON.sC.map(sigmaC => Zq.getElement(fromB64(sigmaC)))
+        sC: m2JSON.sC.map(sigmaC => Zq.getElement(fromBase64Url(sigmaC)))
     };
 }
 function encodeThirdIssuanceMessage(m3) {
     return {
-        sR: m3.sR.map(sigmaR => toB64(sigmaR.getBytes()))
+        sR: m3.sR.map(sigmaR => toBase64Url(sigmaR.getBytes()))
     };
 }
 function decodeThirdIssuanceMessage(ip, m3JSON) {
     const Zq = ip.Gq.Zq;
     return {
-        sR: m3JSON.sR.map(sigmaR => Zq.getElement(fromB64(sigmaR)))
+        sR: m3JSON.sR.map(sigmaR => Zq.getElement(fromBase64Url(sigmaR)))
     };
 }
 function encodePresentationProof(pp) {
     const ppJSON = {
-        a: toB64(pp.a),
-        r: pp.r.map(r => toB64(r.getBytes()))
+        a: toBase64Url(pp.a),
+        r: pp.r.map(r => toBase64Url(r.getBytes()))
     };
     if (pp.A && Object.keys(pp.A).length > 0) {
         ppJSON.A = Object.entries(pp.A).reduce((acc, [i, Ai]) => {
-            acc[Number(i)] = toB64(Ai);
+            acc[Number(i)] = toBase64Url(Ai);
             return acc;
         }, {});
     }
@@ -9933,22 +9931,22 @@ function encodePresentationProof(pp) {
 function decodePresentationProof(ip, ppJSON) {
     const Zq = ip.Gq.Zq;
     const pp = {
-        a: fromB64(ppJSON.a),
-        r: ppJSON.r.map(r => Zq.getElement(fromB64(r)))
+        a: fromBase64Url(ppJSON.a),
+        r: ppJSON.r.map(r => Zq.getElement(fromBase64Url(r)))
     };
     if (ppJSON.A) {
         pp.A = Object.entries(ppJSON.A).reduce((acc, [i, Ai]) => {
-            acc[Number(i)] = fromB64(Ai);
+            acc[Number(i)] = fromBase64Url(Ai);
             return acc;
         }, {});
     }
     return pp;
 }
 function encodeUIDT(UIDT) {
-    return toB64(UIDT);
+    return toBase64Url(UIDT);
 }
 function dncodeUIDT(UIDT) {
-    return fromB64(UIDT);
+    return fromBase64Url(UIDT);
 }
 
 var serialization = /*#__PURE__*/Object.freeze({
@@ -9969,9 +9967,7 @@ var serialization = /*#__PURE__*/Object.freeze({
     encodeUProveToken: encodeUProveToken
 });
 
-// TODO: fix this, fails in browser ( Unknown encoding: base64url )
-const toBase64Url = (a) => Buffer.from(a).toString('base64').replace(/\//g, '_').replace(/=+$/, '');
-//const toBase64Url = (a) => btoa(a).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, ''); (fails)
+const toBase64Url = (a) => Buffer.from(a).toString('base64').replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 const fromBase64Url = (b64) => Buffer.from(b64, 'base64');
 
 // expiration functions
