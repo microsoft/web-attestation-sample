@@ -219,7 +219,6 @@ class ExtensionControl /*extends HTMLElement*/ {
 
     static untrusted(issuer, callback) {
 
-        const pageHasIssuerUrl = sessionStorage.getItem(ISSUERURL);
         const element = icon(WARNING_URL);
         const control = new ExtensionControl(element);
         const root = control.#shadowRoot;
@@ -237,7 +236,7 @@ class ExtensionControl /*extends HTMLElement*/ {
         root.querySelector("#value2").parentNode.remove();
 
 
-        if (pageHasIssuerUrl) {
+        if (issuer) {
             const button = root.querySelector("#button");
             button.style.display = "block";
 

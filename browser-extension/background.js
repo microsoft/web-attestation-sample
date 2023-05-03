@@ -21,23 +21,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
         downloadIssuerParams(msg.string).then(sendResponse);
     }
 
-    if (msg?.text === "fetchImage") {
-        fetch(msg.imageUrl)
-            .then((response) => response.blob())
-            .then((blob) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    sendResponse({ imageData: reader.result });
-                };
-                reader.readAsDataURL(blob);
-            })
-            .catch((error) => {
-                console.error("Error fetching image:", error);
-                sendResponse({ imageData: null });
-            });
 
-        return true; // Indicates that the response will be sent asynchronously
-    }
 
     return true;
 });

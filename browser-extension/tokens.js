@@ -29,19 +29,17 @@ async function sendIssuanceMessage(issuanceUrl, message) {
  * @returns {string} 
  */
 export async function downloadIssuerParams(issuerUrl) {
-    let jwk;
-    // first need to obtain the params from the issuer
+    let jwks;
     const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
     if (jwksResp.ok) {
-        const jwks = await jwksResp.json();
-        jwk = jwks.keys[0]; // TODO: deal with more than one token
-        console.log("jwk", jwk);
-        if (jwk) {
-            setIssuerParams(issuerUrl, jwk);
-        }
+        jwks = await jwksResp.json();
+        jwks.keys.forEach(jwk => {
+            console.log("jwk", jwk);
+            setIssuerParams(jwk.kid, jwk);
+        });
     }
     // TODO: handle failure
-    return jwk;
+    return true;
 }
 
 /**
@@ -53,9 +51,6 @@ export async function downloadIssuerParams(issuerUrl) {
 export async function getTokens(issuerUrl, refreshID) {
     console.log("getTokens called", issuerUrl);
     try {
-
-        // obtain issuer params from the issuer store or issuer url
-        let jwk = await (getIssuerParams(issuerUrl) || downloadIssuerParams(issuerUrl));
 
         const issuanceUrl = issuerUrl + "/issue";
         const request = {
@@ -70,21 +65,12 @@ export async function getTokens(issuerUrl, refreshID) {
 
         // obtain issuer params (identified by the kid sent by the issuer) from the issuer store
         let kid = firstMsg.kid;
-        //let jwk = await getIssuerParams(kid);
-        if (!jwk) {
-            // unknown kid, we need to obtain the params from the issuer
-            const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
-            if (jwksResp.ok) {
-                const jwks = await jwksResp.json();
-                jwk = jwks.keys.find(key => key.kid === kid);
-                if (jwk) {
-                    console.log("jwk", jwk);
-                    setIssuerParams(kid, jwk);
-                } else {
-                    throw "can't find issuer params with kid " + kid;
-                }
-            }
-        }
+
+        // obtain issuer params from the issuer store or issuer url
+        let jwk = await (getIssuerParams(kid) || downloadIssuerParams(issuerUrl));
+        if (!jwk) await getIssuerParams(kid);
+        if (!jwk) { throw "can't find issuer params with kid " + kid; }
+
         const issuerParams = await upjf.decodeJWKAsIP(jwk);
         if (!issuerParams) {
             throw "can't parse issuer params with kid " + kid;
