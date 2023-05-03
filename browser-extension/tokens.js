@@ -53,14 +53,11 @@ export async function downloadIssuerParams(issuerUrl) {
 export async function getTokens(issuerUrl, refreshID) {
     console.log("getTokens called", issuerUrl);
     try {
+
         // obtain issuer params from the issuer store or issuer url
         let jwk = await (getIssuerParams(issuerUrl) || downloadIssuerParams(issuerUrl));
 
         const issuanceUrl = issuerUrl + "/issue";
-        const issuerParams = await upjf.decodeJWKAsIP(jwk);
-        if (!issuerParams) {
-            throw "can't parse issuer params";
-        }
         const request = {
             n: 5 // number of requested tokens
         }
@@ -68,25 +65,52 @@ export async function getTokens(issuerUrl, refreshID) {
         if (refreshID) {
             request.rID = refreshID;
         }
-        // parse 1st issuance message
+        // send the token request and parse the 1st issuance message
         const firstMsg = await sendIssuanceMessage(issuanceUrl, request);
+
+        // obtain issuer params (identified by the kid sent by the issuer) from the issuer store
+        let kid = firstMsg.kid;
+        //let jwk = await getIssuerParams(kid);
+        if (!jwk) {
+            // unknown kid, we need to obtain the params from the issuer
+            const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
+            if (jwksResp.ok) {
+                const jwks = await jwksResp.json();
+                jwk = jwks.keys.find(key => key.kid === kid);
+                if (jwk) {
+                    console.log("jwk", jwk);
+                    setIssuerParams(kid, jwk);
+                } else {
+                    throw "can't find issuer params with kid " + kid;
+                }
+            }
+        }
+        const issuerParams = await upjf.decodeJWKAsIP(jwk);
+        if (!issuerParams) {
+            throw "can't parse issuer params with kid " + kid;
+        }
+
         // save the refresh ID for subsequent issuances
         refreshID = firstMsg.rID;
         const msg1 = serialization.decodeFirstIssuanceMessage(issuerParams, firstMsg.msg);
         const actualNumberOfTokens = msg1.sA.length;
         const TI = Buffer.from(firstMsg.TI, "base64");
         const tokenInformation = upjf.parseTokenInformation(TI);
-        // check tokenInformation.iss matches issuerUrl
+        // check that tokenInformation.iss matches issuerUrl
         if (tokenInformation.iss !== issuerUrl) {
             throw "token information issuer mismatch: " + tokenInformation.iss + " != " + issuerUrl;
         }
-        // check tokenInformation.exp is not expired    
+        // check that tokenInformation.exp is not expired    
         const spec = upjf.parseSpecification(issuerParams.S);
         const nowTime = upjf.msToTypedTime(spec.expType, Date.now());
         if (upjf.isExpired(spec.expType, tokenInformation.exp, nowTime)) {
             throw `token is expired`;
         }
         const expiration = tokenInformation.exp;
+        // check that the tokenInformation.lbl value is contained in the specification (protects the user against "tagging attacks")
+        if (!spec.lblType[tokenInformation.lbl]) {
+            throw "invalid lbl value: " + tokenInformation.lbl;
+        }
 
         // create the prover
         const prover = await uprove.Prover.create(issuerParams, [], TI, new Uint8Array(), actualNumberOfTokens);
@@ -120,7 +144,8 @@ export async function getTokens(issuerUrl, refreshID) {
         return {
             tokens,
             refreshID,
-            expiration
+            expiration,
+            kid
         }
     } catch (error) {
         console.error('Error making the POST request:', error);
@@ -133,20 +158,19 @@ export async function getTokens(issuerUrl, refreshID) {
  * @param {string} scope the scope of the presentation
  */
 export async function presentToken(issuerUrl, scope) {
-    const timestamp = new Date().toUTCString();
-
-    const issuerParamsJWK = await getIssuerParams(issuerUrl);
+    const tokenData = await popToken(issuerUrl);
+    if (!tokenData) {
+        throw "no token available";
+    }
+    const issuerParamsJWK = await getIssuerParams(tokenData.kid);
     if (!issuerParamsJWK) {
         throw "issuer params not found";
     }
     const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
-    const keyAndToken = await popToken(issuerUrl);
-    if (!keyAndToken) {
-        throw "no token available";
-    }
+
     let upkt = {
-        alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, keyAndToken.key),
-        upt: serialization.decodeUProveToken(issuerParams, keyAndToken.token)
+        alphaInverse: upjf.decodeBase64UrlAsPrivateKey(issuerParams, tokenData.keyAndToken.key),
+        upt: serialization.decodeUProveToken(issuerParams, tokenData.keyAndToken.token)
     }
     let message = Buffer.from(JSON.stringify({
         scope: scope,
@@ -155,7 +179,7 @@ export async function presentToken(issuerUrl, scope) {
     let presentationData = await uprove.generatePresentationProof(issuerParams, [], upkt, message, []);
     let proof = serialization.encodePresentationProof(presentationData.pp);
     let tp = {
-        upt: keyAndToken.token,
+        upt: tokenData.keyAndToken.token,
         pp: proof
     };
     let jws = upjf.createJWS(upjf.descGqToUPAlg(issuerParams.descGq), message, tp);
@@ -185,14 +209,20 @@ export async function verifyTokenPresentation(jws) {
             throw "pp missing from JWS";
         }
         const token = tokenPresentation.upt;
+
+
+        // retrieve the issuer parameters key identifier and the issuer url from the token
+        const kid = token.UIDP;
         const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'));
-        const issuerParamsJWK = await getIssuerParams(tokenInfo.iss);
+        const issuerParamsJWK = await getIssuerParams(kid);
         if (!issuerParamsJWK) {
+            // unknown issuer; can't proceed with verification
             return {
                 issuer: tokenInfo.iss,
                 status: "unknown_issuer"
             }
         }
+        // parse the JSON Web Key as an Issuer parameters object
         const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK);
         // check that JWS alg matches the issuer params's group
         if ((issuerParams.descGq == uprove.ECGroup.P256 && header.alg !== upjf.UPAlg.UP256) ||
@@ -200,14 +230,19 @@ export async function verifyTokenPresentation(jws) {
             (issuerParams.descGq == uprove.ECGroup.P521 && header.alg !== upjf.UPAlg.UP521)) {
             throw `header alg ${header.alg} doesn't match the Issuer params' group ${issuerParams.descGq}`;
         }
+        // decode and verify the U-Prove token
         const upt = serialization.decodeUProveToken(issuerParams, token)
         uprove.verifyTokenSignature(issuerParams, upt);
 
+        // parse the presentation message's scope and timestamp
         const parsedMessage = JSON.parse(Buffer.from(message).toString("utf8"));
         const scope = parsedMessage.scope;
         const timestamp = parsedMessage.timestamp;
 
+        // parse the issuer parameters' specification encoding expiration and label types
         const spec = upjf.parseSpecification(issuerParams.S);
+
+        // check the expiration
         // transform the ms timestamp to the type encoded by the issuer (number of days)
         const sigTime = upjf.msToTypedTime(spec.expType, parseInt(timestamp));
         if (upjf.isExpired(spec.expType, tokenInfo.exp, sigTime)) {
@@ -219,12 +254,15 @@ export async function verifyTokenPresentation(jws) {
             message,
             serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
 
+        // extract the label
+        const label = spec.lblType[tokenInfo.lbl];
+
         return {
             issuer: tokenInfo.iss,
             status: "valid",
             scope: scope,
             timestamp: timestamp,
-            info: "Some info" // TODO: get this from TI
+            info: label
         }
     } catch (error) {
         console.error('Error validating the JWS', error);

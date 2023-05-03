@@ -6,6 +6,15 @@ import uproveModule from "./uprove.mjs";
 const { upjf } = uproveModule;
 
 
+// The token store contains U-Prove tokens issued by various issuers. It is a map
+// from issuerUrl to issuerData. The issuerData contains a refreshID (used to obtain
+// new tokens from the issuer) string and an array of tokens. Each token is an object
+// with the following properties:
+// - exp: the expiration time of the token
+// - kid: the identifier of the issuer parameters
+// - t: the token itself
+
+// The token store is stored in the local storage of the extension.
 const TOKEN_STORE_KEY = "tokenStore";
 
 /**
@@ -32,7 +41,7 @@ export async function updateTokens() {
         console.log("updateToken: getting more tokens", issuerUrl);
         let freshTokens = await getTokens(issuerUrl, issuerData.refreshID);
         freshTokens.forEach(t => { 
-          tokens.push({ exp: t.exp, t: t.t });
+          tokens.push({ exp: t.exp, kid: t.kid, t: t.t });
           issuerData.refreshID = t.refreshID;
         });
       }
@@ -57,15 +66,16 @@ export async function clearTokens() {
  * @param {string} issuerUrl the url of the issuer
  * @param {string} refreshID the refresh ID received from the issuer 
  * @param {number} exp the expiration time of the tokens
+ * @param {string} kid the identifier of the issuer parameters
  * @param {*} newTokens batch of tokens obtained from the issuer
  */
-export async function storeTokens(issuerUrl, refreshID, exp, newTokens) {
-  console.log("storeTokens called", issuerUrl, refreshID, exp, newTokens);
+export async function storeTokens(issuerUrl, refreshID, exp, kid, newTokens) {
+  console.log("storeTokens called", issuerUrl, refreshID, exp, kid, newTokens);
   chrome.storage.local.get([TOKEN_STORE_KEY]).then((result) => {
     let tokenStore = result.tokenStore || {};
     let issuerData = tokenStore[issuerUrl] || {refreshID: null, tokens: []};
     issuerData.refreshID = refreshID;
-    issuerData.tokens.push(...newTokens.map(t => { return { exp: exp, t: t } }));
+    issuerData.tokens.push(...newTokens.map(t => { return { exp: exp, kid: kid, t: t } }));
     tokenStore[issuerUrl] = issuerData;
     console.log("storeTokens: tokenStore", tokenStore);
     chrome.storage.local.set({ tokenStore: tokenStore });
@@ -90,9 +100,10 @@ export async function listTokenIssuers() {
 /**
  * Returns and deletes a token from the store
  * @param {string} issuerUrl the url of the issuer
- * @returns a JSON encoded token
+ * @returns an object with the following properties:
+ * - kid: the identifier of the corresponding issuer parameters
+ * - keyAndToken: the key and token pair
  */
-
 export async function popToken(issuerUrl) {
   console.log("popToken called", issuerUrl);
   return new Promise((resolve) => {
@@ -100,10 +111,14 @@ export async function popToken(issuerUrl) {
       let tokenStore = result.tokenStore || {};
       let issuerData = tokenStore[issuerUrl] || { refreshID: null, tokens: [] };
       if (issuerData.tokens.length > 0) {
-        let token = issuerData.tokens.pop().t;
+        let tokenData = issuerData.tokens.pop();
+        let result = {
+          kid: tokenData.kid,
+          keyAndToken: tokenData.t
+        }
         chrome.storage.local.set({ tokenStore: tokenStore });
         console.log("popToken: tokenStore", tokenStore);
-        resolve(token);
+        resolve(result);
       } else {
         resolve(null);
       }

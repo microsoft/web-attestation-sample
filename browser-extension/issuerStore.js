@@ -5,15 +5,15 @@ const ISSUER_STORE_KEY = "issuerStore";
 
 /**
  * Returns the issuer params from the store
- * @param {string} issuerUrl the url of the issuer
+ * @param {string} kid the key identifier of the issuer parameters
  * @returns the JSON encoded issuer params
  */
-export async function getIssuerParams(issuerUrl) {
-    console.log("getIssuerParams called", issuerUrl);
+export async function getIssuerParams(kid) {
+    console.log("getIssuerParams called", kid);
     return new Promise((resolve) => {
         chrome.storage.local.get([ISSUER_STORE_KEY], (result) => {
             let issuerStore = result.issuerStore || {};
-            let issuerParams = issuerStore[issuerUrl] || null;
+            let issuerParams = issuerStore[kid] || null;
             console.log("getIssuerParams: issuerParams", issuerParams);
             resolve(issuerParams);
         });
@@ -21,15 +21,15 @@ export async function getIssuerParams(issuerUrl) {
 }
 
 /**
- * Store the issuer params in the store
- * @param {string} issuerUrl url of the issuer
+ * Stores the issuer params in the store
+ * @param {string} kid the key identifier of the issuer parameters
  * @param {*} issuerParams the JSON encoded issuer params
  */
-export function setIssuerParams(issuerUrl, issuerParams) {
-    console.log("setIssuerParams called", issuerUrl, issuerParams);
+export function setIssuerParams(kid, issuerParams) {
+    console.log("setIssuerParams called", kid, issuerParams);
     chrome.storage.local.get([ISSUER_STORE_KEY]).then((result) => {
         let issuerStore = result.issuerStore || {};
-        issuerStore[issuerUrl] = issuerParams;
+        issuerStore[kid] = issuerParams;
         console.log("setIssuerParams: issuerStore", issuerStore);
         chrome.storage.local.set({ issuerStore: issuerStore });
     });
