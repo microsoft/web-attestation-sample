@@ -57,11 +57,10 @@ void (async () => {
         const uproveKeysAndTokens = prover.createTokens(msg3);
 
         // verify the U-Prove tokens
-        uproveKeysAndTokens.forEach((ukat) => {
+        uproveKeysAndTokens.forEach((ukat, i) => {
             uprove.verifyTokenSignature(issuerParams, ukat.upt);
-            console.log(serialization.encodeUProveToken(ukat.upt));
-            
-            console.log(ukat.alphaInverse);
+            console.log("token " + i, serialization.encodeUProveToken(ukat.upt));
+            console.log("key " + i, upjf.encodePrivateKeyAsBase64Url(ukat.alphaInverse));
         });
 
         console.log("Success");
