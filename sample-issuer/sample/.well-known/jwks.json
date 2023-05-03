@@ -3,9 +3,9 @@
         {
             "kty": "UP",
             "alg": "UP256",
-            "kid": "mxANd6pAbiO2DoL2qB1jpaeHRkjpFZXyFXkLmv6U79Y",
-            "g0": "BCBrrePM00SFz4NL7kTnM9WbXGcYQTCNf7fXbeK7t7oCnKptIoqMchNJBeEGetdOBvDLUp5HkFxy9u2T6oxug9w",
-            "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5In0"
+            "kid": "7BjraQ_p-iIZz_Vx8jO0HnXCaLnTIXHlIX--1Pin4p0",
+            "g0": "BCRkJj1pirHWhih-erbJrUjPlQfMDgHgilSAhKhwx7PAtYOPTEWmcZSlJA0iVvCa3HaxnOlyIM_hkFlRJquFufo",
+            "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5IiwibGJsVHlwZSI6eyIxIjoiVHlwZSBBIiwiMiI6IlR5cGUgQiIsIjMiOiJUeXBlIEMifX0"
         }
     ]
 }
