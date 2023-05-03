@@ -133,9 +133,12 @@ function validationResponse(uwaData, node, tag) {
                     untrustedControl.hide()
                     untrustedControl.icon.remove();
 
-                    getTokens(sessionStorage.getItem(ISSUERURL))
-                        .then(tokens => {
+                    // download issuer parameters into the issuerStore
+                    downloadIssuerParams(uwaData.issuer)
+                        .then(() => {
 
+                            // re-validate tag now that the issuer parameters are stored
+                            // TODO: re-validate all tags on the page from this issuer
                             chrome.runtime.sendMessage({ text: "checkUWA", string: tag }, (uwaData) => {
                                 validationResponse(uwaData, node, tag);
                             });
@@ -180,8 +183,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 
-function getTokens(issuerUrl) {
+function downloadIssuerParams(issuerUrl) {
     return new Promise((resolve, reject) => {
-        chrome.runtime.sendMessage({ text: "getTokens", string: issuerUrl }, (tokens) => tokens ? resolve(tokens) : reject());
+        chrome.runtime.sendMessage({ text: "downloadIssuerParams", string: issuerUrl }, (jwk) => jwk ? resolve(jwk) : reject());
     });
 }
