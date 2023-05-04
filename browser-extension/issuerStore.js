@@ -25,13 +25,15 @@ export async function getIssuerParams(kid) {
  * @param {string} kid the key identifier of the issuer parameters
  * @param {*} issuerParams the JSON encoded issuer params
  */
-export function setIssuerParams(kid, issuerParams) {
+export async function setIssuerParams(kid, issuerParams) {
     console.log("setIssuerParams called", kid, issuerParams);
-    chrome.storage.local.get([ISSUER_STORE_KEY]).then((result) => {
-        let issuerStore = result.issuerStore || {};
-        issuerStore[kid] = issuerParams;
-        console.log("setIssuerParams: issuerStore", issuerStore);
-        chrome.storage.local.set({ issuerStore: issuerStore });
+    return new Promise((resolve) => {
+        chrome.storage.local.get([ISSUER_STORE_KEY], (result) => {
+            let issuerStore = result.issuerStore || {};
+            issuerStore[kid] = issuerParams;
+            console.log("setIssuerParams: issuerStore", issuerStore);
+            chrome.storage.local.set({ issuerStore: issuerStore }, resolve);
+        });
     });
 }
 

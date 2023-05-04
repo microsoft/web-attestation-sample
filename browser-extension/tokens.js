@@ -33,10 +33,9 @@ export async function downloadIssuerParams(issuerUrl) {
     const jwksResp = await fetch(issuerUrl + "/.well-known/jwks.json");
     if (jwksResp.ok) {
         jwks = await jwksResp.json();
-        jwks.keys.forEach(jwk => {
-            console.log("jwk", jwk);
-            setIssuerParams(jwk.kid, jwk);
-        });
+        await Promise.all(
+            jwks.keys.map(jwk => setIssuerParams(jwk.kid, jwk))
+        );
     }
     // TODO: handle failure
     return true;
@@ -66,9 +65,15 @@ export async function getTokens(issuerUrl, refreshID) {
         // obtain issuer params (identified by the kid sent by the issuer) from the issuer store
         let kid = firstMsg.kid;
 
-        // obtain issuer params from the issuer store or issuer url
-        let jwk = await (getIssuerParams(kid) || downloadIssuerParams(issuerUrl));
-        if (!jwk) await getIssuerParams(kid);
+        // obtain issuer params from the issuer store by kid
+        let jwk = await getIssuerParams(kid);
+
+        // if not found, download issuer params and try again
+        if (!jwk) {
+            await downloadIssuerParams(issuerUrl);
+            jwk = await getIssuerParams(kid);
+        }
+
         if (!jwk) { throw "can't find issuer params with kid " + kid; }
 
         const issuerParams = await upjf.decodeJWKAsIP(jwk);
