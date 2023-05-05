@@ -20,13 +20,11 @@
 const PATTERN = /uwa:\/\/\S+/g;
 const ISSUERURL = "uwaIssuerUrl";
 
-
 // Check for uwa meta tag
 const uwaMeta = document.querySelector('meta[name="uwa"]');
 if (uwaMeta) {
     sessionStorage.setItem(ISSUERURL, uwaMeta.content);
 }
-
 
 // Walks a node tree matching nodes containing specific text
 // Returns array of nodes that match.
@@ -153,24 +151,33 @@ function validationResponse(uwaData, node, tag) {
 
         } else {
 
-            const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
-                timeZone: 'UTC',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            });
-
-            // Insert the new icon node after the original node
-            node.after(ExtensionControl.verified(
-                uwaData.issuer, uwaData.scope, dt, uwaData.info).icon);
+            // check if the scope is correct
+            const currentScope = uwaData.scope; // TODO: FIXME (ljoy): get the current scope (base url without query params/anchor, see popup.js's getBaseURL) from the page
+            if (uwaData.scope !== currentScope) {
+                // invalid badge
+                node.after(ExtensionControl.invalid("invalid scope: " + uwaData.scope).icon);
+            } else {
+                // valid badge
+                const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
+                    timeZone: 'UTC',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+    
+                // Insert the new icon node after the original node
+                node.after(ExtensionControl.verified(
+                    uwaData.issuer, uwaData.scope, dt, uwaData.info).icon);
+            }
         }
 
     } else {
         // invalid web attestation, we won't render it
+        console.log('invalid web attestation');
     }
 }
 
