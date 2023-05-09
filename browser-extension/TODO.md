@@ -2,6 +2,7 @@ Pre-release TODO list
 
 * Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
 * Encode uwa as QR code; allow extension to verify them (check all images, or add a "verify" in the [context menu](https://developer.chrome.com/docs/extensions/reference/contextMenus/))
+* Fix Issuer popup tab (now showing some giberish...)
 * Create a more compact encoding for UWA
 * Encrypt keys and tokens in the extension
 * CI (codeql), https://code.visualstudio.com/api/working-with-extensions/testing-extension
