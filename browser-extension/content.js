@@ -188,3 +188,54 @@ function downloadIssuerParams(issuerUrl) {
         chrome.runtime.sendMessage({ text: "downloadIssuerParams", string: issuerUrl }, (jwk) => jwk ? resolve(jwk) : reject());
     });
 }
+
+function onImageLoad(event) {
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    document.querySelectorAll('img').forEach(i => {
+
+        if (i.width < 100) {
+            return;
+        }
+
+        chrome.runtime.sendMessage({ text: "fetchImage", imageUrl: i.src }, (result) => {
+
+            console.info(`IMAGE: src:${i.src}`);
+
+            const img = new Image();
+
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height);
+
+                if (result?.chunks?.[0]?.data === "uwa://") {
+                    const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`;
+                    console.log(uwaTag);
+                    chrome.runtime.sendMessage({ text: "checkUWA", string: uwaTag }, (uwaData) => {
+                        validationResponse(uwaData, i, uwaTag);
+                    });
+                }
+
+            };
+
+            img.src = result.imageData;
+
+        });
+
+    });
+
+}
+
+window.addEventListener('load', onImageLoad, true);
+
+function toBase64Url(byteArray) {
+    const binaryString = byteArray.map(b => String.fromCharCode(b)).join('');
+    const base64 = btoa(binaryString);
+    const base64url = base64.replace('+', '-').replace('/', '_').replace(/=+$/, '');
+    return base64url;
+}
