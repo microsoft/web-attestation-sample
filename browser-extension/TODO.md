@@ -1,6 +1,5 @@
 Pre-release TODO list
 
-* Delete uprove.min.mjs, unless we need it
 * Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
 * Encode uwa as QR code; allow extension to verify them (check all images, or add a "verify" in the [context menu](https://developer.chrome.com/docs/extensions/reference/contextMenus/))
 * Add a info URL in the issuer params, displayed and clickable in the badge, allowing users to learn more about the token issuance.
