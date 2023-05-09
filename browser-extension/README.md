@@ -41,11 +41,7 @@ Clicking on the badge icon displays the attestation's details, including its iss
 
 ## Extensions
 
-This project is a sample proof-of-concept, with many possible extensions:
-* Project updates
-  * Move to TypeScript
-* Improved security
-  * Protect private keys to avoid transferability
-  * Token Information to contain a typed attribute, to avoid free-form field from the issuer
-  * Replace extension ui elements in a tab with IFrames using an origin different from the tab;  
-    this way the tab scripting cannot manipulate the DOM of extension provided elements.
+This project is a proof-of-concept sample, illustrating the mechanism to create and validate secure and privacy-preserving web attestations. Many improvements, both to the specification and the implementation would be needed to make it suitable for real-life deployment. For example
+* Token private keys should be better protected to avoid extraction my malicious parties, including the user who might want to transfer its tokens to unauthorized parties. U-Prove supports a device-binding feature allowing issued tokens to be bound to a secondary component, which could help prevent token sharing. 
+* Attestations could be made more informative by containing attributes that a user could chose to disclose when creating them. U-Prove tokens supports selective-disclosure of attributes, which would be suitable for this feature.
+* The display badges UI could be better protected to avoid manipulation by other components having access to the DOM. 

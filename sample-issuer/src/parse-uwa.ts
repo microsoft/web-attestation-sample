@@ -106,7 +106,7 @@ void (async () => {
         }
 
         // extract the label
-        const label = spec.lblType[tokenInfo.lbl];
+        const label = spec.lblType + spec.lblValues[tokenInfo.lbl];
         console.log("Label: " + label);
 
     } catch (err) {

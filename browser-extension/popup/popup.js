@@ -6,6 +6,12 @@ import { listIssuers, clearIssuerParams } from "../issuerStore.js";
 import { getTokens } from "../tokens.js";
 import { createUWA } from "../uwa.js";
 
+function getBaseURL(url) {
+  const urlObj = new URL(url);
+  const baseURL = urlObj.origin + urlObj.pathname;
+  return baseURL.toLowerCase();
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   // Add event listeners to switch tabs
   const tabs = document.querySelectorAll(".tab");
@@ -49,15 +55,15 @@ document.addEventListener("DOMContentLoaded", function () {
   let selectedIssuer;
 
   // get current tab
-  let url;
+  let sanitizedUrl;
 
   // issuer url of current tab. value will be undefined if not provided by page.
   let tabIssuerUrl;
 
   chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
     const activeTab = tabs[0];
-    url = activeTab.url;
-    console.log("url:", url);
+    sanitizedUrl = getBaseURL(activeTab.url);
+    console.log("sanitizedUrl, as seen by popup.js:", sanitizedUrl);
 
     // enable the issue button if the current page provides an issuer url
     tabIssuerUrl = await getTabIssuerUrl(activeTab);
@@ -157,9 +163,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // present an attestation to the current page
   presentButton.addEventListener('click', async function () {
-    const scope = url.split('/').slice(-2).join('/'); // TODO: fix this beyond demo files; just use new URL(url).path
-    scopeText.textContent = 'URL: ' + scope;
-    const wa = await createUWA(selectedIssuer, scope);
+    scopeText.textContent = 'URL: ' + sanitizedUrl;
+    const wa = await createUWA(selectedIssuer, sanitizedUrl);
     waText.textContent = wa;
     waLabel.style.display = 'inline-block';
     waText.style.display = 'block';

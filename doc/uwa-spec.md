@@ -15,14 +15,16 @@ The [U-Prove JSON Framework](https://github.com/microsoft/uprove-node-reference/
 
 ## Issuer setup
 
-The Issuer is identified by a URL `[ISSUER_URL]`. It creates its U-Prove Issuer parameters encoded as a JSON Web Key as specified in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuer-parameters), to issue tokens with no attributes with expiration numbered in days. The Issuer can encode a label into its issued tokens, the values of which are described in a `lblType` object encoded in its specification containing numerical keys and string values. The `specJSON` is therefore of this form:
+The Issuer is identified by a URL `[ISSUER_URL]`. It creates its U-Prove Issuer parameters encoded as a JSON Web Key as specified in the [UPJF](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove_JSON_Framework.md#issuer-parameters), to issue tokens with no attributes with expiration numbered in days. The Issuer can encode a label into its issued tokens of the form `<type>: <value>`; the specification contains a `lblType` string describing the type of the label, and the allowed values are described in a `lblValues` object containing numerical keys and string values.
+The `specJSON` is therefore of this form:
 ```
 {
     n: 0,
     expType: "days",
-    lblType:? {
-        1: <first type>,
-        2: <second type>,
+    lblType: "<label type>"
+    lblValues:? {
+        1: "<first value>",
+        2: "<second value>",
         ...
     }
 }
@@ -63,7 +65,7 @@ where:
 
 ### First issuance message
 
-The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, selects the parameters to use (identified by its identifier `kid`), sets the token expiration date (number of days since the Unix epoch), and optionally sets the label value (one of the numeric keys contained in the `lblType` object in its parameters' specification field). The `[ISSUER_URL]`, expiration, and label values are then encoded in the U-Prove Token Information field, a JSON object of this form:
+The Issuer can issue U-Prove tokens to the User by continuing the issuance protocol. It decides on the number of tokens `N` to issue (up to `n`), creates a unique session ID for the issuance, creates (or reuses) a refresh identifier that a User can present to obtain new tokens in a subsequent issuance requests, selects the parameters to use (identified by its identifier `kid`), sets the token expiration date (number of days since the Unix epoch), and optionally sets the label value (one of the numeric keys contained in the `lblValues` object in its parameters' specification field). The `[ISSUER_URL]`, expiration, and label value are then encoded in the U-Prove Token Information field, a JSON object of this form:
 ```
 {
     iss: string,
@@ -148,10 +150,11 @@ A Verifier can validate web attestations URI `uwa://[JWS]` attached to a web sit
 1. Decoding the payload into a presentation message containing a scope and a timestamp.
 1. Checking that the presentation message scope matches the web site's scope.
 1. Decoding the signature into a U-Prove token presentation, consisting of a U-Prove token and a presentation proof.
-1. Decoding the U-Prove token's Token Information field, consisting of a issuer URL `[ISSUER_URL]` and an expiration value.
+1. Decoding the U-Prove token's Token Information field, consisting of a issuer URL `[ISSUER_URL]`, an expiration value, and a label value `lbl`.
 1. Retrieving the Issuer parameters for the Issuer from its cached store (or retrieve them from `[ISSUER_URL]/.well-known/jwks.json` if deemed trusted).
 1. Validating the U-Prove token and the presentation proof.
 1. Checking that the token expiration (encoded as a number of days after the Unix epoch) is after the presentation message's timestamp (encoded in milliseconds).
+1. Extracting the token label, consisting of a string `<type>: <value>` where the `<type>` is extracted from the Issuer parameters specification's `lblType` value, and the `<value>` is extracted by looking up the specification's `lblValues[lbl]` using the token's `lbl` value.
 
 ## Sample 
 

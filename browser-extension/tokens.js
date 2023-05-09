@@ -99,7 +99,7 @@ export async function getTokens(issuerUrl, refreshID) {
         }
         const expiration = tokenInformation.exp;
         // check that the tokenInformation.lbl value is contained in the specification (protects the user against "tagging attacks")
-        if (!spec.lblType[tokenInformation.lbl]) {
+        if (!spec.lblValues[tokenInformation.lbl]) {
             throw "invalid lbl value: " + tokenInformation.lbl;
         }
 
@@ -246,7 +246,7 @@ export async function verifyTokenPresentation(jws) {
             serialization.decodePresentationProof(issuerParams, tokenPresentation.pp));
 
         // extract the label
-        const label = spec.lblType[tokenInfo.lbl];
+        const label = `${spec.lblType}: ${spec.lblValues[tokenInfo.lbl]}`;
 
         return {
             issuer: tokenInfo.iss,

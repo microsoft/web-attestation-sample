@@ -52,7 +52,10 @@ void (async () => {
             { 
                 n: 0, // no attributes
                 expType: UPJF.ExpirationType.day, // token expirations measured in days
-                lblType: settings.TOKEN_LABEL_TYPES, // valid token label types
+
+                // application-specific values
+                lblType: settings.TOKEN_LABEL_TYPE, // type of the token label
+                lblValues: settings.TOKEN_LABEL_VALUES, // valid token label values
             } as Specification, 
             undefined);
         const jwk = UPJF.encodeIPAsJWK(ikp.ip);
