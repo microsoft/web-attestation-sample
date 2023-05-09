@@ -201,7 +201,6 @@ export async function verifyTokenPresentation(jws) {
         }
         const token = tokenPresentation.upt;
 
-
         // retrieve the issuer parameters key identifier and the issuer url from the token
         const kid = token.UIDP;
         const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'));
@@ -232,6 +231,7 @@ export async function verifyTokenPresentation(jws) {
 
         // parse the issuer parameters' specification encoding expiration and label types
         const spec = upjf.parseSpecification(issuerParams.S);
+        const about = spec.about;
 
         // check the expiration
         // transform the ms timestamp to the type encoded by the issuer (number of days)
@@ -253,7 +253,8 @@ export async function verifyTokenPresentation(jws) {
             status: "valid",
             scope: scope,
             timestamp: timestamp,
-            info: label
+            info: label,
+            about: about
         }
     } catch (error) {
         console.error('Error validating the JWS', error);

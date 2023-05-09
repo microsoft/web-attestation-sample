@@ -171,7 +171,7 @@ function validationResponse(uwaData, node, tag) {
     
                 // Insert the new icon node after the original node
                 node.after(ExtensionControl.verified(
-                    uwaData.issuer, uwaData.scope, dt, uwaData.info).icon);
+                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about).icon);
             }
         }
 
