@@ -25,6 +25,7 @@
                 "<all_urls>"
             ],
             "js": [
+                "uwaqrencoder.js",
                 "control.js",
                 "content.js"
             ],
