@@ -1,8 +1,13 @@
-const CHECKMARK_URL = chrome.runtime.getURL("icons/checkmark.svg");
-const INVALID_URL = chrome.runtime.getURL("icons/invalid.svg");
-const WARNING_URL = chrome.runtime.getURL("icons/warning.svg");
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
-const template = document.createElement('TEMPLATE');
+/* global chrome */
+
+const CHECKMARK_URL = chrome.runtime.getURL('icons/checkmark.svg')
+const INVALID_URL = chrome.runtime.getURL('icons/invalid.svg')
+const WARNING_URL = chrome.runtime.getURL('icons/warning.svg')
+
+const template = document.createElement('TEMPLATE')
 template.innerHTML = `
 <style>
 
@@ -136,169 +141,158 @@ template.innerHTML = `
 </div>
 
 
-`;
+`
 
-class ExtensionControl /*extends HTMLElement*/ {
+// eslint-disable-next-line no-unused-vars
+class ExtensionControl /* extends HTMLElement */ {
+    icon
+    root
+    #shadowRoot
+    #tag
 
-    icon;
-    root;
-    #shadowRoot;
-    #tag;
+    constructor (element) {
+    // super();
 
-    constructor(element) {
-        //super();
+        this.root = document.createElement('DIV')
+        this.icon = element
 
-        this.root = document.createElement('DIV');
-        this.icon = element;
-
-        console.debug(`CONSTRUCTOR: custom-control`);
+        console.debug('CONSTRUCTOR: custom-control')
 
         // create shadow-dom
-        this.#shadowRoot = this.root.attachShadow({ mode: "open" });
-        this.#shadowRoot.appendChild(template.cloneNode(true).content);
+        this.#shadowRoot = this.root.attachShadow({ mode: 'open' })
+        this.#shadowRoot.appendChild(template.cloneNode(true).content)
 
-        //this.root.id = id ?? 'extension-control';
-        this.root.style.display = "none";
+        // this.root.id = id ?? 'extension-control';
+        this.root.style.display = 'none'
 
-        document.body.appendChild(this.root);
+        document.body.appendChild(this.root)
 
         element.addEventListener('click', event => {
             if (this.root.style.display === 'none') {
-                this.show();
+                this.show()
             } else {
-                this.hide();
+                this.hide()
             }
             // stop the event propogation
             // otherwise our check to see if the user clicked off the control, to close it, will fire.
-            event.stopPropagation();
-        });
+            event.stopPropagation()
+        })
 
         element.addEventListener('hover', event => {
-        });
+        })
     }
 
-    show() {
-        this.root.style.display = 'block';
-        this.position();
-        document.addEventListener('click', outsideOfControlClickHandler.bind(this));
+    show () {
+        this.root.style.display = 'block'
+        this.position()
+        document.addEventListener('click', outsideOfControlClickHandler.bind(this))
     }
 
-    hide() {
-        this.root.style.display = 'none';
-        document.removeEventListener('click', outsideOfControlClickHandler.bind(this));
-        document.removeEventListener('click', outsideOfControlClickHandler.bind(this));
+    hide () {
+        this.root.style.display = 'none'
+        document.removeEventListener('click', outsideOfControlClickHandler.bind(this))
+        document.removeEventListener('click', outsideOfControlClickHandler.bind(this))
     }
 
-    position() {
-        var boundRect = this.icon.getBoundingClientRect();
-        var controlRect = this.root.getBoundingClientRect();
-        var left = boundRect.left + window.pageXOffset - (controlRect.width / 2) + (boundRect.width / 2);
-        var top = boundRect.top + window.pageYOffset + boundRect.height;
-        left = Math.max(left, 0);
-        this.root.style.left = Math.min(left, window.innerWidth - controlRect.width) + "px";
-        this.root.style.top = top + "px";
+    position () {
+        const boundRect = this.icon.getBoundingClientRect()
+        const controlRect = this.root.getBoundingClientRect()
+        let left = boundRect.left + window.pageXOffset - (controlRect.width / 2) + (boundRect.width / 2)
+        const top = boundRect.top + window.pageYOffset + boundRect.height
+        left = Math.max(left, 0)
+        this.root.style.left = Math.min(left, window.innerWidth - controlRect.width) + 'px'
+        this.root.style.top = top + 'px'
     }
 
-    static verified(issuer, scope, created, info, about) {
+    static verified (issuer, scope, created, info, about) {
+        const element = icon(CHECKMARK_URL)
+        const control = new ExtensionControl(element)
+        const root = control.#shadowRoot
 
-        const element = icon(CHECKMARK_URL);
-        const control = new ExtensionControl(element);
-        const root = control.#shadowRoot;
+        const img = control.#shadowRoot.querySelector('#icon')
 
-        const img = control.#shadowRoot.querySelector("#icon");
+        img.src = element.src
+        root.querySelector('#label').textContent = 'Verified'
+        root.querySelector('#key1').textContent = 'Issuer'
+        root.querySelector('#key2').textContent = 'Scope'
+        root.querySelector('#key3').textContent = 'Created'
+        root.querySelector('#key4').textContent = 'Info'
+        root.querySelector('#key5').textContent = 'About'
+        root.querySelector('#value1').textContent = issuer
+        root.querySelector('#value2').textContent = scope
+        root.querySelector('#value3').textContent = created
+        root.querySelector('#value4').textContent = info
+        root.querySelector('#value5').textContent = about
 
-        img.src = element.src;
-        root.querySelector("#label").textContent = 'Verified';
-        root.querySelector("#key1").textContent = 'Issuer';
-        root.querySelector("#key2").textContent = 'Scope';
-        root.querySelector("#key3").textContent = 'Created';
-        root.querySelector("#key4").textContent = 'Info';
-        root.querySelector("#key5").textContent = 'About';
-        root.querySelector("#value1").textContent = issuer;
-        root.querySelector("#value2").textContent = scope;
-        root.querySelector("#value3").textContent = created;
-        root.querySelector("#value4").textContent = info;
-        root.querySelector("#value5").textContent = about;
-
-        return control;
+        return control
     }
 
-    static untrusted(issuer, callback) {
+    static untrusted (issuer, callback) {
+        const element = icon(WARNING_URL)
+        const control = new ExtensionControl(element)
+        const root = control.#shadowRoot
 
-        const element = icon(WARNING_URL);
-        const control = new ExtensionControl(element);
-        const root = control.#shadowRoot;
+        const img = control.#shadowRoot.querySelector('#icon')
 
-        const img = control.#shadowRoot.querySelector("#icon");
+        img.src = element.src
+        root.querySelector('#label').textContent = 'Untrusted'
 
-        img.src = element.src;
-        root.querySelector("#label").textContent = 'Untrusted';
+        root.querySelector('#key1').textContent = 'Issuer'
+        root.querySelector('#value1').textContent = issuer
 
-        root.querySelector("#key1").textContent = 'Issuer';
-        root.querySelector("#value1").textContent = issuer;
-
-        root.querySelector("#value5").parentNode.remove();
-        root.querySelector("#value4").parentNode.remove();
-        root.querySelector("#value3").parentNode.remove();
-        root.querySelector("#value2").parentNode.remove();
-
+        root.querySelector('#value5').parentNode.remove()
+        root.querySelector('#value4').parentNode.remove()
+        root.querySelector('#value3').parentNode.remove()
+        root.querySelector('#value2').parentNode.remove()
 
         if (issuer) {
-            const button = root.querySelector("#button");
-            button.style.display = "block";
+            const button = root.querySelector('#button')
+            button.style.display = 'block'
 
             button.addEventListener('click', () => {
-                callback(control);
+                callback(control)
             })
         }
 
-        return control;
+        return control
     }
 
-    static invalid(message) {
+    static invalid (message) {
+        const element = icon(INVALID_URL)
+        const control = new ExtensionControl(element)
+        const root = control.#shadowRoot
+        const img = control.#shadowRoot.querySelector('#icon')
 
-        const element = icon(INVALID_URL);
-        const control = new ExtensionControl(element);
-        const root = control.#shadowRoot;
-        const img = control.#shadowRoot.querySelector("#icon");
+        img.src = element.src
+        root.querySelector('#label').textContent = 'Invalid'
 
-        img.src = element.src;
-        root.querySelector("#label").textContent = 'Invalid';
-
-        root.querySelector("#value5").parentNode.remove();
-        root.querySelector("#value4").parentNode.remove();
-        root.querySelector("#value3").parentNode.remove();
-        root.querySelector("#value2").parentNode.remove();
+        root.querySelector('#value5').parentNode.remove()
+        root.querySelector('#value4').parentNode.remove()
+        root.querySelector('#value3').parentNode.remove()
+        root.querySelector('#value2').parentNode.remove()
 
         if (message) {
-            root.querySelector("#key1").textContent = 'Message';
-            root.querySelector("#value1").textContent = message;
+            root.querySelector('#key1').textContent = 'Message'
+            root.querySelector('#value1').textContent = message
         } else {
-            root.querySelector("#value1").parentNode.remove();
+            root.querySelector('#value1').parentNode.remove()
         }
 
-        return control;
+        return control
     }
-
 }
 
-
-function outsideOfControlClickHandler(event) {
+function outsideOfControlClickHandler (event) {
     if (!this.root.contains(event.target)) {
-        this.hide();
+        this.hide()
     }
 }
 
 // Create an instance of an image element
 const icon = (path) => {
-    const img = document.createElement('img');
-    img.style.height = "1em";
-    img.style.width = "1em";
-    img.setAttribute("src", path);
-    return img;
+    const img = document.createElement('img')
+    img.style.height = '1em'
+    img.style.width = '1em'
+    img.setAttribute('src', path)
+    return img
 }
-
-// Create an instance of each icon
-const iconCheck = icon(CHECKMARK_URL);
-const iconInvalid = icon(INVALID_URL);
-const iconWarning = icon(WARNING_URL);
