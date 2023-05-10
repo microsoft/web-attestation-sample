@@ -54,6 +54,7 @@ void (async () => {
                 expType: UPJF.ExpirationType.day, // token expirations measured in days
 
                 // application-specific values
+                about: settings.ISSUER_ABOUT_URL, // issuer about website
                 lblType: settings.TOKEN_LABEL_TYPE, // type of the token label
                 lblValues: settings.TOKEN_LABEL_VALUES, // valid token label values
             } as Specification, 

@@ -120,6 +120,10 @@ template.innerHTML = `
                 <td id="key4" class="key"></td>
                 <td id="value4" class="value">---------</td>
             </tr>
+            <tr>
+                <td id="key5" class="key"></td>
+                <td id="value5" class="value">---------</td>
+            </tr>
         </table>
     </div>
 
@@ -195,7 +199,7 @@ class ExtensionControl /*extends HTMLElement*/ {
         this.root.style.top = top + "px";
     }
 
-    static verified(issuer, scope, created, info) {
+    static verified(issuer, scope, created, info, about) {
 
         const element = icon(CHECKMARK_URL);
         const control = new ExtensionControl(element);
@@ -209,10 +213,12 @@ class ExtensionControl /*extends HTMLElement*/ {
         root.querySelector("#key2").textContent = 'Scope';
         root.querySelector("#key3").textContent = 'Created';
         root.querySelector("#key4").textContent = 'Info';
+        root.querySelector("#key5").textContent = 'About';
         root.querySelector("#value1").textContent = issuer;
         root.querySelector("#value2").textContent = scope;
         root.querySelector("#value3").textContent = created;
         root.querySelector("#value4").textContent = info;
+        root.querySelector("#value5").textContent = about;
 
         return control;
     }
@@ -231,6 +237,7 @@ class ExtensionControl /*extends HTMLElement*/ {
         root.querySelector("#key1").textContent = 'Issuer';
         root.querySelector("#value1").textContent = issuer;
 
+        root.querySelector("#value5").parentNode.remove();
         root.querySelector("#value4").parentNode.remove();
         root.querySelector("#value3").parentNode.remove();
         root.querySelector("#value2").parentNode.remove();
@@ -258,6 +265,7 @@ class ExtensionControl /*extends HTMLElement*/ {
         img.src = element.src;
         root.querySelector("#label").textContent = 'Invalid';
 
+        root.querySelector("#value5").parentNode.remove();
         root.querySelector("#value4").parentNode.remove();
         root.querySelector("#value3").parentNode.remove();
         root.querySelector("#value2").parentNode.remove();
