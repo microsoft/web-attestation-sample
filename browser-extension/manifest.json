@@ -1,0 +1,47 @@
+{
+    "manifest_version": 3,
+    "name": "User-centric Web Attestation Extension",
+    "version": "0.0.0.1",
+    "description": "Creates and validates User-centric Web Attestations",
+    "permissions": [
+        "scripting",
+        "activeTab",
+        "storage",
+        "webRequest"
+    ],
+    "background": {
+        "service_worker": "background.js",
+        "type": "module"
+    },
+    "icons": {
+        "128": "icons/checkmark128x128.png"
+    },
+    "action": {
+        "default_popup": "popup/popup.html"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "<all_urls>"
+            ],
+            "js": [
+                "lib/uwaqrencoder.js",
+                "control.js",
+                "content.js"
+            ],
+            "run_at": "document_idle"
+        }
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "icons/checkmark.svg",
+                "icons/invalid.svg",
+                "icons/warning.svg"
+            ],
+            "matches": [
+                "<all_urls>"
+            ]
+        }
+    ]
+}
