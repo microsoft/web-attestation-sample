@@ -1,6 +1,5 @@
 Pre-release TODO list
 
-* Move dev branch to main
 * Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
 * QR code
   * Encode uwa as QR code; add generated QR in the Token popup tab, with ability to download/copy (ljoy)
