@@ -93,7 +93,7 @@ findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon)
 
 function validationResponse (uwaData, node, tag) {
     if (uwaData) {
-    // check if web attestation is valid
+        // check if web attestation is valid
         if (uwaData.status === 'error') {
             node.after(ExtensionControl.invalid(uwaData.error).icon)
         } else if (uwaData.status === 'unknown_issuer') {
@@ -143,7 +143,7 @@ function validationResponse (uwaData, node, tag) {
             }
         }
     } else {
-    // invalid web attestation, we won't render it
+        // invalid web attestation, we won't render it
         console.log('invalid web attestation')
     }
 }
@@ -153,6 +153,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const value = sessionStorage.getItem(ISSUERURL)
         sendResponse({ value })
     }
+    if (request.action === 'verifyAllQrImages') {
+        document.querySelectorAll('img').forEach(i => {
+            verifyQrImage(i)
+        })
+        sendResponse({})
+    }
 })
 
 function downloadIssuerParams (issuerUrl) {
@@ -161,43 +167,35 @@ function downloadIssuerParams (issuerUrl) {
     })
 }
 
-function onImageLoad (event) {
+function verifyQrImage (imgNode) {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
-    document.querySelectorAll('img').forEach(i => {
-        if (i.width < 100) {
-            return
-        }
+    // download image to dataUrl in background.js with fetch as we could not read the image data here
+    // because of CORS limitations
+    chrome.runtime.sendMessage({ text: 'fetchImage', imageUrl: imgNode.src }, (result) => {
+        console.info(`IMAGE: src:${imgNode.src}`)
 
-        chrome.runtime.sendMessage({ text: 'fetchImage', imageUrl: i.src }, (result) => {
-            console.info(`IMAGE: src:${i.src}`)
+        // load the blob into a canvas and retrieve the imageData
+        // send imageData to the qrDecoder and get back a uwa string
+        const img = new Image()
+        img.onload = () => {
+            canvas.width = img.width
+            canvas.height = img.height
+            ctx.drawImage(img, 0, 0)
+            const imageData = ctx.getImageData(0, 0, img.width, img.height)
+            const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
 
-            const img = new Image()
-
-            img.onload = () => {
-                canvas.width = img.width
-                canvas.height = img.height
-                ctx.drawImage(img, 0, 0)
-                const imageData = ctx.getImageData(0, 0, img.width, img.height)
-                const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
-
-                if (result?.chunks?.[0]?.data === 'uwa://') {
-                    const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
-                    console.log(uwaTag)
-                    chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
-                        console.log(JSON.stringify(uwaData))
-                        validationResponse(uwaData, i, uwaTag)
-                    })
-                }
+            if (result?.chunks?.[0]?.data === 'uwa://') {
+                const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
+                chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
+                    validationResponse(uwaData, imgNode, uwaTag)
+                })
             }
-
-            img.src = result.imageData
-        })
+        }
+        img.src = result.imageData
     })
 }
-
-window.addEventListener('load', onImageLoad, true)
 
 function toBase64Url (byteArray) {
     const binaryString = byteArray.map(b => String.fromCharCode(b)).join('')
