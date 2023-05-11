@@ -48,6 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteIssuersButton = document.getElementById('delete-issuers-button')
     const deleteTokensButton = document.getElementById('delete-tokens-button')
     const updateTokensButton = document.getElementById('update-tokens-button')
+    const verifyQrCodeButton = document.getElementById('verify-qrcodes-button')
     // FIXME: TODO: implement addIssuer button
     const copyButton = document.getElementById('copy-button')
     const scopeText = document.getElementById('scope-text')
@@ -169,11 +170,31 @@ document.addEventListener('DOMContentLoaded', function () {
         scopeText.textContent = 'URL: ' + sanitizedUrl
         const wa = await createUWA(selectedIssuer, sanitizedUrl)
         const qrDataUrl = self.uwaQrEncoder.encode(wa)
+
+        const img = new Image()
+        img.onload = function () {
+            const canvas = document.createElement('canvas')
+            canvas.width = img.width
+            canvas.height = img.height
+            const ctx = canvas.getContext('2d')
+            ctx.drawImage(img, 0, 0, img.width, img.height)
+
+            const imgCenter = new Image()
+            const scale = 0.25
+            imgCenter.width = Math.floor(canvas.width * scale)
+            imgCenter.height = Math.floor(canvas.height * scale)
+            imgCenter.onload = function () {
+                ctx.drawImage(imgCenter, Math.floor((canvas.width - imgCenter.width) / 2), Math.floor((canvas.height - imgCenter.height) / 2), imgCenter.width, imgCenter.height)
+                qrCode.src = canvas.toDataURL('image/png')
+            }
+            imgCenter.src = '..\\icons\\checkmark128x128.png'
+        }
+        img.src = qrDataUrl
+
         waText.textContent = wa
         waLabel.style.display = 'inline-block'
         waText.style.display = 'block'
         copyButton.style.display = 'inline-block'
-        qrCode.src = qrDataUrl
     })
 
     // copy the web attestation to the clipboard
@@ -197,6 +218,14 @@ document.addEventListener('DOMContentLoaded', function () {
     updateTokensButton.addEventListener('click', async function () {
         await updateTokens()
         updateWaTokens()
+    })
+
+    verifyQrCodeButton.addEventListener('click', async function () {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            chrome.tabs.sendMessage(tabs[0].id, { action: 'verifyAllQrImages' }, function (response) {
+                console.log(response.status)
+            })
+        })
     })
 })
 
