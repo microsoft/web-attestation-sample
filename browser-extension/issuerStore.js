@@ -7,15 +7,20 @@ const ISSUER_STORE_KEY = 'issuerStore'
 
 /**
  * Returns the issuer params from the store
+ * @param {string} url the url of the issuer
  * @param {string} kid the key identifier of the issuer parameters
  * @returns the JSON encoded issuer params
  */
-export async function getIssuerParams (kid) {
-    console.log('getIssuerParams called', kid)
+export async function getIssuerParams (url, kid) {
+    console.log('getIssuerParams called', url, kid)
     return new Promise((resolve) => {
         chrome.storage.local.get([ISSUER_STORE_KEY], (result) => {
             const issuerStore = result.issuerStore || {}
-            const issuerParams = issuerStore[kid] || null
+            const issuerKids = issuerStore[url] || null
+            let issuerParams = null
+            if (issuerKids) {
+                issuerParams = issuerKids[kid] || null
+            }
             console.log('getIssuerParams: issuerParams', issuerParams)
             resolve(issuerParams)
         })
@@ -24,15 +29,22 @@ export async function getIssuerParams (kid) {
 
 /**
  * Stores the issuer params in the store
+ * @param {string} url the url of the issuer 
  * @param {string} kid the key identifier of the issuer parameters
  * @param {*} issuerParams the JSON encoded issuer params
  */
-export async function setIssuerParams (kid, issuerParams) {
-    console.log('setIssuerParams called', kid, issuerParams)
+export async function setIssuerParams (url, kid, issuerParams) {
+    console.log('setIssuerParams called', url, kid, issuerParams)
     return new Promise((resolve) => {
         chrome.storage.local.get([ISSUER_STORE_KEY], (result) => {
             const issuerStore = result.issuerStore || {}
-            issuerStore[kid] = issuerParams
+            let issuerKids = issuerStore[url] || null
+            if (issuerKids) {
+                issuerKids[kid] = issuerParams
+            } else {
+                issuerKids = { [kid]: issuerParams }
+            }
+            issuerStore[url] = issuerKids
             console.log('setIssuerParams: issuerStore', issuerStore)
             chrome.storage.local.set({ issuerStore }, resolve)
         })
