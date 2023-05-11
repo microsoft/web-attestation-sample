@@ -7,6 +7,7 @@ import { storeTokens, listTokenIssuers, clearTokens, updateTokens } from '../tok
 import { listIssuers, clearIssuerParams } from '../issuerStore.js'
 import { getTokens } from '../tokens.js'
 import { createUWA } from '../uwa.js'
+import '../lib/uwaqrencoder.js'
 
 function getBaseURL (url) {
     const urlObj = new URL(url)
@@ -53,6 +54,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const waText = document.getElementById('wa-text')
     const waLabel = document.getElementById('wa-label')
     const waTable = document.getElementById('wa-table')
+    const qrCode = document.getElementById('img-qr-code')
+
     let selectedIssuer
 
     // get current tab
@@ -165,10 +168,12 @@ document.addEventListener('DOMContentLoaded', function () {
     presentButton.addEventListener('click', async function () {
         scopeText.textContent = 'URL: ' + sanitizedUrl
         const wa = await createUWA(selectedIssuer, sanitizedUrl)
+        const qrDataUrl = self.uwaQrEncoder.encode(wa)
         waText.textContent = wa
         waLabel.style.display = 'inline-block'
         waText.style.display = 'block'
         copyButton.style.display = 'inline-block'
+        qrCode.src = qrDataUrl
     })
 
     // copy the web attestation to the clipboard
