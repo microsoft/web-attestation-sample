@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-import { getIssuerParams, setIssuerParams } from './issuerStore.js'
+import { getIssuerParams, setIssuerParams, listIssuers } from './issuerStore.js'
 import { popToken } from './tokenStore.js'
 import uproveModule from './lib/uprove.mjs'
 
@@ -34,7 +34,7 @@ export async function downloadIssuerParams (issuerUrl) {
     if (jwksResp.ok) {
         jwks = await jwksResp.json()
         await Promise.all(
-            jwks.keys.map(jwk => setIssuerParams(jwk.kid, jwk))
+            jwks.keys.map(jwk => setIssuerParams(issuerUrl, jwk.kid, jwk))
         )
     }
     // TODO: handle failure
@@ -65,12 +65,12 @@ export async function getTokens (issuerUrl, refreshID) {
         const kid = firstMsg.kid
 
         // obtain issuer params from the issuer store by kid
-        let jwk = await getIssuerParams(kid)
+        let jwk = await getIssuerParams(issuerUrl, kid)
 
         // if not found, download issuer params and try again
         if (!jwk) {
             await downloadIssuerParams(issuerUrl)
-            jwk = await getIssuerParams(kid)
+            jwk = await getIssuerParams(issuerUrl, kid)
         }
 
         if (!jwk) { throw new Error("can't find issuer params with kid " + kid) }
@@ -152,7 +152,7 @@ export async function presentToken (issuerUrl, scope) {
     if (!tokenData) {
         throw new Error('no token available')
     }
-    const issuerParamsJWK = await getIssuerParams(tokenData.kid)
+    const issuerParamsJWK = await getIssuerParams(issuerUrl, tokenData.kid)
     if (!issuerParamsJWK) {
         throw new Error('issuer params not found')
     }
@@ -203,12 +203,22 @@ export async function verifyTokenPresentation (jws) {
         // retrieve the issuer parameters key identifier and the issuer url from the token
         const kid = token.UIDP
         const tokenInfo = upjf.parseTokenInformation(Buffer.from(token.TI, 'base64'))
-        const issuerParamsJWK = await getIssuerParams(kid)
+        let issuerParamsJWK = await getIssuerParams(tokenInfo.iss, kid)
         if (!issuerParamsJWK) {
-            // unknown issuer; can't proceed with verification
-            return {
-                issuer: tokenInfo.iss,
-                status: 'unknown_issuer'
+            // check if we already trusted the issuer, in which case we are missing
+            // newer issuer parameters
+            const trustedIssuers = await listIssuers();
+            if (trustedIssuers.find((issuer) => issuer === tokenInfo.iss)) {
+                // retrieve the latest issuer parameters
+                await downloadIssuerParams(tokenInfo.iss)
+                issuerParamsJWK = await getIssuerParams(issuerUrl, kid)
+            }
+            if (!issuerParamsJWK) {
+                // unknown issuer; can't proceed with verification
+                return {
+                    issuer: tokenInfo.iss,
+                    status: 'unknown_issuer'
+                }
             }
         }
         // parse the JSON Web Key as an Issuer parameters object
