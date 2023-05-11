@@ -3,9 +3,9 @@
         {
             "kty": "UP",
             "alg": "UP256",
-            "kid": "7BjraQ_p-iIZz_Vx8jO0HnXCaLnTIXHlIX--1Pin4p0",
-            "g0": "BCRkJj1pirHWhih-erbJrUjPlQfMDgHgilSAhKhwx7PAtYOPTEWmcZSlJA0iVvCa3HaxnOlyIM_hkFlRJquFufo",
-            "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5IiwibGJsVHlwZSI6eyIxIjoiVHlwZSBBIiwiMiI6IlR5cGUgQiIsIjMiOiJUeXBlIEMifX0"
+            "kid": "UWzlBSurFIwfuqW-1hWXkeOpcZC9ob3HNTJ9Go3hT7Q",
+            "g0": "BAwFap4XNPkoekkgg4_F5e8kngMpe3ADW4DS8NNBOhfINaxzXLPLLohFacqYl3L6VWiVhJvZz-aVWqbJOwVoqYk",
+            "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5IiwiYWJvdXQiOiJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbWljcm9zb2Z0L3dlYi1hdHRlc3RhdGlvbi1zYW1wbGUvbWFpbi9zYW1wbGUtaXNzdWVyL3NhbXBsZS9hYm91dC5odG1sIiwibGJsVHlwZSI6Ik1lbWJlcnNoaXAiLCJsYmxWYWx1ZXMiOnsiMSI6IlR5cGUgQSIsIjIiOiJUeXBlIEIiLCIzIjoiVHlwZSBDIn19"
         }
     ]
 }

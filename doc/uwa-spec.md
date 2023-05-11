@@ -158,4 +158,83 @@ A Verifier can validate web attestations URI `uwa://[JWS]` attached to a web sit
 
 ## Sample 
 
-TODO: create a sample issuance trace and uwa creation using sample issuance params
+### Sample Issuer parameters
+This sections shows an example of a Issuer parameters encoding the following specification: 
+
+```json
+{
+    "n":0,
+    "expType":"day",
+    "about":"https://raw.githubusercontent.com/microsoft/web-attestation-sample/main/sample-issuer/sample/about.html",
+    "lblType":"Membership",
+    "lblValues":
+    {
+        "1":"Type A",
+        "2":"Type B",
+        "3":"Type C"
+    }
+}
+```
+
+The resulting Issuer parameters:
+```json
+{
+    "keys": [
+        {
+            "kty": "UP",
+            "alg": "UP256",
+            "kid": "UWzlBSurFIwfuqW-1hWXkeOpcZC9ob3HNTJ9Go3hT7Q",
+            "g0": "BAwFap4XNPkoekkgg4_F5e8kngMpe3ADW4DS8NNBOhfINaxzXLPLLohFacqYl3L6VWiVhJvZz-aVWqbJOwVoqYk",
+            "spec": "eyJuIjowLCJleHBUeXBlIjoiZGF5IiwiYWJvdXQiOiJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbWljcm9zb2Z0L3dlYi1hdHRlc3RhdGlvbi1zYW1wbGUvbWFpbi9zYW1wbGUtaXNzdWVyL3NhbXBsZS9hYm91dC5odG1sIiwibGJsVHlwZSI6Ik1lbWJlcnNoaXAiLCJsYmxWYWx1ZXMiOnsiMSI6IlR5cGUgQSIsIjIiOiJUeXBlIEIiLCIzIjoiVHlwZSBDIn19"
+        }
+    ]
+}
+```
+
+The corresponding private key:
+```
+8BlPgOIBI5o0pqT6vMA8UGaYdpSV48yGOYhrULvk_g8
+```
+
+### Sample U-Prove token
+
+This section shows a U-Prove token issued using the Issuer parameters above, encoding the following Token Information:
+```json
+{
+    "iss":"https://raw.githubusercontent.com/microsoft/web-attestation-sample/dev/sample-issuer/sample","exp":19989,
+    "lbl":1
+}
+```
+
+The resulting token:
+```json
+{
+    "UIDP": "UWzlBSurFIwfuqW-1hWXkeOpcZC9ob3HNTJ9Go3hT7Q",
+    "h": "BPirBkpc71q1qQJtWKjRLrAGLyqUogg_p3xr08dMm_3XqRgnBtnYr_QQ9am3FFL-yrCbDT5b5MhxVSBN3AYf4Jo",
+    "TI": "eyJpc3MiOiJodHRwczovL3Jhdy5naXRodWJ1c2VyY29udGVudC5jb20vbWljcm9zb2Z0L3dlYi1hdHRlc3RhdGlvbi1zYW1wbGUvZGV2L3NhbXBsZS1pc3N1ZXIvc2FtcGxlIiwiZXhwIjoxOTk4OSwibGJsIjoxfQ",
+    "PI": "",
+    "sZp": "BKTQ5j9wZRA4u8_DV1U2LughlOKgN74l_DM7Fe0mTxYZXNukmle53ODly-R5THCH159ZlPr0XKDHNktz9ETQnJ0",
+    "sCp": "9SVKlkJwtMJv1OFODlqwLVL6Q-0u9081E_KugUGmMNI",
+    "sRp": "5_C2Kvb4QzAclFG5jq_Ar6FdmieQa6CeeVLxNlT4Mj0"
+}
+```
+
+The corresponding private key:
+```
+KfJGW_2DcYikIUdGrc8J3sIfBWmCnkxYtngisvHnvNI
+```
+
+### Sample UWA
+
+This section shows a User-centric Web Attestation created using the token above, signing the following message:
+```json
+{
+    "scope":"https://contoso.com",
+    "timestamp":1683835051449
+}
+```
+
+The UWA string:
+```
+uwa://eyJhbGciOiJVUDI1NiJ9.eyJzY29wZSI6Imh0dHBzOi8vY29udG9zby5jb20iLCJ0aW1lc3RhbXAiOjE2ODM4MzUwNTE0NDl9.eyJ1cHQiOnsiVUlEUCI6IlVXemxCU3VyRkl3ZnVxVy0xaFdYa2VPcGNaQzlvYjNITlRKOUdvM2hUN1EiLCJoIjoiQlBpckJrcGM3MXExcVFKdFdLalJMckFHTHlxVW9nZ19wM3hyMDhkTW1fM1hxUmduQnRuWXJfUVE5YW0zRkZMLXlyQ2JEVDViNU1oeFZTQk4zQVlmNEpvIiwiVEkiOiJleUpwYzNNaU9pSm9kSFJ3Y3pvdkwzSmhkeTVuYVhSb2RXSjFjMlZ5WTI5dWRHVnVkQzVqYjIwdmJXbGpjbTl6YjJaMEwzZGxZaTFoZEhSbGMzUmhkR2x2YmkxellXMXdiR1V2WkdWMkwzTmhiWEJzWlMxcGMzTjFaWEl2YzJGdGNHeGxJaXdpWlhod0lqb3hPVGs0T1N3aWJHSnNJam94ZlEiLCJQSSI6IiIsInNacCI6IkJLVFE1ajl3WlJBNHU4X0RWMVUyTHVnaGxPS2dONzRsX0RNN0ZlMG1UeFlaWE51a21sZTUzT0RseS1SNVRIQ0gxNTlabFByMFhLREhOa3R6OUVUUW5KMCIsInNDcCI6IjlTVktsa0p3dE1KdjFPRk9EbHF3TFZMNlEtMHU5MDgxRV9LdWdVR21NTkkiLCJzUnAiOiI1X0MyS3ZiNFF6QWNsRkc1anFfQXI2RmRtaWVRYTZDZWVWTHhObFQ0TWowIn0sInBwIjp7ImEiOiJSSmQ4Tm5vZ2tZeVRJaW1vcVdfdzRzaWRCTmlzOFc5OEFDalpBUXl4LW1JIiwiciI6WyJtY2wtUFpOUHJSZHNTbDNGVkhTNzhRdWEwczVlS0NMZHdUelVleVFNRXRnIl19fQ
+```
