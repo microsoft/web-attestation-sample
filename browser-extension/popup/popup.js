@@ -68,6 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.tabs.query({ active: true, currentWindow: true }, async function (tabs) {
         const activeTab = tabs[0]
         sanitizedUrl = getBaseURL(activeTab.url)
+        scopeText.textContent = sanitizedUrl
         console.log('sanitizedUrl, as seen by popup.js:', sanitizedUrl)
 
         // enable the issue button if the current page provides an issuer url
@@ -85,6 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const hasTokens = tokenIssuers.length > 0
         document.getElementById('no-tokens-div').style.display = hasTokens ? 'none' : 'block'
         document.getElementById('has-tokens-div').style.display = hasTokens ? 'block' : 'none'
+        document.getElementById('create-uwa-div').style.display = hasTokens ? 'block' : 'none'
 
         // update table
 
@@ -167,7 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // present an attestation to the current page
     presentButton.addEventListener('click', async function () {
-        scopeText.textContent = 'URL: ' + sanitizedUrl
         const wa = await createUWA(selectedIssuer, sanitizedUrl)
         const qrDataUrl = self.uwaQrEncoder.encode(wa)
 

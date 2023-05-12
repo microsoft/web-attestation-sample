@@ -12,6 +12,7 @@
       <button class="tab" data-tab="about">About</button>
       <button class="tab" data-tab="debug">Debug</button>
     </div>
+
     <div>
       <div id="tokens" class="tab-content active-content">
         <h1>Tokens</h1>
@@ -36,17 +37,20 @@
           </table>
         </div>
         <button id="issue-button" disabled>Get tokens</button>
-        <h2>Generation</h2>
-        <button id="present-button" disabled>Present attestation</button>
-        <p id="scope-text"></p>
-        <p id="time-text"></p>
-        <p>
-          <label id="wa-label" style="display: none;">Web attestation:</label>
-          <button id="copy-button" style="display: none;">Copy</button>
-          <textarea id="wa-text" readonly style="display: none;"></textarea>
-        </p>
-        <img id="img-qr-code">
+        <div id="create-uwa-div">
+          <h2>Create Web Attestation</h2>
+          <label>For scope: </label>
+          <label id="scope-text"></label>
+          <button id="present-button" disabled>Create</button>
+          <p>
+            <label id="wa-label" style="display: none;">Web attestation:</label>
+            <button id="copy-button" style="display: none;">Copy</button>
+            <textarea id="wa-text" readonly style="display: none;"></textarea>
+          </p>
+          <img id="img-qr-code">
+        </div>
       </div>
+
       <div id="issuers" class="tab-content">
         <h1>Trusted Issuers</h1>
         <div id="no-trusted-issuers-div">
@@ -69,10 +73,12 @@
         </table>
         </div>
       </div>
+
       <div id="about" class="tab-content">
         <h1>User-centric Web Attestation Web Browser Extension</h1>
         <p>This is a proof-of-concept browser extension for a User-centric Web Attestation system. See the <a href="https://github.com/microsoft/web-attestation-sample">github page</a> for details.</p>
       </div>
+
       <div id="debug" class="tab-content">
         <h1>Debug</h1>
         <p><button id="verify-qrcodes-button">Verify all QR codes</button></p>
