@@ -201,7 +201,8 @@ The corresponding private key:
 This section shows a U-Prove token issued using the Issuer parameters above, encoding the following Token Information:
 ```json
 {
-    "iss":"https://raw.githubusercontent.com/microsoft/web-attestation-sample/dev/sample-issuer/sample","exp":19989,
+    "iss":"https://raw.githubusercontent.com/microsoft/web-attestation-sample/dev/sample-issuer/sample",
+    "exp":19989,
     "lbl":1
 }
 ```
