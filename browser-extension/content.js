@@ -159,6 +159,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         })
         sendResponse({})
     }
+    if (request.action === 'verifyContextImage') {
+        decodeImage(request.dataUrl, lastContextMenuTarget)
+        sendResponse({})
+    }
 })
 
 function downloadIssuerParams (issuerUrl) {
@@ -168,33 +172,36 @@ function downloadIssuerParams (issuerUrl) {
 }
 
 function verifyQrImage (imgNode) {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-
     // download image to dataUrl in background.js with fetch as we could not read the image data here
     // because of CORS limitations
     chrome.runtime.sendMessage({ text: 'fetchImage', imageUrl: imgNode.src }, (result) => {
-        console.info(`IMAGE: src:${imgNode.src}`)
-
-        // load the blob into a canvas and retrieve the imageData
-        // send imageData to the qrDecoder and get back a uwa string
-        const img = new Image()
-        img.onload = () => {
-            canvas.width = img.width
-            canvas.height = img.height
-            ctx.drawImage(img, 0, 0)
-            const imageData = ctx.getImageData(0, 0, img.width, img.height)
-            const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
-
-            if (result?.chunks?.[0]?.data === 'uwa://') {
-                const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
-                chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
-                    validationResponse(uwaData, imgNode, uwaTag)
-                })
-            }
-        }
-        img.src = result.imageData
+        decodeImage(result.imageData, imgNode)
     })
+}
+
+function decodeImage (imageData, imgNode) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    console.info(`IMAGE: src:${imgNode.src}`)
+    // load the blob into a canvas and retrieve the imageData
+    // send imageData to the qrDecoder and get back a uwa string
+    const img = new Image()
+    img.onload = () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.drawImage(img, 0, 0)
+        const imageData = ctx.getImageData(0, 0, img.width, img.height)
+        const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
+
+        if (result?.chunks?.[0]?.data === 'uwa://') {
+            const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
+            chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
+                validationResponse(uwaData, imgNode, uwaTag)
+            })
+        }
+    }
+    img.src = imageData
 }
 
 function toBase64Url (byteArray) {
@@ -203,3 +210,9 @@ function toBase64Url (byteArray) {
     const base64url = base64.replace('+', '-').replace('/', '_').replace(/=+$/, '')
     return base64url
 }
+
+let lastContextMenuTarget
+
+document.addEventListener('contextmenu', event => {
+    lastContextMenuTarget = event.target
+})

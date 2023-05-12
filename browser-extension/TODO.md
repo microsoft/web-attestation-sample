@@ -1,11 +1,6 @@
 Pre-release TODO list
 
 * Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
-* QR code
-  * Encode uwa as QR code; add generated QR in the Token popup tab, with ability to download/copy (ljoy)
-  * Add UWA logo to the QR code (ljoy)
-  * Make "verify all QR codes" an option in the debug tab (ljoy)
-  * Add context menu verification (see qr-verify branch for an example) 
 * Create a more compact encoding for UWA (v2)
 * Encrypt keys and tokens in the extension (v2)
 * Add a Badges popup tab to show a list of validated UWA on the current page (v2)

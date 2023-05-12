@@ -7,7 +7,8 @@
         "scripting",
         "activeTab",
         "storage",
-        "webRequest"
+        "webRequest",
+        "contextMenus"
     ],
     "background": {
         "service_worker": "background.js",
