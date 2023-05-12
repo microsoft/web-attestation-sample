@@ -211,7 +211,7 @@ export async function verifyTokenPresentation (jws) {
             if (trustedIssuers.find((issuer) => issuer === tokenInfo.iss)) {
                 // retrieve the latest issuer parameters
                 await downloadIssuerParams(tokenInfo.iss)
-                issuerParamsJWK = await getIssuerParams(issuerUrl, kid)
+                issuerParamsJWK = await getIssuerParams(tokenInfo.iss, kid)
             }
             if (!issuerParamsJWK) {
                 // unknown issuer; can't proceed with verification
