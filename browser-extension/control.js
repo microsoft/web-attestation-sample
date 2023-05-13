@@ -147,12 +147,14 @@ template.innerHTML = `
 class ExtensionControl /* extends HTMLElement */ {
     icon
     root
+    state
+    tag
     #shadowRoot
-    #tag
 
     constructor (element) {
     // super();
 
+        this.state = 'PENDING'
         this.root = document.createElement('DIV')
         this.icon = element
 
@@ -208,8 +210,14 @@ class ExtensionControl /* extends HTMLElement */ {
         const element = icon(CHECKMARK_URL)
         const control = new ExtensionControl(element)
         const root = control.#shadowRoot
+        control.state = 'VERIFIED'
 
         const img = control.#shadowRoot.querySelector('#icon')
+
+        const a = document.createElement('a')
+        a.setAttribute('href', about)
+        a.setAttribute('target', '_blank')
+        a.innerHTML = about
 
         img.src = element.src
         root.querySelector('#label').textContent = 'Verified'
@@ -222,7 +230,8 @@ class ExtensionControl /* extends HTMLElement */ {
         root.querySelector('#value2').textContent = scope
         root.querySelector('#value3').textContent = created
         root.querySelector('#value4').textContent = info
-        root.querySelector('#value5').textContent = about
+        root.querySelector('#value5').textContent = ''
+        root.querySelector('#value5').appendChild(a)
 
         return control
     }
@@ -231,7 +240,7 @@ class ExtensionControl /* extends HTMLElement */ {
         const element = icon(WARNING_URL)
         const control = new ExtensionControl(element)
         const root = control.#shadowRoot
-
+        control.state = 'UNTRUSTED'
         const img = control.#shadowRoot.querySelector('#icon')
 
         img.src = element.src
@@ -262,6 +271,7 @@ class ExtensionControl /* extends HTMLElement */ {
         const control = new ExtensionControl(element)
         const root = control.#shadowRoot
         const img = control.#shadowRoot.querySelector('#icon')
+        control.state = 'INVALID'
 
         img.src = element.src
         root.querySelector('#label').textContent = 'Invalid'

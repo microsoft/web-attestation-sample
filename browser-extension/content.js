@@ -91,13 +91,19 @@ function replaceWithIcon (node) {
 // do an initial scan of the document body for pages that are not dynamic
 findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon)
 
+let shields = []
+
 function validationResponse (uwaData, node, tag) {
+    let ec
     if (uwaData) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
-            node.after(ExtensionControl.invalid(uwaData.error).icon)
+            ec = ExtensionControl.invalid(uwaData.error)
+            ec.tag = tag
+            shields.push(ec)
+            node.after(ec.icon)
         } else if (uwaData.status === 'unknown_issuer') {
-            node.after(ExtensionControl.untrusted(
+            ec = ExtensionControl.untrusted(
                 uwaData.issuer,
 
                 // Trust button was pressed
@@ -105,25 +111,32 @@ function validationResponse (uwaData, node, tag) {
                     untrustedControl.hide()
                     untrustedControl.icon.remove()
 
+                    shields = shields.filter(c => c !== untrustedControl)
+
                     // download issuer parameters into the issuerStore
                     downloadIssuerParams(uwaData.issuer)
                         .then(() => {
                             // re-validate tag now that the issuer parameters are stored
-                            // TODO: re-validate all tags on the page from this issuer
-                            runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
+                            chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
                                 validationResponse(uwaData, node, tag)
                             })
                         })
                         .catch((/* no tokens */) => {
-
+                            throw new Error('downloadIssuerParams failed')
                         })
-                }).icon)
+                })
+            ec.tag = tag
+            shields.push(ec)
+            node.after(ec.icon)
         } else {
             // check if the scope is correct
             const currentScope = uwaData.scope // TODO: FIXME (ljoy): get the current scope (base url without query params/anchor, see popup.js's getBaseURL) from the page
             if (uwaData.scope !== currentScope) {
                 // invalid badge
-                node.after(ExtensionControl.invalid('invalid scope: ' + uwaData.scope).icon)
+                ec = ExtensionControl.invalid('invalid scope: ' + uwaData.scope)
+                ec.tag = tag
+                shields.push(ec)
+                node.after(ec.icon)
             } else {
                 // valid badge
                 const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
@@ -137,9 +150,25 @@ function validationResponse (uwaData, node, tag) {
                     hour12: false
                 })
 
+                ec = ExtensionControl.verified(
+                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about)
+                ec.tag = tag
+                shields.push(ec)
                 // Insert the new icon node after the original node
-                node.after(ExtensionControl.verified(
-                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about).icon)
+                node.after(ec.icon)
+
+                const shieldWithSameTag = shields.filter(c => {
+                    const f = c !== ec && c.tag === tag && c.state !== 'VERIFIED'
+                    return f
+                })
+
+                shieldWithSameTag.forEach(c => {
+                    shields = shields.filter(d => c !== d)
+                    chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
+                        validationResponse(uwaData, c.icon, c.tag)
+                        c.icon.remove()
+                    })
+                })
             }
         }
     } else {
