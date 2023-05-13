@@ -1,22 +1,29 @@
 # User-centric Web Attestations
 
-This project is a proof-of-concept prototype for user-centric web attestations. TODO: add description
+This project is a proof-of-concept prototype for User-Centric Web Attestations (UWA). These attestations are statements (encoded as U-Prove tokens) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
 
-The repository contains two projects, which need to be built and installed separately:
-* a sample server that issues tokens to users
-* a web browser extension that obtains tokens, creates and verifies web attestations
+Details can be found in the [UWA specification](./doc/uwa-spec.md).
+
+The repository contains two projects, which need to be setup separately:
+* an Express [sample server](./sample-issuer/README.md)
+* a Edge/Chrome [web browser extension](./browser-extension/README.md)
 
 ## System overview
 
-TODO
+The system consists of three participants:
+* an Issuer that issues U-Prove tokens to Users
+* a User that obtains U-Prove tokens from Issuers, and creates web attestations
+* a Verifier that verifies web attestations
 
-## Issuer server
+The [sample server](./sample-issuer/README.md) implements the Issuer role, while the [web browser extension](./browser-extension/README.md) implements both the User and Verifier roles.
 
-For setup instructions, see the sample issuer's [README](./sample-issuer/README.md).
+The UWA lifecycle is as follows:
+1. The Issuer sets up its Issuer parameters and publishes them in a publicly accessible location. These specify the contents of the U-Prove tokens, which can contain an application-specific label. Users and Verifiers must obtain the Issuer parameters before creating or verifying web attestations.
+2. The User obtains U-Prove tokens from an Issuer. Authentication to the Issuer is application-specific. U-Prove tokens are stored in the web browser extension; new tokens will be automatically obtained if they expired or if they are running out.
+3. When visiting a web site, the User can create a web attestation using the web browser extension (encoded either as a string or a QR code), and attach it to the site.
+4. Other users visiting the same web site can validate attached web attestations from trusted Issuers using the web browser extension. Unknown Issuers can be added to the trusted list by the User. Invalid attestations (for example: forged, or copied to a different site) are marked as such; malformed ones are simply ignored.
 
-## Web browser extension
-
-For setup instructions, see the browser extension's [README](./browser-extension/README.md).
+![UWA architecture](./doc/UWA_arch.svg)
 
 ## Contributing
 
