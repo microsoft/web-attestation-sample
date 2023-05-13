@@ -61,7 +61,6 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
             .then(dataUrl => {
                 chrome.tabs.sendMessage(tab.id, { action: 'verifyContextImage', dataUrl })
             })
-        // verifyQR(info.srcUrl, tab.id)
     }
 })
 
