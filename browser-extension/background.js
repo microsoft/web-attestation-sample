@@ -24,17 +24,11 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     if (msg?.text === 'fetchImage') {
-        fetch(msg.imageUrl)
-            .then((response) => response.blob())
-            .then((blob) => {
-                const reader = new FileReader()
-                reader.onload = () => {
-                    sendResponse({ imageData: reader.result })
-                }
-                reader.readAsDataURL(blob)
+        fetchImage(msg.imageUrl)
+            .then(dataUrl => {
+                sendResponse({ imageData: dataUrl })
             })
-            .catch((error) => {
-                console.error('Error fetching image:', error)
+            .catch(() => {
                 sendResponse({ imageData: null })
             })
     }
@@ -49,3 +43,43 @@ chrome.runtime.onStartup.addListener(function () {
 setInterval(() => {
     updateTokens()
 }, 15 * 60 * 1000)
+
+// Create context menu item
+chrome.runtime.onInstalled.addListener(() => {
+    chrome.contextMenus.create({
+        id: 'verifyQR',
+        title: 'Verify QR',
+        contexts: ['image']
+    })
+})
+
+// Listen for context menu clicks
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === 'verifyQR') {
+        console.log('verifyQR clicked', info, tab.id)
+        fetchImage(info.srcUrl)
+            .then(dataUrl => {
+                chrome.tabs.sendMessage(tab.id, { action: 'verifyContextImage', dataUrl })
+            })
+    }
+})
+
+function fetchImage (url) {
+    return fetch(url)
+        .then((response) => response.blob())
+        .then((blob) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader()
+                reader.onload = () => {
+                    resolve(reader.result)
+                }
+                reader.onerror = (err) => {
+                    reject(err)
+                }
+                reader.readAsDataURL(blob)
+            })
+        })
+        .catch((error) => {
+            console.error('Error fetching image:', error)
+        })
+}

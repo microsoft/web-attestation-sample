@@ -1,8 +1,8 @@
-Pre-release TODO list:
+Pre-release TODO list
+* Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
 * QR code (ljoy)
   * Add UWA logo to the QR code
   * Make "verify all QR codes" as an on/off option in the debug tab
-  * Add context menu verification (see qr-verify branch for an example)
 * Compare the badge scope with the current URL (see FIXME in content.js) (ljoy)
 * Implement: add Issuer button in Debug tab
 * Create a more compact encoding for UWA (v2)
