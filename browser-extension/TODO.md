@@ -5,13 +5,17 @@ Pre-release TODO list
   * Make "verify all QR codes" as an on/off option in the debug tab
 * Compare the badge scope with the current URL (see FIXME in content.js) (ljoy)
 * Implement: add Issuer button in Debug tab
+* TODO: FIXME: delete this file :)
+
+Future features
 * Create a more compact encoding for UWA (v2)
+* Specify UWA links to retrieve external UWA (v2)
 * Encrypt keys and tokens in the extension (v2)
 * Add a Badges popup tab to show a list of validated UWA on the current page (v2)
 * Make the badge popup about link clickable (v2)
 * CI (codeql), https://code.visualstudio.com/api/working-with-extensions/testing-extension (v2)
 * Replace extension ui elements in a tab with IFrames using an origin different from the tab; this way the tab scripting cannot manipulate the DOM of extension provided elements. (v2)
-* TODO: FIXME: delete this file :)
+* Create a test page that can verify a UWA QR from the camera (similar to https://cozmo.github.io/jsQR/) (v2)
 
 Issues:
 * Fix error in popup when you visit a "stale" page. Tokens tab UI all messed up (catch errors and don't mess up UI)
