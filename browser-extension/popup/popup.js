@@ -220,21 +220,18 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     verifyQrCodeToggle.addEventListener('change', () => {
-        console.log('toggleImageVerification')
+        console.log('verifyQrCodeToggle changed')
+
+        chrome.storage.local.set({ autoScanQrCodes: verifyQrCodeToggle.checked }, () => {
+            console.log('autoScanQrCodes is set to ' + verifyQrCodeToggle.checked)
+        })
 
         if (verifyQrCodeToggle.checked) {
-            chrome.storage.local.set({ autoScanQrCodes: true }, () => {
-                // auto-verification turned on. Scan all images now.
-                chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-                    chrome.tabs.sendMessage(tabs[0].id, { action: 'verifyAllQrImages' }, function (response) {
-                        console.log(response.status)
-                    })
+            // auto-verification turned on. Scan all images now.
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                chrome.tabs.sendMessage(tabs[0].id, { action: 'verifyAllQrImages' }, function (response) {
+                    console.log('verifyAllQrImages response', response.status)
                 })
-            })
-        } else {
-            // auto-verification turned off. Scan all images now.
-            chrome.storage.local.set({ autoScanQrCodes: false }, () => {
-                console.log('Value is set to ' + 'value')
             })
         }
     })
