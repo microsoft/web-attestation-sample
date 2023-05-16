@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteIssuersButton = document.getElementById('delete-issuers-button')
     const deleteTokensButton = document.getElementById('delete-tokens-button')
     const updateTokensButton = document.getElementById('update-tokens-button')
-    const verifyQrCodeButton = document.getElementById('verify-qrcodes-button')
+    const verifyQrCodeToggle = document.getElementById('verify-all-images-toggle')
     // FIXME: TODO: implement addIssuer button
     const copyButton = document.getElementById('copy-button')
     const scopeText = document.getElementById('scope-text')
@@ -155,7 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add a change event listener to the table
     waTable.addEventListener('change', function () {
-    // enable the present button if a row is selected
+        // enable the present button if a row is selected
         const selectedRow = waTable.querySelector('input[name="selected-row"]:checked')
         console.log('selectedRow:', selectedRow)
         if (selectedRow) {
@@ -221,20 +221,36 @@ document.addEventListener('DOMContentLoaded', function () {
         updateWaTokens()
     })
 
-    verifyQrCodeButton.addEventListener('click', async function () {
-        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
-            chrome.tabs.sendMessage(tabs[0].id, { action: 'verifyAllQrImages' }, function (response) {
-                console.log(response.status)
-            })
-        })
+    chrome.storage.local.get(['autoScanQrCodes'], (result) => {
+        verifyQrCodeToggle.checked = result === undefined ? false : result.autoScanQrCodes
     })
-})
 
-// requests issuer url from tab
-async function getTabIssuerUrl (tab) {
-    return new Promise((resolve, reject) => {
-        chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
-            resolve(response.value)
-        })
-    }).catch((err) => { throw new Error(`Error checking tab issuer url. ${err}`) })
-}
+    verifyQrCodeToggle.addEventListener('change', () => {
+        console.log('toggleImageVerification')
+
+        if (verifyQrCodeToggle.checked) {
+            chrome.storage.local.set({ autoScanQrCodes: true }, () => {
+                // auto-verification turned on. Scan all images now.
+                chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, { action: 'verifyAllQrImages' }, function (response) {
+                        console.log(response.status)
+                    })
+                })
+            })
+        } else {
+            // auto-verification turned off. Scan all images now.
+            chrome.storage.local.set({ autoScanQrCodes: false }, () => {
+                console.log('Value is set to ' + 'value')
+            })
+        }
+    })
+
+    // requests issuer url from tab
+    async function getTabIssuerUrl (tab) {
+        return new Promise((resolve, reject) => {
+            chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
+                resolve(response.value)
+            })
+        }).catch((err) => { throw new Error(`Error checking tab issuer url. ${err}`) })
+    }
+})

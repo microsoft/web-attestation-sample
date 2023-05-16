@@ -11,12 +11,15 @@ import { downloadIssuerParams } from './tokens.js'
 async function checkUWA (string, scope) {
     console.log('checkUWA called', string)
     const uwaData = await parseUWA(string)
+    if (uwaData.status === 'valid' && uwaData.scope !== scope) {
+        uwaData.status = 'invalid_scope'
+    }
     return uwaData
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.text === 'checkUWA') {
-        checkUWA(msg.string, sender.origin).then(sendResponse)
+        checkUWA(msg.string, sender.origin + sender.pathName).then(sendResponse)
     }
 
     if (msg?.text === 'downloadIssuerParams') {
@@ -46,6 +49,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 chrome.runtime.onStartup.addListener(function () {
     updateTokens()
 })
+
 setInterval(() => {
     updateTokens()
 }, 15 * 60 * 1000)

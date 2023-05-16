@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/* global chrome, runtime, ExtensionControl, uwaQrEncoder */
+/* global chrome, ExtensionControl, uwaQrEncoder */
 
 const PATTERN = /uwa:\/\/\S+/g
 const ISSUERURL = 'uwaIssuerUrl'
@@ -96,6 +96,9 @@ function validationResponse (uwaData, node, tag) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
             node.after(ExtensionControl.invalid(uwaData.error).icon)
+        } else if (uwaData.status === 'invalid_scope') {
+            node.after(ExtensionControl.invalid(uwaData.error).icon)
+            console.error(`Invalid uwa scope : ${uwaData.scope}`)
         } else if (uwaData.status === 'unknown_issuer') {
             node.after(ExtensionControl.untrusted(
                 uwaData.issuer,
@@ -103,44 +106,37 @@ function validationResponse (uwaData, node, tag) {
                 // Trust button was pressed
                 (untrustedControl) => {
                     untrustedControl.hide()
-                    untrustedControl.icon.remove()
 
                     // download issuer parameters into the issuerStore
                     downloadIssuerParams(uwaData.issuer)
                         .then(() => {
+                            untrustedControl.icon.remove()
                             // re-validate tag now that the issuer parameters are stored
-                            // TODO: re-validate all tags on the page from this issuer
-                            runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
+                            chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
                                 validationResponse(uwaData, node, tag)
                             })
                         })
-                        .catch((/* no tokens */) => {
-
+                        .catch((err) => {
+                            console.error(err.toString())
                         })
                 }).icon)
-        } else {
-            // check if the scope is correct
-            const currentScope = uwaData.scope // TODO: FIXME (ljoy): get the current scope (base url without query params/anchor, see popup.js's getBaseURL) from the page
-            if (uwaData.scope !== currentScope) {
-                // invalid badge
-                node.after(ExtensionControl.invalid('invalid scope: ' + uwaData.scope).icon)
-            } else {
-                // valid badge
-                const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
-                    timeZone: 'UTC',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                })
+        } else if (uwaData.status === 'valid') {
+            const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
+                timeZone: 'UTC',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            })
 
-                // Insert the new icon node after the original node
-                node.after(ExtensionControl.verified(
-                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about).icon)
-            }
+            // Insert the new icon node after the original node
+            node.after(ExtensionControl.verified(
+                uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about).icon)
+        } else {
+            throw new Error(`unknown validation status: ${uwaData.status}`)
         }
     } else {
         // invalid web attestation, we won't render it
@@ -203,3 +199,45 @@ function toBase64Url (byteArray) {
     const base64url = base64.replace('+', '-').replace('/', '_').replace(/=+$/, '')
     return base64url
 }
+
+chrome.storage.local.get(['autoScanQrCodes'], function (result) {
+    if (result.autoScanQrCodes === true) {
+        // function onImageLoad () {
+        //     console.log('Image loaded: ', this.src)
+        // }
+
+        // Add load event listener to existing images
+        const images = document.getElementsByTagName('img')
+        for (let i = 0; i < images.length; i++) {
+            // images[i].addEventListener('load', onImageLoad)
+            verifyQrImage(images[i])
+        }
+
+        // Create a MutationObserver to watch for added images
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    for (let i = 0; i < mutation.addedNodes.length; i++) {
+                        const node = mutation.addedNodes[i]
+
+                        // Check if the added node is an image
+                        if (node.tagName === 'IMG') {
+                            // node.addEventListener('load', onImageLoad)
+                            verifyQrImage(node)
+                        }
+
+                        // If the added node is a container, check its descendants for images
+                        const descendants = node.getElementsByTagName('img')
+                        for (let j = 0; j < descendants.length; j++) {
+                            // descendants[j].addEventListener('load', onImageLoad)
+                            verifyQrImage(descendants[j])
+                        }
+                    }
+                }
+            })
+        })
+
+        // Start observing the document with the configured parameters
+        observer.observe(document.body, { childList: true, subtree: true })
+    }
+})
