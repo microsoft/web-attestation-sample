@@ -1,3 +1,5 @@
+*** ***PRE-RELEASE VERSION: WORK IN PROGRESS*** ***
+
 # User-centric Web Attestations
 
 This project is a proof-of-concept prototype for User-Centric Web Attestations (UWA). These attestations are statements (encoded as U-Prove tokens) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
