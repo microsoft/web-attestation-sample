@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctx.drawImage(imgCenter, Math.floor((canvas.width - imgCenter.width) / 2), Math.floor((canvas.height - imgCenter.height) / 2), imgCenter.width, imgCenter.height)
                 qrCode.src = canvas.toDataURL('image/png')
             }
-            imgCenter.src = '..\\icons\\uwa-logo-black.png'
+            imgCenter.src = '..\\icons\\uwa-logo-blue.png'
         }
         img.src = qrDataUrl
 
