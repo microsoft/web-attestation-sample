@@ -5,20 +5,9 @@
 
 import { storeTokens, listTokenIssuers, clearTokens, updateTokens } from '../tokenStore.js'
 import { listIssuers, clearIssuerParams } from '../issuerStore.js'
-import { getTokens } from '../tokens.js'
+import { getTokens, getBaseURL } from '../tokens.js'
 import { createUWA } from '../uwa.js'
 import '../lib/uwaqrencoder.js'
-
-function getBaseURL (url) {
-    try {
-        const urlObj = new URL(url)
-        const baseURL = urlObj.origin + urlObj.pathname
-        return baseURL.toLowerCase()
-    } catch (error) {
-        console.error('Error getting base URL:', error)
-        return null
-    }
-}
 
 document.addEventListener('DOMContentLoaded', function () {
     // Add event listeners to switch tabs

@@ -271,3 +271,14 @@ export async function verifyTokenPresentation (jws) {
         }
     }
 }
+
+export function getBaseURL (url) {
+    try {
+        const urlObj = new URL(url)
+        const baseURL = urlObj.origin + urlObj.pathname
+        return baseURL.toLowerCase()
+    } catch (error) {
+        console.error('Error getting base URL:', error)
+        return null
+    }
+}

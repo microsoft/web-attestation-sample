@@ -5,7 +5,7 @@
 
 import { updateTokens } from './tokenStore.js'
 import { parseUWA } from './uwa.js'
-import { downloadIssuerParams } from './tokens.js'
+import { downloadIssuerParams, getBaseURL } from './tokens.js'
 
 // Define the checkUPWA function
 async function checkUWA (string, scope) {
@@ -19,8 +19,8 @@ async function checkUWA (string, scope) {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.text === 'checkUWA') {
-        const url = new URL(sender.url)
-        checkUWA(msg.string, url.origin + url.pathname).then(sendResponse)
+        const url = getBaseURL(sender.url)
+        checkUWA(msg.string, url).then(sendResponse)
     }
 
     if (msg?.text === 'downloadIssuerParams') {
