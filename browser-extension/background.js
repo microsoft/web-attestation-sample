@@ -19,7 +19,8 @@ async function checkUWA (string, scope) {
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.text === 'checkUWA') {
-        checkUWA(msg.string, sender.origin + sender.pathName).then(sendResponse)
+        const url = new URL(sender.url)
+        checkUWA(msg.string, url.origin + url.pathname).then(sendResponse)
     }
 
     if (msg?.text === 'downloadIssuerParams') {

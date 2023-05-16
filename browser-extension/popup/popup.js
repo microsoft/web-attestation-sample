@@ -17,7 +17,7 @@ function getBaseURL (url) {
     } catch (error) {
         console.error('Error getting base URL:', error)
         return null
-    }  
+    }
 }
 
 document.addEventListener('DOMContentLoaded', function () {

@@ -3,7 +3,7 @@
 
 /* global chrome, ExtensionControl, uwaQrEncoder */
 
-const PATTERN = /uwa:\/\/\S+/g
+const PATTERN = /uwa:\/\/[0-9a-zA-Z-_]+\.[0-9a-zA-Z-_]+\.[0-9a-zA-Z-_]+/g
 const ISSUERURL = 'uwaIssuerUrl'
 
 // Check for uwa meta tag
@@ -123,8 +123,11 @@ function validationResponse (uwaData, node, tag) {
                                 validationResponse(uwaData, node, tag)
                             })
                         })
-                        .catch((/* no tokens */) => {
-                            throw new Error('downloadIssuerParams failed')
+                        .catch((error) => {
+                            ec = ExtensionControl.invalid(error)
+                            ec.tag = tag
+                            shields.push(ec)
+                            node.after(ec.icon)
                         })
                 })
             ec.tag = tag
