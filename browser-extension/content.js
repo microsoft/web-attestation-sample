@@ -91,21 +91,28 @@ function replaceWithIcon (node) {
 // do an initial scan of the document body for pages that are not dynamic
 findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon)
 
+let shields = []
+
 function validationResponse (uwaData, node, tag) {
+    let ec
     if (uwaData) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
             node.after(ExtensionControl.invalid(uwaData.error).icon)
         } else if (uwaData.status === 'invalid_scope') {
-            node.after(ExtensionControl.invalid(uwaData.error).icon)
-            console.error(`Invalid uwa scope : ${uwaData.scope}`)
+            ec = ExtensionControl.invalid(uwaData.error)
+            ec.tag = tag
+            shields.push(ec)
+            node.after(ec.icon)
         } else if (uwaData.status === 'unknown_issuer') {
-            node.after(ExtensionControl.untrusted(
+            ec = ExtensionControl.untrusted(
                 uwaData.issuer,
 
                 // Trust button was pressed
                 (untrustedControl) => {
                     untrustedControl.hide()
+
+                    shields = shields.filter(c => c !== untrustedControl)
 
                     // download issuer parameters into the issuerStore
                     downloadIssuerParams(uwaData.issuer)
@@ -116,27 +123,55 @@ function validationResponse (uwaData, node, tag) {
                                 validationResponse(uwaData, node, tag)
                             })
                         })
-                        .catch((err) => {
-                            console.error(err.toString())
+                        .catch((/* no tokens */) => {
+                            throw new Error('downloadIssuerParams failed')
                         })
-                }).icon)
-        } else if (uwaData.status === 'valid') {
-            const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
-                timeZone: 'UTC',
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false
-            })
-
-            // Insert the new icon node after the original node
-            node.after(ExtensionControl.verified(
-                uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about).icon)
+                })
+            ec.tag = tag
+            shields.push(ec)
+            node.after(ec.icon)
         } else {
-            throw new Error(`unknown validation status: ${uwaData.status}`)
+            // check if the scope is correct
+            const currentScope = uwaData.scope // TODO: FIXME (ljoy): get the current scope (base url without query params/anchor, see popup.js's getBaseURL) from the page
+            if (uwaData.scope !== currentScope) {
+                // invalid badge
+                ec = ExtensionControl.invalid('invalid scope: ' + uwaData.scope)
+                ec.tag = tag
+                shields.push(ec)
+                node.after(ec.icon)
+            } else {
+                // valid badge
+                const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
+                    timeZone: 'UTC',
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                })
+
+                ec = ExtensionControl.verified(
+                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about)
+                ec.tag = tag
+                shields.push(ec)
+                // Insert the new icon node after the original node
+                node.after(ec.icon)
+
+                const shieldWithSameTag = shields.filter(c => {
+                    const f = c !== ec && c.tag === tag && c.state !== 'VERIFIED'
+                    return f
+                })
+
+                shieldWithSameTag.forEach(c => {
+                    shields = shields.filter(d => c !== d)
+                    chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
+                        validationResponse(uwaData, c.icon, c.tag)
+                        c.icon.remove()
+                    })
+                })
+            }
         }
     } else {
         // invalid web attestation, we won't render it
@@ -155,6 +190,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         })
         sendResponse({})
     }
+    if (request.action === 'verifyContextImage') {
+        decodeImage(request.dataUrl, lastContextMenuTarget)
+        sendResponse({})
+    }
 })
 
 function downloadIssuerParams (issuerUrl) {
@@ -164,33 +203,36 @@ function downloadIssuerParams (issuerUrl) {
 }
 
 function verifyQrImage (imgNode) {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-
     // download image to dataUrl in background.js with fetch as we could not read the image data here
     // because of CORS limitations
     chrome.runtime.sendMessage({ text: 'fetchImage', imageUrl: imgNode.src }, (result) => {
-        console.info(`IMAGE: src:${imgNode.src}`)
-
-        // load the blob into a canvas and retrieve the imageData
-        // send imageData to the qrDecoder and get back a uwa string
-        const img = new Image()
-        img.onload = () => {
-            canvas.width = img.width
-            canvas.height = img.height
-            ctx.drawImage(img, 0, 0)
-            const imageData = ctx.getImageData(0, 0, img.width, img.height)
-            const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
-
-            if (result?.chunks?.[0]?.data === 'uwa://') {
-                const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
-                chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
-                    validationResponse(uwaData, imgNode, uwaTag)
-                })
-            }
-        }
-        img.src = result.imageData
+        decodeImage(result.imageData, imgNode)
     })
+}
+
+function decodeImage (imageData, imgNode) {
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+
+    console.info(`IMAGE: src:${imgNode.src}`)
+    // load the blob into a canvas and retrieve the imageData
+    // send imageData to the qrDecoder and get back a uwa string
+    const img = new Image()
+    img.onload = () => {
+        canvas.width = img.width
+        canvas.height = img.height
+        ctx.drawImage(img, 0, 0)
+        const imageData = ctx.getImageData(0, 0, img.width, img.height)
+        const result = uwaQrEncoder.decode(imageData.data, imageData.width, imageData.height)
+
+        if (result?.chunks?.[0]?.data === 'uwa://') {
+            const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
+            chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
+                validationResponse(uwaData, imgNode, uwaTag)
+            })
+        }
+    }
+    img.src = imageData
 }
 
 function toBase64Url (byteArray) {
@@ -202,14 +244,9 @@ function toBase64Url (byteArray) {
 
 chrome.storage.local.get(['autoScanQrCodes'], function (result) {
     if (result.autoScanQrCodes === true) {
-        // function onImageLoad () {
-        //     console.log('Image loaded: ', this.src)
-        // }
-
         // Add load event listener to existing images
-        const images = document.getElementsByTagName('img')
+        const images = document.getElementsByTagName('IMG')
         for (let i = 0; i < images.length; i++) {
-            // images[i].addEventListener('load', onImageLoad)
             verifyQrImage(images[i])
         }
 
@@ -222,14 +259,12 @@ chrome.storage.local.get(['autoScanQrCodes'], function (result) {
 
                         // Check if the added node is an image
                         if (node.tagName === 'IMG') {
-                            // node.addEventListener('load', onImageLoad)
                             verifyQrImage(node)
                         }
 
                         // If the added node is a container, check its descendants for images
-                        const descendants = node.getElementsByTagName('img')
+                        const descendants = node.getElementsByTagName('IMG')
                         for (let j = 0; j < descendants.length; j++) {
-                            // descendants[j].addEventListener('load', onImageLoad)
                             verifyQrImage(descendants[j])
                         }
                     }
@@ -240,4 +275,9 @@ chrome.storage.local.get(['autoScanQrCodes'], function (result) {
         // Start observing the document with the configured parameters
         observer.observe(document.body, { childList: true, subtree: true })
     }
+})
+
+let lastContextMenuTarget
+document.addEventListener('contextmenu', event => {
+    lastContextMenuTarget = event.target
 })

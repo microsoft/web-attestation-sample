@@ -10,9 +10,14 @@ import { createUWA } from '../uwa.js'
 import '../lib/uwaqrencoder.js'
 
 function getBaseURL (url) {
-    const urlObj = new URL(url)
-    const baseURL = urlObj.origin + urlObj.pathname
-    return baseURL.toLowerCase()
+    try {
+        const urlObj = new URL(url)
+        const baseURL = urlObj.origin + urlObj.pathname
+        return baseURL.toLowerCase()
+    } catch (error) {
+        console.error('Error getting base URL:', error)
+        return null
+    }  
 }
 
 document.addEventListener('DOMContentLoaded', function () {

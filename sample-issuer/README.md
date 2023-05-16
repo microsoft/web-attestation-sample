@@ -4,6 +4,8 @@
 
 Make sure [node.js](https://nodejs.org/) and [npm](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm) are installed on your system; the latest Long-Term Support (LTS) version is recommended for both. 
 
+Edit the [setting file](./src/settings.ts) according to the application needs.
+
 Build the `npm` package:
 ```
 npm install
