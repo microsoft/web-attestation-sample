@@ -5,7 +5,7 @@
 
 import { storeTokens, listTokenIssuers, clearTokens, updateTokens } from '../tokenStore.js'
 import { listIssuers, clearIssuerParams } from '../issuerStore.js'
-import { getTokens, getBaseURL } from '../tokens.js'
+import { getTokens, getBaseURL, downloadIssuerParams } from '../tokens.js'
 import { createUWA } from '../uwa.js'
 import '../lib/uwaqrencoder.js'
 
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteTokensButton = document.getElementById('delete-tokens-button')
     const updateTokensButton = document.getElementById('update-tokens-button')
     const verifyQrCodeToggle = document.getElementById('verify-all-images-toggle')
-    // FIXME: TODO: implement addIssuer button
+    const addIssuerButton = document.getElementById('add-issuer-button')
     const copyButton = document.getElementById('copy-button')
     const scopeText = document.getElementById('scope-text')
     const waText = document.getElementById('wa-text')
@@ -235,6 +235,17 @@ document.addEventListener('DOMContentLoaded', function () {
             // auto-verification turned off. Scan all images now.
             chrome.storage.local.set({ autoScanQrCodes: false }, () => {
                 console.log('Value is set to ' + 'value')
+            })
+        }
+    })
+
+    // add a trusted issuer, download its parameters
+    addIssuerButton.addEventListener('click', async function () {
+        const issuerUrl = document.getElementById('add-issuer-text')
+        if (issuerUrl.value) {
+            console.log('adding issuer: ' + issuerUrl.value)
+            downloadIssuerParams(issuerUrl.value).then(() => {
+                updateIssuers()
             })
         }
     })
