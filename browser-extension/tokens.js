@@ -37,8 +37,7 @@ export async function downloadIssuerParams (issuerUrl) {
             jwks.keys.map(jwk => setIssuerParams(issuerUrl, jwk.kid, jwk))
         )
     }
-    // TODO: handle failure
-    return true
+    return jwksResp.ok
 }
 
 /**
@@ -207,7 +206,7 @@ export async function verifyTokenPresentation (jws) {
         if (!issuerParamsJWK) {
             // check if we already trusted the issuer, in which case we are missing
             // newer issuer parameters
-            const trustedIssuers = await listIssuers();
+            const trustedIssuers = await listIssuers()
             if (trustedIssuers.find((issuer) => issuer === tokenInfo.iss)) {
                 // retrieve the latest issuer parameters
                 await downloadIssuerParams(tokenInfo.iss)
@@ -270,5 +269,16 @@ export async function verifyTokenPresentation (jws) {
         return {
             status: 'error'
         }
+    }
+}
+
+export function getBaseURL (url) {
+    try {
+        const urlObj = new URL(url)
+        const baseURL = urlObj.origin + urlObj.pathname
+        return baseURL.toLowerCase()
+    } catch (error) {
+        console.error('Error getting base URL:', error)
+        return null
     }
 }

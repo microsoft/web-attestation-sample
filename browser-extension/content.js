@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/* global chrome, runtime, ExtensionControl, uwaQrEncoder */
+/* global chrome, ExtensionControl, uwaQrEncoder */
 
-const PATTERN = /uwa:\/\/\S+/g
+const PATTERN = /uwa:\/\/[0-9a-zA-Z-_]+\.[0-9a-zA-Z-_]+\.[0-9a-zA-Z-_]+/g
 const ISSUERURL = 'uwaIssuerUrl'
 
 // Check for uwa meta tag
@@ -98,6 +98,8 @@ function validationResponse (uwaData, node, tag) {
     if (uwaData) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
+            node.after(ExtensionControl.invalid(uwaData.error).icon)
+        } else if (uwaData.status === 'invalid_scope') {
             ec = ExtensionControl.invalid(uwaData.error)
             ec.tag = tag
             shields.push(ec)
@@ -109,20 +111,23 @@ function validationResponse (uwaData, node, tag) {
                 // Trust button was pressed
                 (untrustedControl) => {
                     untrustedControl.hide()
-                    untrustedControl.icon.remove()
 
                     shields = shields.filter(c => c !== untrustedControl)
 
                     // download issuer parameters into the issuerStore
                     downloadIssuerParams(uwaData.issuer)
                         .then(() => {
+                            untrustedControl.icon.remove()
                             // re-validate tag now that the issuer parameters are stored
                             chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
                                 validationResponse(uwaData, node, tag)
                             })
                         })
-                        .catch((/* no tokens */) => {
-                            throw new Error('downloadIssuerParams failed')
+                        .catch((error) => {
+                            ec = ExtensionControl.invalid(error)
+                            ec.tag = tag
+                            shields.push(ec)
+                            node.after(ec.icon)
                         })
                 })
             ec.tag = tag
@@ -240,8 +245,42 @@ function toBase64Url (byteArray) {
     return base64url
 }
 
-let lastContextMenuTarget
+chrome.storage.local.get(['autoScanQrCodes'], function (result) {
+    if (result.autoScanQrCodes === true) {
+        // Add load event listener to existing images
+        const images = document.getElementsByTagName('IMG')
+        for (let i = 0; i < images.length; i++) {
+            verifyQrImage(images[i])
+        }
 
+        // Create a MutationObserver to watch for added images
+        const observer = new MutationObserver(function (mutations) {
+            mutations.forEach(function (mutation) {
+                if (mutation.type === 'childList') {
+                    for (let i = 0; i < mutation.addedNodes.length; i++) {
+                        const node = mutation.addedNodes[i]
+
+                        // Check if the added node is an image
+                        if (node.tagName === 'IMG') {
+                            verifyQrImage(node)
+                        }
+
+                        // If the added node is a container, check its descendants for images
+                        const descendants = node.getElementsByTagName('IMG')
+                        for (let j = 0; j < descendants.length; j++) {
+                            verifyQrImage(descendants[j])
+                        }
+                    }
+                }
+            })
+        })
+
+        // Start observing the document with the configured parameters
+        observer.observe(document.body, { childList: true, subtree: true })
+    }
+})
+
+let lastContextMenuTarget
 document.addEventListener('contextmenu', event => {
     lastContextMenuTarget = event.target
 })

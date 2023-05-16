@@ -5,18 +5,22 @@
 
 import { updateTokens } from './tokenStore.js'
 import { parseUWA } from './uwa.js'
-import { downloadIssuerParams } from './tokens.js'
+import { downloadIssuerParams, getBaseURL } from './tokens.js'
 
 // Define the checkUPWA function
 async function checkUWA (string, scope) {
     console.log('checkUWA called', string)
     const uwaData = await parseUWA(string)
+    if (uwaData.status === 'valid' && uwaData.scope !== scope) {
+        uwaData.status = 'invalid_scope'
+    }
     return uwaData
 }
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     if (msg?.text === 'checkUWA') {
-        checkUWA(msg.string, sender.origin).then(sendResponse)
+        const url = getBaseURL(sender.url)
+        checkUWA(msg.string, url).then(sendResponse)
     }
 
     if (msg?.text === 'downloadIssuerParams') {
@@ -40,6 +44,7 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 chrome.runtime.onStartup.addListener(function () {
     updateTokens()
 })
+
 setInterval(() => {
     updateTokens()
 }, 15 * 60 * 1000)
