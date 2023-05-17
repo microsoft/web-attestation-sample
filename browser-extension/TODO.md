@@ -1,6 +1,5 @@
 Pre-release TODO list
 * Fix "Get token" UI, tokens table doesn't refresh, and sometimes errors out (you have to reload the page to fix)
-* Implement: add Issuer button in Debug tab
 * TODO: FIXME: delete this file :)
 
 Future features
