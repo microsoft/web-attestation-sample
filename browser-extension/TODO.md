@@ -2,6 +2,8 @@ Pre-release TODO list
 * Add invalid scope in invalid badge (and other error messages)
 * Right click QR --> show popup result
 * add label to Get Tokens to show issuer URL: [ Get Tokens ] from https://...
+* Refresh tokens when running low; UI error when there are no more 
+* Improve Badge positioning in HTML
 * TODO: FIXME: delete this file :)
 
 Future features
