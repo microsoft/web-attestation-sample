@@ -93,8 +93,19 @@ findElementsWithText(document.body, PATTERN).forEach(replaceWithIcon)
 
 let shields = []
 
+function removeShield (node) {
+    shields = shields.filter(s => {
+        if (node.nextSibling === s.icon) {
+            document.remove(s.icon)
+            return false
+        }
+        return true
+    })
+}
+
 function validationResponse (uwaData, node, tag) {
     let ec
+    removeShield(node)
     if (uwaData) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
@@ -134,47 +145,37 @@ function validationResponse (uwaData, node, tag) {
             shields.push(ec)
             node.after(ec.icon)
         } else {
-            // check if the scope is correct
-            const currentScope = uwaData.scope // TODO: FIXME (ljoy): get the current scope (base url without query params/anchor, see popup.js's getBaseURL) from the page
-            if (uwaData.scope !== currentScope) {
-                // invalid badge
-                ec = ExtensionControl.invalid('invalid scope: ' + uwaData.scope)
-                ec.tag = tag
-                shields.push(ec)
-                node.after(ec.icon)
-            } else {
-                // valid badge
-                const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
-                    timeZone: 'UTC',
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false
-                })
+            // valid badge
+            const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
+                timeZone: 'UTC',
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            })
 
-                ec = ExtensionControl.verified(
-                    uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about)
-                ec.tag = tag
-                shields.push(ec)
-                // Insert the new icon node after the original node
-                node.after(ec.icon)
+            ec = ExtensionControl.verified(
+                uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about)
+            ec.tag = tag
+            shields.push(ec)
+            // Insert the new icon node after the original node
+            node.after(ec.icon)
 
-                const shieldWithSameTag = shields.filter(c => {
-                    const f = c !== ec && c.tag === tag && c.state !== 'VERIFIED'
-                    return f
-                })
+            const shieldWithSameTag = shields.filter(c => {
+                const f = c !== ec && c.tag === tag && c.state !== 'VERIFIED'
+                return f
+            })
 
-                shieldWithSameTag.forEach(c => {
-                    shields = shields.filter(d => c !== d)
-                    chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
-                        validationResponse(uwaData, c.icon, c.tag)
-                        c.icon.remove()
-                    })
+            shieldWithSameTag.forEach(c => {
+                shields = shields.filter(d => c !== d)
+                chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
+                    validationResponse(uwaData, c.icon, c.tag)
+                    c.icon.remove()
                 })
-            }
+            })
         }
     } else {
         // invalid web attestation, we won't render it

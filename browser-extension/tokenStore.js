@@ -72,14 +72,18 @@ export async function clearTokens () {
  */
 export async function storeTokens (issuerUrl, refreshID, exp, kid, newTokens) {
     console.log('storeTokens called', issuerUrl, refreshID, exp, kid, newTokens)
-    chrome.storage.local.get([TOKEN_STORE_KEY]).then((result) => {
-        const tokenStore = result.tokenStore || {}
-        const issuerData = tokenStore[issuerUrl] || { refreshID: null, tokens: [] }
-        issuerData.refreshID = refreshID
-        issuerData.tokens.push(...newTokens.map(t => { return { exp, kid, t } }))
-        tokenStore[issuerUrl] = issuerData
-        console.log('storeTokens: tokenStore', tokenStore)
-        chrome.storage.local.set({ tokenStore })
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get([TOKEN_STORE_KEY]).then((result) => {
+            const tokenStore = result.tokenStore || {}
+            const issuerData = tokenStore[issuerUrl] || { refreshID: null, tokens: [] }
+            issuerData.refreshID = refreshID
+            issuerData.tokens.push(...newTokens.map(t => { return { exp, kid, t } }))
+            tokenStore[issuerUrl] = issuerData
+            console.log('storeTokens: tokenStore', tokenStore)
+            chrome.storage.local.set({ tokenStore }, () => {
+                resolve()
+            })
+        })
     })
 }
 
