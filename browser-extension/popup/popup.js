@@ -251,7 +251,12 @@ document.addEventListener('DOMContentLoaded', function () {
     async function getTabIssuerUrl (tab) {
         return new Promise((resolve, reject) => {
             chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
-                resolve(response.value)
+                // if the tab is the empty-tab there will be no message listener
+                // we must check chrome.runtime.lastError to prevent the error from displaying in the console
+                if (chrome.runtime.lastError) {
+                    // tab has no listener
+                }
+                resolve(response?.value)
             })
         }).catch((err) => { throw new Error(`Error checking tab issuer url. ${err}`) })
     }
