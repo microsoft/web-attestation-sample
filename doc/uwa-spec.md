@@ -144,7 +144,7 @@ The web attestation is then created by appending the `[JWS]` with a `uwa://` URI
 
 ## Web Attestation verification
 
-A Verifier can validate web attestations URI `uwa://[JWS]` attached to a web site (scope) by
+A Verifier can validate a web attestation URI `uwa://[JWS]` attached to a web site (scope) by
 1. Decoding the JWS into a header, a payload, and a signature part.
 1. Checking that the header contains a valid U-Prove algorithm identifier (`alg` = `UP256`, `UP384`, or `UP521`).
 1. Decoding the payload into a presentation message containing a scope and a timestamp.
@@ -155,6 +155,16 @@ A Verifier can validate web attestations URI `uwa://[JWS]` attached to a web sit
 1. Validating the U-Prove token and the presentation proof.
 1. Checking that the token expiration (encoded as a number of days after the Unix epoch) is after the presentation message's timestamp (encoded in milliseconds).
 1. Extracting the token label, consisting of a string `<type>: <value>` where the `<type>` is extracted from the Issuer parameters specification's `lblType` value, and the `<value>` is extracted by looking up the specification's `lblValues[lbl]` using the token's `lbl` value.
+
+## QR encoding
+
+A web attestations URI `uwa://[JWS]` can be encoded into a QR code by following these steps:
+1. Split the 3-part `[JWS]` string in its period-separated parts: `[JWS_HEADER]`, `[JWS_PAYLOAD]`, and `[JWS_SIGNATURE]`.
+1. Decode the base64url-encoded JWS parts into their corresponding byte representation: `[JWS_HEADER_BYTES]`, `[JWS_PAYLOAD_BYTES]`, and `[JWS_SIGNATURE_BYTES]`.
+1. Create a QR code with medium error correction (level M) with four, byte-encoded, segments (chunks):  `uwa://`, `[JWS_HEADER_BYTES]`, `[JWS_PAYLOAD_BYTES]`, and  `[JWS_SIGNATURE_BYTES]`.
+1. Add the [UWA logo](./uwa-logo-blue.png) to the center of the QR image, scaled to 25% height and width of the QR image.
+
+The inverse steps are used to recreate the web attestation URI after reading a QR code.
 
 ## Sample 
 
