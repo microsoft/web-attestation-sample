@@ -1,3 +1,4 @@
 .vscode
 sample-issuer/.vscode
 sample-issuer/private
+sample-issuer/tmp
