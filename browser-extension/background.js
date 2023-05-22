@@ -13,6 +13,7 @@ async function checkUWA (string, scope) {
     const uwaData = await parseUWA(string)
     if (uwaData.status === 'valid' && uwaData.scope !== scope) {
         uwaData.status = 'invalid_scope'
+        uwaData.error = `Scope: ${scope} !== ${uwaData.scope}`
     }
     return uwaData
 }
@@ -66,6 +67,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
             .then(dataUrl => {
                 chrome.tabs.sendMessage(tab.id, { action: 'verifyContextImage', dataUrl })
             })
+    }
+})
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.mediaType === 'image') {
+        console.log('User clicked on an image with src:', info.srcUrl)
     }
 })
 
