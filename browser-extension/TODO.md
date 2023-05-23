@@ -1,5 +1,4 @@
 Pre-release TODO list
-* add label to Get Tokens to show issuer URL: [ Get Tokens ] from https://...
 * Refresh tokens when running low; UI error when there are no more 
 * Improve Badge positioning in HTML
 * TODO: FIXME: delete this file :)
