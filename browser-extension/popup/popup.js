@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const waLabel = document.getElementById('wa-label')
     const waTable = document.getElementById('wa-table')
     const qrCode = document.getElementById('img-qr-code')
+    const fromIssuerLabel = document.getElementById('from-issuer-label')
 
     let selectedIssuer
 
@@ -71,6 +72,11 @@ document.addEventListener('DOMContentLoaded', function () {
         console.debug(`tab: ${activeTab.title}  issuerUrl: ${tabIssuerUrl}`)
 
         issueButton.disabled = !tabIssuerUrl
+        if (issueButton.disabled) {
+            fromIssuerLabel.textContent = 'No issuer detected on this page.'
+        } else {
+            fromIssuerLabel.textContent = 'Issuer detected: ' + tabIssuerUrl
+        }
 
         await updateWaTokens()
     })
@@ -248,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     // requests issuer url from tab
-    async function getTabIssuerUrl (tab) {
+    async function getTabIssuerUrl(tab) {
         return new Promise((resolve, reject) => {
             chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
                 // if the tab is the empty-tab there will be no message listener

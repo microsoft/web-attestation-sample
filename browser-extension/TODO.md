@@ -1,5 +1,4 @@
 Pre-release TODO list
-* add label to Get Tokens to show issuer URL: [ Get Tokens ] from https://...
 * Improve Badge positioning in HTML
 * TODO: FIXME: delete this file :)
 
