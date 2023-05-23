@@ -8,12 +8,12 @@ import { parseUWA } from './uwa.js'
 import { downloadIssuerParams, getBaseURL } from './tokens.js'
 
 // Define the checkUPWA function
-async function checkUWA (string, scope) {
+async function checkUWA(string, scope) {
     console.log('checkUWA called', string)
     const uwaData = await parseUWA(string)
     if (uwaData.status === 'valid' && uwaData.scope !== scope) {
         uwaData.status = 'invalid_scope'
-        uwaData.error = `Scope: ${scope} !== ${uwaData.scope}`
+        uwaData.error = `Wrong URL: ${uwaData.scope}`
     }
     return uwaData
 }
@@ -76,7 +76,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 })
 
-function fetchImage (url) {
+function fetchImage(url) {
     return fetch(url)
         .then((response) => response.blob())
         .then((blob) => {
