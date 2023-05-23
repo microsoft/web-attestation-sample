@@ -282,7 +282,7 @@ class ExtensionControl /* extends HTMLElement */ {
         root.querySelector('#value2').parentNode.remove()
 
         if (message) {
-            root.querySelector('#key1').textContent = 'Message'
+            root.querySelector('#key1').textContent = 'Error'
             root.querySelector('#value1').textContent = message
         } else {
             root.querySelector('#value1').parentNode.remove()

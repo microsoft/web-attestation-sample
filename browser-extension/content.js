@@ -96,14 +96,14 @@ let shields = []
 function removeShield (node) {
     shields = shields.filter(s => {
         if (node.nextSibling === s.icon) {
-            document.remove(s.icon)
+            s.icon.remove()
             return false
         }
         return true
     })
 }
 
-function validationResponse (uwaData, node, tag) {
+function validationResponse (uwaData, node, tag, show = false) {
     let ec
     removeShield(node)
     if (uwaData) {
@@ -115,6 +115,7 @@ function validationResponse (uwaData, node, tag) {
             ec.tag = tag
             shields.push(ec)
             node.after(ec.icon)
+            if (show) ec.show()
         } else if (uwaData.status === 'unknown_issuer') {
             ec = ExtensionControl.untrusted(
                 uwaData.issuer,
@@ -131,11 +132,11 @@ function validationResponse (uwaData, node, tag) {
                             untrustedControl.icon.remove()
                             // re-validate tag now that the issuer parameters are stored
                             chrome.runtime.sendMessage({ text: 'checkUWA', string: tag }, (uwaData) => {
-                                validationResponse(uwaData, node, tag)
+                                validationResponse(uwaData, node, tag, show)
                             })
                         })
                         .catch((error) => {
-                            ec = ExtensionControl.invalid(error)
+                            ec = ExtensionControl.invalid(error.message)
                             ec.tag = tag
                             shields.push(ec)
                             node.after(ec.icon)
@@ -144,6 +145,7 @@ function validationResponse (uwaData, node, tag) {
             ec.tag = tag
             shields.push(ec)
             node.after(ec.icon)
+            if (show) ec.show()
         } else {
             // valid badge
             const dt = (new Date(uwaData.timestamp)).toLocaleString('en-US', {
@@ -163,6 +165,7 @@ function validationResponse (uwaData, node, tag) {
             shields.push(ec)
             // Insert the new icon node after the original node
             node.after(ec.icon)
+            if (show) ec.show()
 
             const shieldWithSameTag = shields.filter(c => {
                 const f = c !== ec && c.tag === tag && c.state !== 'VERIFIED'
@@ -232,7 +235,7 @@ function decodeImage (imageData, imgNode) {
         if (result?.chunks?.[0]?.data === 'uwa://') {
             const uwaTag = `uwa://${toBase64Url(result.chunks[1].bytes)}.${toBase64Url(result.chunks[2].bytes)}.${toBase64Url(result.chunks[3].bytes)}`
             chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
-                validationResponse(uwaData, imgNode, uwaTag)
+                validationResponse(uwaData, imgNode, uwaTag, true)
             })
         }
     }
