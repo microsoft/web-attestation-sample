@@ -7,3 +7,7 @@ js/*
 # sample files
 private/ip.key
 public/.well-known/jwks.json
+
+# temp files
+/tmp/*
+!/tmp/.gitkeep

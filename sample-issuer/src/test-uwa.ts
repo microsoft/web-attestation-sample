@@ -6,6 +6,8 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import process from 'process'
+import QRCode, { QRCodeByteSegment, QRCodeToFileOptions } from 'qrcode'
+import sharp from 'sharp'
 
 import { upjf, uprove, serialization } from 'uprove-node-reference'
 import type * as io from './io.js'
@@ -21,6 +23,7 @@ interface Options {
     label: string
     uwaScope: string
     uwaPath: string
+    qrPath: string
 }
 
 const program = new Command()
@@ -33,6 +36,7 @@ program.option('-e, --expiration <expiration>', 'token expiration in days', '500
 program.option('-l, --label <label>', 'token label', '1')
 program.option('-s, --uwaScope <uwaScope>', 'UWA scope', 'https://example.com')
 program.option('-a, --uwaPath <uwaPath>', 'path to the output UWA file', 'uwa.txt')
+program.option('-q, --qrPath <qrPath>', 'path to the output QR file', 'qr.png')
 
 program.parse(process.argv)
 const options: Options = program.opts()
@@ -97,6 +101,45 @@ void (async () => {
         const uwa = 'uwa://' + jws
         fs.writeFileSync(options.uwaPath, uwa)
         console.log('UWA written to: ' + options.uwaPath)
+
+        // create QR code, save it to a temporary file
+        const jwsByteParts = jws.split('.').map((part) => Buffer.from(part, 'base64'))
+        const qrSegments: QRCodeByteSegment[] = [ Buffer.from('uwa://')]
+            .concat(jwsByteParts)
+            .map((segment) => { return {
+                data: segment,
+                mode: 'byte'
+            }})
+        const qrOptions: QRCodeToFileOptions = {
+            width: 350,
+            errorCorrectionLevel: 'M',
+            type: 'png',
+        }
+        const tempQrPath = 'tmp/tmpfile.png'
+        await QRCode.toFile(tempQrPath, qrSegments, qrOptions)
+
+        // add UWA logo to the QR
+        await sharp(tempQrPath)
+        .metadata()
+        .then(({ width }) => {
+            if (!width) throw new Error('Could not read QR code width');
+            // resize logo to 25% of QR code width
+            return sharp('img/uwa-logo-blue.png')
+                .resize(Math.floor(width * 0.25))
+                .toBuffer();
+        })
+        .then((logoBuffer) => {
+            // Use sharp to overlay resized logo onto QR code
+            return sharp(tempQrPath)
+                .composite([{ input: logoBuffer, gravity: 'center' }])
+                .toFile(options.qrPath);
+        })
+        .catch((err) => {
+            throw err;
+        });
+        // delete the temporary QR code file
+        fs.rmSync(tempQrPath, { force: true })
+        console.log('Qr code written to: ' + options.qrPath)
     } catch (err) {
         console.log(err)
     }
