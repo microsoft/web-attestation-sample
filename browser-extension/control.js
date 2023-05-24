@@ -93,6 +93,8 @@ template.innerHTML = `
 
     #button {
         display: none;
+        margin-left: 0.4em;
+        padding: 0.4em 0.8em;
     }
 
 
@@ -149,6 +151,7 @@ class ExtensionControl /* extends HTMLElement */ {
     root
     state
     tag
+    node
     #shadowRoot
 
     constructor (element) {
@@ -206,6 +209,32 @@ class ExtensionControl /* extends HTMLElement */ {
         this.root.style.top = top + 'px'
     }
 
+    message (label, message) {
+        let updated = false
+        const table = this.#shadowRoot.querySelector('#table')
+        for (let i = 0; i < table.rows.length; i++) {
+            const row = table.rows[i]
+            if (row.cells[0].textContent === label) {
+                row.cells[1].textContent = message
+                updated = true
+                break
+            }
+        }
+
+        if (!updated) {
+            const tr = document.createElement('TR')
+            const td0 = document.createElement('TD')
+            const td1 = document.createElement('TD')
+            td0.textContent = label
+            td1.textContent = message
+            td0.className = 'key'
+            td1.className = 'value'
+            tr.appendChild(td0)
+            tr.appendChild(td1)
+            table.appendChild(tr)
+        }
+    }
+
     static verified (issuer, scope, created, info, about) {
         const element = icon(CHECKMARK_URL)
         const control = new ExtensionControl(element)
@@ -236,7 +265,7 @@ class ExtensionControl /* extends HTMLElement */ {
         return control
     }
 
-    static untrusted (issuer, callback) {
+    static untrusted (issuer, callback, error) {
         const element = icon(WARNING_URL)
         const control = new ExtensionControl(element)
         const root = control.#shadowRoot
@@ -249,10 +278,16 @@ class ExtensionControl /* extends HTMLElement */ {
         root.querySelector('#key1').textContent = 'Issuer'
         root.querySelector('#value1').textContent = issuer
 
+        if (error) {
+            root.querySelector('#key1').textContent = error[0]
+            root.querySelector('#value1').textContent = error[1]
+        } else {
+            root.querySelector('#value2').parentNode.remove()
+        }
+
         root.querySelector('#value5').parentNode.remove()
         root.querySelector('#value4').parentNode.remove()
         root.querySelector('#value3').parentNode.remove()
-        root.querySelector('#value2').parentNode.remove()
 
         if (issuer) {
             const button = root.querySelector('#button')

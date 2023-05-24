@@ -109,12 +109,18 @@ function validationResponse (uwaData, node, tag, show = false) {
     if (uwaData) {
         // check if web attestation is valid
         if (uwaData.status === 'error') {
-            node.after(ExtensionControl.invalid(uwaData.error).icon)
+            ec = ExtensionControl.invalid(uwaData.error)
+            ec.tag = tag
+            ec.node = node
+            shields.push(ec)
+            placeShield(node, ec.icon)
+            if (show) ec.show()
         } else if (uwaData.status === 'invalid_scope') {
             ec = ExtensionControl.invalid(uwaData.error)
             ec.tag = tag
+            ec.node = node
             shields.push(ec)
-            node.after(ec.icon)
+            placeShield(node, ec.icon)
             if (show) ec.show()
         } else if (uwaData.status === 'unknown_issuer') {
             ec = ExtensionControl.untrusted(
@@ -136,15 +142,14 @@ function validationResponse (uwaData, node, tag, show = false) {
                             })
                         })
                         .catch((error) => {
-                            ec = ExtensionControl.invalid(error.message)
-                            ec.tag = tag
-                            shields.push(ec)
-                            node.after(ec.icon)
+                            untrustedControl.message('Error', error.message)
+                            untrustedControl.show()
                         })
                 })
             ec.tag = tag
+            ec.node = node
             shields.push(ec)
-            node.after(ec.icon)
+            placeShield(node, ec.icon)
             if (show) ec.show()
         } else {
             // valid badge
@@ -162,9 +167,9 @@ function validationResponse (uwaData, node, tag, show = false) {
             ec = ExtensionControl.verified(
                 uwaData.issuer, uwaData.scope, dt, uwaData.info, uwaData.about)
             ec.tag = tag
+            ec.node = node
             shields.push(ec)
-            // Insert the new icon node after the original node
-            node.after(ec.icon)
+            placeShield(node, ec.icon)
             if (show) ec.show()
 
             const shieldWithSameTag = shields.filter(c => {
@@ -270,9 +275,11 @@ chrome.storage.local.get(['autoScanQrCodes'], function (result) {
                         }
 
                         // If the added node is a container, check its descendants for images
-                        const descendants = node.getElementsByTagName('IMG')
-                        for (let j = 0; j < descendants.length; j++) {
-                            verifyQrImage(descendants[j])
+                        if (node.getElementsByTagName) {
+                            const descendants = node.getElementsByTagName('IMG')
+                            for (let j = 0; j < descendants.length; j++) {
+                                verifyQrImage(descendants[j])
+                            }
                         }
                     }
                 }
@@ -288,3 +295,40 @@ let lastContextMenuTarget
 document.addEventListener('contextmenu', event => {
     lastContextMenuTarget = event.target
 })
+
+function placeShield (node, icon) {
+    if (node.tagName === 'IMG') {
+        icon.style.position = 'absolute'
+        icon.style.zIndex = '1000' // make sure the zIndex is higher than that of the target element
+        const rect = node.getBoundingClientRect()
+
+        const iconWidth = Math.floor(Math.min(rect.width, rect.height) * 0.1)
+        icon.style.height = `${iconWidth}px`
+        icon.style.width = `${iconWidth}px`
+        icon.style.top = `${rect.bottom - iconWidth}px`
+        icon.style.left = `${rect.right - iconWidth}px`
+
+        // Append the image to the body
+        document.body.appendChild(icon)
+    } else {
+        node.after(icon)
+    }
+}
+
+function updateShield (ec) {
+    const rect = ec.node.getBoundingClientRect()
+    const iconWidth = Math.floor(Math.min(rect.width, rect.height) * 0.1)
+    ec.icon.style.height = `${iconWidth}px`
+    ec.icon.style.width = `${iconWidth}px`
+    ec.icon.style.top = `${rect.bottom - iconWidth}px`
+    ec.icon.style.left = `${rect.right - iconWidth}px`
+}
+
+window.onresize = function () {
+    shields.forEach(ec => {
+        ec.hide()
+        if (ec.node && ec.node.tagName === 'IMG') {
+            updateShield(ec)
+        }
+    })
+}

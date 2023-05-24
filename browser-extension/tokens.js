@@ -30,7 +30,9 @@ async function sendIssuanceMessage (issuanceUrl, message) {
  */
 export async function downloadIssuerParams (issuerUrl) {
     let jwks
-    const jwksResp = await fetch(issuerUrl + '/.well-known/jwks.json')
+    const jwksResp = await fetch(issuerUrl + '/.well-known/jwks.json').catch(err => {
+        return { ok: false, err }
+    })
     if (jwksResp.ok) {
         jwks = await jwksResp.json()
         await Promise.all(
