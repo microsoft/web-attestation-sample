@@ -22,10 +22,50 @@ The [sample server](./sample-issuer/README.md) implements the Issuer role, while
 The UWA lifecycle is as follows:
 1. The Issuer sets up its Issuer parameters and publishes them in a publicly accessible location. These specify the contents of the U-Prove tokens, which can contain an application-specific label. Users and Verifiers must obtain the Issuer parameters before creating or verifying web attestations.
 2. The User obtains U-Prove tokens from an Issuer. Authentication to the Issuer is application-specific. U-Prove tokens are stored in the web browser extension; new tokens will be automatically obtained if they expired or if they are running out.
-3. When visiting a web site, the User can create a web attestation using the web browser extension (encoded either as a string or a QR code), and attach it to the site.
-4. Other users visiting the same web site can validate attached web attestations from trusted Issuers using the web browser extension. Unknown Issuers can be added to the trusted list by the User. Invalid attestations (for example: forged, or copied to a different site) are marked as such; malformed ones are simply ignored.
+3. When visiting a web site, the User can create a web attestation from an issued token using the web browser extension (encoded either as a string or a QR code), and attach it to the site. The U-Prove token is then deleted from the browser extension to prevent linkability with newly created attestations.
+4. Other users visiting the same web site can verify attached web attestations from trusted Issuers using the web browser extension. Unknown Issuers can be added to the trusted list by the User. Invalid attestations (for example: forged, or copied from a different site) are marked as such; malformed ones are simply ignored.
 
 ![UWA architecture](./doc/UWA_arch.svg)
+
+## Deployment example
+
+This section describes an example of how a user could create a web attestation for their *soc.ial* profile attesting their membership in the amazing *commun.ity* (both *soc.ial* and *commun.ity* are fictional web sites).
+
+### Issuer setup
+
+The *commun.ity* admin first need to create their U-Prove Issuer parameters and setup their issuance service; this can be achieved using the [sample server](./sample-issuer/README.md) project.
+
+The admin first modifies the [settings.ts](./sample-issuer/src/settings.ts) file to correctly setup the Express server (to be deployed at `https://commun.ity`), which would then need to be modified and integrated into the *commun.ity* web environment to authenticate incoming users. In this example, the admin decides on a 7-day token validity, on an about page location (e.g., `https://commun.ity/uwa/about.html`), and decides to add a "Membership level" label to the tokens with three possible values: "Gold", "Silver", and "Bronze", representing the community's three membership types it offers.
+
+The admin then creates the Issuer parameters by running `npm run setup-issuer` resulting in the creation of a JSON web key (JWK) set (publicly available at `https://commun.ity/.well-known/jwks.json`) and the corresponding private key (that remains, of course, secret).
+
+The admin creates the about page explaining its UWA issuance criteria, and adds a `<meta name="uwa" content="https://commun.ity/issue">` tag in the page's HTML allowing a user's browser extension to discover the token issuance endpoint.
+
+The token issuance server can be deployed by running `npm run deploy-issuer`.
+
+### Token issuance
+
+Alice, a member of *commun.ity*, visits the community web site, and sees the new feature to obtain tokens on its about page. She downloads and install the UWA browser extension for Edge, and in the popup Tokens tab, she clicks `Get tokens` (the browser extension enables this button after parsing the `<meta>` tag in the about page). This triggers the U-Prove issuance protocol after which she obtains some U-Prove tokens signed by *commun.ity* (5 tokens by default); the tokens and corresponding private keys are stored in the browser extension.
+
+### Attestation creation
+
+Alice has a pseudonymous account on *soc.ial*, with name tag *@pr1v4cy*; she wants to add a *commun.ity* membership attestation to her profile. She navigates to her profile page `https://soc.ial/@pr1v4cy`, and from the browser extension's Tokens tab, she selects the `https://commun.ity` issuer and clicks `Create`. The browser extension selects an unused token from the selected issuer, and creates a web attestation by signing the scope URL `https://soc.ial/@pr1v4cy` and current time using the token's private key before deleting it (expired and low-count tokens are automatically renewed by the browser extension). The resulting UWA string and equivalent QR code image are displayed in the popup. Alice copies the UWA string and edits her profile's bio adding the following text:
+
+```
+I'm a member of the amazing commun.ity: uwa://eyJhbGciOiJVUDI1NiJ9.eyJzY29wZSI6Imh0dHBzOi8vc29jLmlhbC9AcHIxdjRjeSIsInRpbWVzdGFtcCI6MTY4NDk1MDA0Mzg5MX0.eyJ1cHQiOnsiVUlEUCI6ImJvTGNUdTA1M2NNeGtOVEJtdEMyTmFkb2VIUnEyMzVtTmlQLVRNblM1Y2siLCJoIjoiQkVrZHJWU1padV9lUmNXc25YNld4M0Z3QmxwdWxnSkU2NUEyeWtyUmxkMjdUN3VxY3E4ZTZKOVl1NkNVaDJOQzNYZVo3QmlvTGQ4M2VMWlhGQURNeW00IiwiVEkiOiJleUpwYzNNaU9pSm9kSFJ3Y3pvdkwyTnZiVzExYmk1cGRIa2lMQ0psZUhBaU9qSXdNREF5TENKc1ltd2lPakY5IiwiUEkiOiIiLCJzWnAiOiJCR2RlT01rcTNnX1VEdHp2R1ZOTTYzckY2VGh6WDlPX0RoWFA4Q3I0Y3dlQW9QaHAxMEpKWnZBZ3NsN2tjLWJXTDEtX2V4eHpzdEhuS1JVT2ZpX0N2dE0iLCJzQ3AiOiJHaWJXdDYybGt3TG1Od3hYM3F5U2szblR5Y05HQy1pNmRiTkJhUUdBbzZjIiwic1JwIjoiWFNfY1dTOTdRNm5udTJpSlRjVXpKWHJHamdFdXBWLWZiOWZNRFlhRGpaMCJ9LCJwcCI6eyJhIjoiMFl3VUZWQjBKUmJIM2tRM1cyaElzb3VnLTJnQ21wbTVUSnBTLXJQYXZfdyIsInIiOlsiZGdqTU9mR2U1MWlpV0JHWTB0bVQ5VHJ1dVRRWjhXZHBpaFhZY2pBSUM5VSJdfX0
+```
+
+In addition, she downloads the QR code image, and adds it in a pinned message on her profile page.
+
+![soc.ial QR code](./doc/soc.ial.qr.png)
+
+### Attestation verification
+
+Bob, who also has the UWA browser extension installed, navigates to `https://soc.ial/@pr1v4cy` to learn more about this insightful user. The browser extension automatically parses the UWA string in the bio text, and since Bob is also a member of *commun.ity* (and therefore already trusts this Issuer), it renders it as a verified blue badge. Clicking on the badge reveals that *@pr1v4cy* is a Gold member of *commun.ity* (wow!) and this already increases Bob's confidence in this user's *soc.ial* posts. Bob would like to know who is behind this *@pr1v4cy* tag name, unfortunately he can't even if he bribed the *commun.ity* admin with a million dollars (this could be any of the site's Gold members, nothing else to learn due to the U-Prove unlinkability property).
+
+Bob later navigates to `https://soc.ial/@h4ck3r`, who also claims to be part of *commun.ity*. This malicious user is however not part of the reputable community, they simply copied the UWA string from *@pr1v4cy*'s page and added it to their own. Fortunately, the browser extension isn't fooled by this subterfuge, and renders the string as a red invalid badge (the U-Prove presentation proof is invalid, because the signed scope doesn't match the current page).
+
+Finally, Bob visits the page of `https://soc.ial/2cool4u` and starts reading this user's numerous but interesting posts. Bob starts to wonder if this is a bot account or simply someone with a lot of free time! This user's profile pic is a UWA QR code, so Bob right click on it and selects "Verify QR". The QR-encoded UWA string has been issued by `https://human.iam`, an issuer unknown to Bob (and his browser extension), so a yellow unknown badge is displayed. After navigating to their website and performing a quick web search, Bob learns that this is a web site that validates users' humanness after validating their real-life identity. Bob decides to click on the `Trust` button in the UWA badge, which prompts the browser extension to download and trust the Issuer parameters from `https://human.iam/.well-known/jwks.json` and validate the UWA. Bob now inspect the information of the verified blue badge, learning that *2cool4u* was verified using a government-issued ID, which convinces Bob that this is indeed a real person. From now on, UWA from `https://human.iam` will be automatically verified by his browser extension.
 
 ## Frequently Asked Questions
 

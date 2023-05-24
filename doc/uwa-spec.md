@@ -5,7 +5,7 @@ This document specifies the User-centric Web Attestation (UWA) framework.
 A UWA is composed of an attestation issued to a user by an issuer, and a proof created by the user attaching the attestation to a scope at a specific timestamp. UWA have these interesting properties:
 
 * *Authenticated*: Attestations are signed by issuers and tied to a user-controlled private key. Only the users to whom the attestation was issued can attach it to some web content.
-* *Unlinkable*: The cryptographic values (including the issuer signature and user public key) have been randomized by the user, preventing anyone to link the attestation issuance to its attachment to some web content.
+* *Unlinkable*: The cryptographic values (including the issuer signature and user public key) have been randomized by the user, preventing anyone from linking the attestation issuance to its attachment to some web content, preserving the user's privacy.
 * *Informational*: Attestations can contain attributes about its user.
 * *Non-transferable*: once attached to some web content, the attestations cannot be transferred (stolen).
 
