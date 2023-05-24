@@ -111,6 +111,7 @@ void (async () => {
                 mode: 'byte'
             }})
         const qrOptions: QRCodeToFileOptions = {
+            width: 350,
             errorCorrectionLevel: 'M',
             type: 'png',
         }
