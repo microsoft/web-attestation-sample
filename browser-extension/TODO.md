@@ -1,5 +1,4 @@
 Pre-release TODO list
-* Refresh tokens when running low; UI error when there are no more 
 * Improve Badge positioning in HTML
 * TODO: FIXME: delete this file :)
 
