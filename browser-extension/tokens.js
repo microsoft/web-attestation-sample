@@ -274,11 +274,17 @@ export async function verifyTokenPresentation (jws) {
     }
 }
 
+/**
+ * Returns the base, sanitized URL given a complete one; i.e. a lowercase scheme + path
+ * URL without query-parameters or anchors, and without a trailing '/'
+ * @param {*} url the URL to sanitize
+ * @returns the sanitized base URL
+ */
 export function getBaseURL (url) {
     try {
         const urlObj = new URL(url)
-        const baseURL = urlObj.origin + urlObj.pathname
-        return baseURL.toLowerCase()
+        const baseURL = (urlObj.origin + urlObj.pathname).replace(/\/$/,'').toLowerCase()
+        return baseURL
     } catch (error) {
         console.error('Error getting base URL:', error)
         return null
