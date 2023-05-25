@@ -198,7 +198,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
     if (request.action === 'verifyAllQrImages') {
         document.querySelectorAll('img').forEach(i => {
-            verifyQrImage(i)
+            verifyQrImage(i, true)
         })
         sendResponse({})
     }
@@ -214,15 +214,15 @@ function downloadIssuerParams (issuerUrl) {
     })
 }
 
-function verifyQrImage (imgNode) {
+function verifyQrImage (imgNode, auto = false) {
     // download image to dataUrl in background.js with fetch as we could not read the image data here
     // because of CORS limitations
     chrome.runtime.sendMessage({ text: 'fetchImage', imageUrl: imgNode.src }, (result) => {
-        decodeImage(result.imageData, imgNode)
+        decodeImage(result.imageData, imgNode, auto)
     })
 }
 
-function decodeImage (imageData, imgNode) {
+function decodeImage (imageData, imgNode, auto = false) {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
 
@@ -242,6 +242,8 @@ function decodeImage (imageData, imgNode) {
             chrome.runtime.sendMessage({ text: 'checkUWA', string: uwaTag }, (uwaData) => {
                 validationResponse(uwaData, imgNode, uwaTag, true)
             })
+        } else {
+            if (auto === false) { alert('Image is not a UWA QR code') }
         }
     }
     img.src = imageData
@@ -259,7 +261,7 @@ chrome.storage.local.get(['autoScanQrCodes'], function (result) {
         // Add load event listener to existing images
         const images = document.getElementsByTagName('IMG')
         for (let i = 0; i < images.length; i++) {
-            verifyQrImage(images[i])
+            verifyQrImage(images[i], true)
         }
 
         // Create a MutationObserver to watch for added images
@@ -271,14 +273,14 @@ chrome.storage.local.get(['autoScanQrCodes'], function (result) {
 
                         // Check if the added node is an image
                         if (node.tagName === 'IMG') {
-                            verifyQrImage(node)
+                            verifyQrImage(node, true)
                         }
 
                         // If the added node is a container, check its descendants for images
                         if (node.getElementsByTagName) {
                             const descendants = node.getElementsByTagName('IMG')
                             for (let j = 0; j < descendants.length; j++) {
-                                verifyQrImage(descendants[j])
+                                verifyQrImage(descendants[j], true)
                             }
                         }
                     }
