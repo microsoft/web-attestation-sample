@@ -61,11 +61,21 @@ In addition, she downloads the QR code image, and adds it in a pinned message on
 
 ### Attestation verification
 
-Bob, who also has the UWA browser extension installed, navigates to `https://soc.ial/@pr1v4cy` to learn more about this insightful user. The browser extension automatically parses the UWA string in the bio text, and since Bob is also a member of *commun.ity* (and therefore already trusts this Issuer), it renders it as a verified blue badge. Clicking on the badge reveals that *@pr1v4cy* is a Gold member of *commun.ity* (wow!) and this already increases Bob's confidence in this user's *soc.ial* posts. Bob would like to know who is behind this *@pr1v4cy* tag name, unfortunately he can't even if he bribed the *commun.ity* admin with a million dollars (this could be any of the site's Gold members, nothing else to learn due to the U-Prove unlinkability property).
+Bob, who also has the UWA browser extension installed, navigates to `https://soc.ial/@pr1v4cy` to learn more about this insightful user. The browser extension automatically parses the UWA string in the bio text, and since Bob is also a member of *commun.ity* (and therefore already trusts this Issuer), it renders it as a verified blue badge. Clicking on the badge reveals that *@pr1v4cy* is a Gold member of *commun.ity* (wow!) and this already increases Bob's confidence in this user's *soc.ial* posts. 
+
+<img src="./doc/verified_soc.ial.png" alt="Verified blue badge" width="40%"/>
+
+Bob would like to know who is behind this *@pr1v4cy* tag name, unfortunately he can't even if he bribed the *commun.ity* admin with a million dollars (this could be any of the site's Gold members, nothing else to learn due to the U-Prove unlinkability property).
 
 Bob later navigates to `https://soc.ial/@h4ck3r`, who also claims to be part of *commun.ity*. This malicious user is however not part of the reputable community, they simply copied the UWA string from *@pr1v4cy*'s page and added it to their own. Fortunately, the browser extension isn't fooled by this subterfuge, and renders the string as a red invalid badge (the U-Prove presentation proof is invalid, because the signed scope doesn't match the current page).
 
-Finally, Bob visits the page of `https://soc.ial/2cool4u` and starts reading this user's numerous but interesting posts. Bob starts to wonder if this is a bot account or simply someone with a lot of free time! This user's profile pic is a UWA QR code, so Bob right click on it and selects "Verify QR". The QR-encoded UWA string has been issued by `https://human.iam`, an issuer unknown to Bob (and his browser extension), so a yellow unknown badge is displayed. After navigating to their website and performing a quick web search, Bob learns that this is a web site that validates users' humanness after validating their real-life identity. Bob decides to click on the `Trust` button in the UWA badge, which prompts the browser extension to download and trust the Issuer parameters from `https://human.iam/.well-known/jwks.json` and validate the UWA. Bob now inspect the information of the verified blue badge, learning that *2cool4u* was verified using a government-issued ID, which convinces Bob that this is indeed a real person. From now on, UWA from `https://human.iam` will be automatically verified by his browser extension.
+<img src="./doc/invalid_soc.ial.png" alt="Invalid red badge" width="40%"/>
+
+Finally, Bob visits the page of `https://soc.ial/2cool4u` and starts reading this user's numerous but interesting posts. Bob starts to wonder if this is a bot account or simply someone with a lot of free time! This user's profile pic is a UWA QR code, so Bob right click on it and selects "Verify QR". The QR-encoded UWA string has been issued by `https://human.iam`, an issuer unknown to Bob (and his browser extension), so a yellow unknown badge is displayed. 
+
+<img src="./doc/untrusted_soc.ial.png" alt="Untrusted yellow badge" width="40%"/>
+
+After navigating to their website and performing a quick web search, Bob learns that this is a web site that validates users' humanness after validating their real-life identity. Bob decides to click on the `Trust` button in the UWA badge, which prompts the browser extension to download and trust the Issuer parameters from `https://human.iam/.well-known/jwks.json` and validate the UWA. Bob now inspect the information of the verified blue badge, learning that *2cool4u* was verified using a government-issued ID, which convinces Bob that this is indeed a real person. From now on, UWA from `https://human.iam` will be automatically verified by his browser extension.
 
 ## Frequently Asked Questions
 
