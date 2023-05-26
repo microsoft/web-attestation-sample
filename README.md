@@ -1,8 +1,8 @@
-*** ***PRE-RELEASE VERSION: WORK IN PROGRESS*** ***
-
 # User-centric Web Attestations
 
-This project is a proof-of-concept prototype for User-Centric Web Attestations (UWA); as such, it shouldn't be used as-is in a production environment. These attestations are statements (encoded as [U-Prove tokens](https://microsoft.com/uprove)) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
+*This is a sample project, as such, it shouldn't be used as-is in a production environment.*
+
+This project implements a proof-of-concept prototype for User-Centric Web Attestations (UWA). These attestations are statements (encoded as [U-Prove tokens](https://microsoft.com/uprove)) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
 
 Details can be found in the [UWA specification](./doc/uwa-spec.md).
 
@@ -29,11 +29,11 @@ The UWA lifecycle is as follows:
 
 ## Deployment example
 
-This section describes an example of how a user could create a web attestation for their *soc.ial* profile attesting their membership in the amazing *commun.ity* (both *soc.ial* and *commun.ity* are fictional web sites).
+This section describes an example of how a user could create a web attestation for their *soc.ial* profile attesting their membership in the amazing *commun.ity* group, and how another user can prove they are human using an attestation from the *human.iam* service (note that *soc.ial*, *commun.ity*, and *human.iam* are fictional web sites).
 
 ### Issuer setup
 
-The *commun.ity* admin first need to create their U-Prove Issuer parameters and setup their issuance service; this can be achieved using the [sample server](./sample-issuer/README.md) project.
+The *commun.ity* admin first needs to create their U-Prove Issuer parameters and setup their issuance service; this can be achieved using the [sample server](./sample-issuer/README.md) project.
 
 The admin first modifies the [settings.ts](./sample-issuer/src/settings.ts) file to correctly setup the Express server (to be deployed at `https://commun.ity`), which would then need to be modified and integrated into the *commun.ity* web environment to authenticate incoming users. In this example, the admin decides on a 7-day token validity, on an about page location (e.g., `https://commun.ity/uwa/about.html`), and decides to add a "Membership level" label to the tokens with three possible values: "Gold", "Silver", and "Bronze", representing the community's three membership types it offers.
 
