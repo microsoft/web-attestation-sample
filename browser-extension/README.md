@@ -12,7 +12,7 @@ Using this browser extension, a user can
 
 ## Setup
 
-Follow the [sideloading instructions](https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/getting-started/extension-sideloading) to lead the browser extension into Edge.
+Follow the [sideloading instructions](https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/getting-started/extension-sideloading) to load the browser extension into Edge, and the [unpacked loading instructions](https://developer.chrome.com/docs/extensions/mv3/getstarted/development-basics/#load-unpacked) to load it in Chrome.
 
 ## Usage
 
@@ -38,10 +38,3 @@ When the user visits a web site containing web attestations, the extension parse
 * Unknown badge <img src="./icons/warning.svg" alt="unknown badge" title="unknown badge" width="25" />: the attestation cannot be validated, since the issuer is unknown. The user can opt to trust the issuer, in which case the validation is performed again.
 
 Clicking on the badge icon displays the attestation's details, including its issuer, the date at which it was created, the scope it was attached to, and a label created by the issuer.
-
-## Extensions
-
-This project is a proof-of-concept sample, illustrating the mechanism to create and validate secure and privacy-preserving web attestations. Many improvements, both to the specification and the implementation would be needed to make it suitable for real-life deployment. For example
-* Token private keys should be better protected to avoid extraction my malicious parties, including the user who might want to transfer its tokens to unauthorized parties. U-Prove supports a device-binding feature allowing issued tokens to be bound to a secondary component, which could help prevent token sharing. 
-* Attestations could be made more informative by containing attributes that a user could chose to disclose when creating them. U-Prove tokens supports selective-disclosure of attributes, which would be suitable for this feature.
-* The display badges UI could be better protected to avoid manipulation by other components having access to the DOM. 

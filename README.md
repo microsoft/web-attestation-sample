@@ -1,8 +1,8 @@
-*** ***PRE-RELEASE VERSION: WORK IN PROGRESS*** ***
-
 # User-centric Web Attestations
 
-This project is a proof-of-concept prototype for User-Centric Web Attestations (UWA); as such, it shouldn't be used as-is in a production environment. These attestations are statements (encoded as [U-Prove tokens](https://microsoft.com/uprove)) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
+*This is a sample project, as such, it shouldn't be used as-is in a production environment.*
+
+This project implements a proof-of-concept prototype for User-Centric Web Attestations (UWA). These attestations are statements (encoded as [U-Prove tokens](https://microsoft.com/uprove)) certified by an Issuer that can be attached to a web site by their User and verified by anyone. The UWA are only valid on the page (scope) to which they are attached. UWA protects the privacy of users; they contain no traceable information other than the application-specific data a user might want to disclose. Users are in control of which attestations to present where.
 
 Details can be found in the [UWA specification](./doc/uwa-spec.md).
 
@@ -29,11 +29,11 @@ The UWA lifecycle is as follows:
 
 ## Deployment example
 
-This section describes an example of how a user could create a web attestation for their *soc.ial* profile attesting their membership in the amazing *commun.ity* (both *soc.ial* and *commun.ity* are fictional web sites).
+This section describes an example of how a user could create a web attestation for their *soc.ial* profile attesting their membership in the amazing *commun.ity* group, and how another user can prove they are human using an attestation from the *human.iam* service (note that *soc.ial*, *commun.ity*, and *human.iam* are fictional web sites).
 
 ### Issuer setup
 
-The *commun.ity* admin first need to create their U-Prove Issuer parameters and setup their issuance service; this can be achieved using the [sample server](./sample-issuer/README.md) project.
+The *commun.ity* admin first needs to create their U-Prove Issuer parameters and setup their issuance service; this can be achieved using the [sample server](./sample-issuer/README.md) project.
 
 The admin first modifies the [settings.ts](./sample-issuer/src/settings.ts) file to correctly setup the Express server (to be deployed at `https://commun.ity`), which would then need to be modified and integrated into the *commun.ity* web environment to authenticate incoming users. In this example, the admin decides on a 7-day token validity, on an about page location (e.g., `https://commun.ity/uwa/about.html`), and decides to add a "Membership level" label to the tokens with three possible values: "Gold", "Silver", and "Bronze", representing the community's three membership types it offers.
 
@@ -116,6 +116,7 @@ This initial release focusses on the core concept of creating user-controlled an
 * *Key protection*: the User's token keys are stored as-is in the browser extension's local storage. Keys should be encrypted under a user-controlled key to help prevent theft. It is also desirable to prevent Users from extracting the private keys to prevent undesired token transfer (for example, to prevent Users from sharing or selling their attestations), which is difficult to do in a JavaScript environment. Stronger cryptographic techniques, such as the U-Prove device binding (see section 6 of the U-Prove [technical overview](https://github.com/microsoft/uprove-node-reference/blob/main/doc/U-Prove%20Technology%20Overview%20V1.1%20Revision%203.pdf)) could be use to tie a token to a specific 2nd-factor device (e.g., a TPM, a phone).
 * *UWA links*: a web attestation URI might be too big to fit into some web environments with a character limit, and its alternative QR code form might not suitable for text-only environment. Another possibility is to define a UWA link, pointing to an external location from which the UWA content could be retrieved from.
 * *Verifier UI protections*: malicious code could be used to trick a user into believing a fake UWA is valid by manipulating the page's UI (e.g., displaying verified badges or fake content popup on top of the ones created by the browser extensions). Isolating the extension's UI element in their own iframe could help mitigate this issue. Another useful feature would be for the browser extension to display the current's page validated UWAs in its popup. 
+* *Site integration support*: the system currenty requires users to integrate the UWA string or QR code into a web site themselves. Participating sites could make the experience more user friendly by providing a mechanisms to accept attestations from the browser extension, and integrate them in the HTML they serve in a non-intrusive way, or by verifying the information once and directly displaying validated badges for all site visitors.
 
 ## Contributing
 
