@@ -8,7 +8,7 @@ import { parseUWA } from './uwa.js'
 import { downloadIssuerParams, getBaseURL } from './tokens.js'
 
 // Define the checkUPWA function
-async function checkUWA(string, scope) {
+async function checkUWA (string, scope) {
     console.log('checkUWA called', string)
     const uwaData = await parseUWA(string)
     if (uwaData.status === 'valid' && uwaData.scope !== scope) {
@@ -25,16 +25,18 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
     }
 
     if (msg?.text === 'downloadIssuerParams') {
-        downloadIssuerParams(msg.string).then(sendResponse)
+        downloadIssuerParams(msg.string).then(result => {
+            sendResponse(result)
+        })
     }
 
     if (msg?.text === 'fetchImage') {
-        fetchImage(msg.imageUrl)
+        fetchImage(msg.string)
             .then(dataUrl => {
-                sendResponse({ imageData: dataUrl })
+                sendResponse({ dataUrl })
             })
             .catch(() => {
-                sendResponse({ imageData: null })
+                sendResponse({ dataUrl: null })
             })
     }
 
@@ -63,10 +65,7 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener((info, tab) => {
     if (info.menuItemId === 'verifyQR') {
         console.log('verifyQR clicked', info, tab.id)
-        fetchImage(info.srcUrl)
-            .then(dataUrl => {
-                chrome.tabs.sendMessage(tab.id, { action: 'verifyContextImage', dataUrl })
-            })
+        chrome.tabs.sendMessage(tab.id, { action: 'verifyContextImage' })
     }
 })
 
@@ -76,7 +75,7 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     }
 })
 
-function fetchImage(url) {
+function fetchImage (url) {
     return fetch(url)
         .then((response) => response.blob())
         .then((blob) => {

@@ -26,9 +26,13 @@
                 "<all_urls>"
             ],
             "js": [
+                "global.js",
                 "lib/uwaqrencoder.js",
+                "uwaControl.js",
+                "scanner.js",
                 "control.js",
                 "content.js"
+
             ],
             "run_at": "document_idle"
         }

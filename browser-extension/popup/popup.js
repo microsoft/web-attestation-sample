@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
     })
 
     // requests issuer url from tab
-    async function getTabIssuerUrl(tab) {
+    async function getTabIssuerUrl (tab) {
         return new Promise((resolve, reject) => {
             chrome.tabs.sendMessage(tab.id, { action: 'getIssuerUrl' }, (response) => {
                 // if the tab is the empty-tab there will be no message listener

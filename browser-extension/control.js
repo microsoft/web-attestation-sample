@@ -1,11 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-/* global chrome */
-
-const CHECKMARK_URL = chrome.runtime.getURL('icons/checkmark.svg')
-const INVALID_URL = chrome.runtime.getURL('icons/invalid.svg')
-const WARNING_URL = chrome.runtime.getURL('icons/warning.svg')
+/* global */
 
 const template = document.createElement('TEMPLATE')
 template.innerHTML = `
@@ -31,6 +27,8 @@ template.innerHTML = `
         font-size: 12px;
         padding: 0.8em;
         margin: 1em;
+        line-height: 1.25;
+        
     }
 
     .left {
@@ -145,199 +143,123 @@ template.innerHTML = `
 
 `
 
+/**
+ * Uwa validation status popup for content.js
+ * There will be a single instance of this control is re-decorated for each use
+ * @class UwaContentPopup
+ */
 // eslint-disable-next-line no-unused-vars
-class ExtensionControl /* extends HTMLElement */ {
-    icon
-    root
-    state
-    tag
-    node
+class UwaContentPopup /* extends HTMLElement */ {
+    container
     #shadowRoot
+    #table
+    #icon
+    #label
+    #button
+    #callback
 
-    constructor (element) {
-    // super();
-
-        this.state = 'PENDING'
-        this.root = document.createElement('DIV')
-        this.icon = element
-
-        console.debug('CONSTRUCTOR: custom-control')
-
-        // create shadow-dom
-        this.#shadowRoot = this.root.attachShadow({ mode: 'open' })
+    constructor () {
+        this.container = document.createElement('DIV')
+        this.#shadowRoot = this.container.attachShadow({ mode: 'open' })
         this.#shadowRoot.appendChild(template.cloneNode(true).content)
-
-        // this.root.id = id ?? 'extension-control';
-        this.root.style.display = 'none'
-
-        document.body.appendChild(this.root)
-
-        element.addEventListener('click', event => {
-            if (this.root.style.display === 'none') {
-                this.show()
-            } else {
-                this.hide()
-            }
-            // stop the event propogation
-            // otherwise our check to see if the user clicked off the control, to close it, will fire.
-            event.stopPropagation()
-        })
-
-        element.addEventListener('hover', event => {
-        })
+        this.container.style.display = 'none'
+        document.body.appendChild(this.container)
+        this.#table = this.#shadowRoot.querySelector('#table')
+        this.#icon = this.#shadowRoot.querySelector('#icon')
+        this.#label = this.#shadowRoot.querySelector('#label')
+        this.#button = this.#shadowRoot.querySelector('#button')
+        this.hide()
     }
 
-    show () {
-        this.root.style.display = 'block'
-        this.position()
-        document.addEventListener('click', outsideOfControlClickHandler.bind(this))
+    show (element, label, iconUrl, table, buttonLabel, callback) {
+        this.#label.textContent = label
+        this.#label.style.display = 'block'
+        if (iconUrl) {
+            this.#icon.style.display = 'block'
+            this.#icon.src = iconUrl
+        }
+        table.forEach((line, index) => {
+            const tr = this.#table.rows[index]
+            tr.style.display = 'table-row'
+            if (line.value !== undefined || line.link !== undefined) {
+                tr.cells[0].textContent = line.label
+                if (line.value) {
+                    tr.cells[1].textContent = line.value
+                } else if (line.link) {
+                    tr.cells[1].innerHTML = line.link
+                }
+            }
+        })
+        if (buttonLabel) {
+            this.#button.style.display = 'block'
+            this.#button.value = buttonLabel
+            this.#callback = callback
+            this.#button.addEventListener('click', callback)
+        }
+        this.container.style.display = 'block'
+
+        // eslint-disable-next-line no-void
+        void this.container.offsetWidth
+
+        // don't position until the icon has loaded or we will get the wrong width
+        this.#icon.onload = () => {
+            this.position(element)
+        }
+
+        if (iconUrl === undefined) {
+            this.position(element)
+        }
+
+        // eslint-disable-next-line no-unused-vars
+        const closeListener = (event) => {
+            const isClickInsideElement = this.container.contains(event.target)
+
+            if (!isClickInsideElement) {
+                this.hide()
+                document.removeEventListener('click', closeListener)
+            }
+        }
+
+        document.addEventListener('click', closeListener)
     }
 
     hide () {
-        this.root.style.display = 'none'
-        document.removeEventListener('click', outsideOfControlClickHandler.bind(this))
-        document.removeEventListener('click', outsideOfControlClickHandler.bind(this))
-    }
-
-    position () {
-        const boundRect = this.icon.getBoundingClientRect()
-        const controlRect = this.root.getBoundingClientRect()
-        let left = boundRect.left + window.pageXOffset - (controlRect.width / 2) + (boundRect.width / 2)
-        const top = boundRect.top + window.pageYOffset + boundRect.height
-        left = Math.max(left, 0)
-        this.root.style.left = Math.min(left, window.innerWidth - controlRect.width) + 'px'
-        this.root.style.top = top + 'px'
-    }
-
-    message (label, message) {
-        let updated = false
-        const table = this.#shadowRoot.querySelector('#table')
-        for (let i = 0; i < table.rows.length; i++) {
-            const row = table.rows[i]
-            if (row.cells[0].textContent === label) {
-                row.cells[1].textContent = message
-                updated = true
-                break
-            }
-        }
-
-        if (!updated) {
-            const tr = document.createElement('TR')
-            const td0 = document.createElement('TD')
-            const td1 = document.createElement('TD')
-            td0.textContent = label
-            td1.textContent = message
-            td0.className = 'key'
-            td1.className = 'value'
-            tr.appendChild(td0)
-            tr.appendChild(td1)
-            table.appendChild(tr)
-        }
-    }
-
-    static verified (issuer, scope, created, info, about) {
-        const element = icon(CHECKMARK_URL)
-        const control = new ExtensionControl(element)
-        const root = control.#shadowRoot
-        control.state = 'VERIFIED'
-
-        const img = control.#shadowRoot.querySelector('#icon')
-
-        const a = document.createElement('a')
-        a.setAttribute('href', about)
-        a.setAttribute('target', '_blank')
-        a.innerHTML = about
-
-        img.src = element.src
-        root.querySelector('#label').textContent = 'Verified'
-        root.querySelector('#key1').textContent = 'Issuer'
-        root.querySelector('#key2').textContent = 'Scope'
-        root.querySelector('#key3').textContent = 'Created'
-        root.querySelector('#key4').textContent = 'Info'
-        root.querySelector('#key5').textContent = 'About'
-        root.querySelector('#value1').textContent = issuer
-        root.querySelector('#value2').textContent = scope
-        root.querySelector('#value3').textContent = created
-        root.querySelector('#value4').textContent = info
-        root.querySelector('#value5').textContent = ''
-        root.querySelector('#value5').appendChild(a)
-
-        return control
-    }
-
-    static untrusted (issuer, callback, error) {
-        const element = icon(WARNING_URL)
-        const control = new ExtensionControl(element)
-        const root = control.#shadowRoot
-        control.state = 'UNTRUSTED'
-        const img = control.#shadowRoot.querySelector('#icon')
-
-        img.src = element.src
-        root.querySelector('#label').textContent = 'Untrusted'
-
-        root.querySelector('#key1').textContent = 'Issuer'
-        root.querySelector('#value1').textContent = issuer
-
-        if (error) {
-            root.querySelector('#key1').textContent = error[0]
-            root.querySelector('#value1').textContent = error[1]
-        } else {
-            root.querySelector('#value2').parentNode.remove()
-        }
-
-        root.querySelector('#value5').parentNode.remove()
-        root.querySelector('#value4').parentNode.remove()
-        root.querySelector('#value3').parentNode.remove()
-
-        if (issuer) {
-            const button = root.querySelector('#button')
-            button.style.display = 'block'
-
-            button.addEventListener('click', () => {
-                callback(control)
+        this.#label.textContent = ''
+        Array.from(this.#table.rows).forEach(tr => {
+            Array.from(tr.cells).forEach(td => {
+                td.textContent = ''
             })
-        }
-
-        return control
+            tr.style.display = 'none'
+        })
+        this.#icon.style.display = 'none'
+        this.#button.style.display = 'none'
+        this.#button.removeEventListener('click', this.#callback)
+        this.#callback = undefined
+        this.container.style.display = 'none'
     }
 
-    static invalid (message) {
-        const element = icon(INVALID_URL)
-        const control = new ExtensionControl(element)
-        const root = control.#shadowRoot
-        const img = control.#shadowRoot.querySelector('#icon')
-        control.state = 'INVALID'
+    /**
+     * Position the popup relative to an element fully on the screen
+     *
+     * @param {*} node
+     * @memberof UwaContentPopup
+     */
+    position (element) {
+        const boundRect = element.getBoundingClientRect()
 
-        img.src = element.src
-        root.querySelector('#label').textContent = 'Invalid'
+        // check if the fixed element will go off the right edge of the screen
+        this.container.style.left =
+            boundRect.right + this.container.offsetWidth > window.innerWidth
+                ? `${window.innerWidth - this.container.offsetWidth - 10}px`
+                : `${boundRect.right}px`
 
-        root.querySelector('#value5').parentNode.remove()
-        root.querySelector('#value4').parentNode.remove()
-        root.querySelector('#value3').parentNode.remove()
-        root.querySelector('#value2').parentNode.remove()
-
-        if (message) {
-            root.querySelector('#key1').textContent = 'Error'
-            root.querySelector('#value1').textContent = message
-        } else {
-            root.querySelector('#value1').parentNode.remove()
-        }
-
-        return control
-    }
-}
-
-function outsideOfControlClickHandler (event) {
-    if (!this.root.contains(event.target)) {
-        this.hide()
+        // check if the fixed element will go off the bottom edge of the screen
+        this.container.style.top =
+            boundRect.bottom + this.container.offsetHeight > window.innerHeight
+                ? `${window.innerHeight - this.container.offsetHeight - 10}px`
+                : this.container.style.top = `${boundRect.bottom}px`
     }
 }
 
-// Create an instance of an image element
-const icon = (path) => {
-    const img = document.createElement('img')
-    img.style.height = '1em'
-    img.style.width = '1em'
-    img.setAttribute('src', path)
-    return img
-}
+// eslint-disable-next-line no-unused-vars
+const uwaContentPopup = new UwaContentPopup()
