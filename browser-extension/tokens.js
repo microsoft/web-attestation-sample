@@ -7,6 +7,8 @@ import uproveModule from './lib/uprove.mjs'
 
 const { Buffer, serialization, upjf, uprove } = uproveModule
 
+const DOWNLOAD_TIMEOUT = 2000
+
 // send a message to the issuer and return the next message
 async function sendIssuanceMessage (issuanceUrl, message) {
     console.log('sending issuance message', message)
@@ -30,9 +32,17 @@ async function sendIssuanceMessage (issuanceUrl, message) {
  */
 export async function downloadIssuerParams (issuerUrl) {
     let jwks
-    const jwksResp = await fetch(issuerUrl + '/.well-known/jwks.json').catch(err => {
+    const jwksResp = await Promise.race([
+        fetch(issuerUrl + '/.well-known/jwks.json'),
+        new Promise((_resolve, reject) =>
+            setTimeout(() => {
+                reject(new Error('timeout'))
+            }, DOWNLOAD_TIMEOUT)
+        )
+    ]).catch(err => {
         return { ok: false, err }
     })
+
     if (jwksResp.ok) {
         jwks = await jwksResp.json()
         await Promise.all(
@@ -283,7 +293,7 @@ export async function verifyTokenPresentation (jws) {
 export function getBaseURL (url) {
     try {
         const urlObj = new URL(url)
-        const baseURL = (urlObj.origin + urlObj.pathname).replace(/\/$/,'').toLowerCase()
+        const baseURL = (urlObj.origin + urlObj.pathname).replace(/\/$/, '').toLowerCase()
         return baseURL
     } catch (error) {
         console.error('Error getting base URL:', error)
