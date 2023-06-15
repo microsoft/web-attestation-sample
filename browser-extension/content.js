@@ -40,8 +40,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         Scanner.scanImages = true
     }
     if (request.action === 'verifyContextImage') {
-        Uwa.tryDecodeNode(lastContextMenuTarget).then(result => {
-            if (!result) alert('This image cannot be decoded to a UWA')
+        Uwa.tryDecodeNode(lastContextMenuTarget).then(uwa => {
+            if (!uwa) {
+                alert('This image cannot be decoded to a UWA')
+            } else { 
+                uwa.popup()
+            }
         })
     }
 })
