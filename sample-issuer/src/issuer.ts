@@ -5,12 +5,13 @@ import express from 'express'
 import http from 'http'
 import rateLimit from 'express-rate-limit'
 import fs from 'fs'
-import * as crypto from 'crypto'
+import { webcrypto as crypto } from 'crypto'
 
 import type * as io from './io.js'
 import * as settings from './settings.js'
 
 import { upjf, uprove, utils, serialization } from 'uprove-node-reference'
+import { type Request, type Response } from 'express'
 
 // some issuer settings
 const MAX_TOKEN_COUNT = 10 // maximum number of tokens to issue in parallel
@@ -20,7 +21,7 @@ const PRIVATE_KEY_PATH = 'private/ip.key' // created by the setup script
 // read the issuer parameters
 const jwksString = fs.readFileSync(ISSUER_PARAMS_PATH, 'utf8')
 const jwk: upjf.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0] // TODO: add a config option to select the key
-const issuerParams = upjf.decodeJWKAsIP(jwk)
+const issuerParams = await upjf.decodeJWKAsIP(jwk)
 console.log('Issuer parameters loaded from: ' + ISSUER_PARAMS_PATH)
 
 // read the private key
@@ -52,7 +53,8 @@ app.use(limiter)
 const sessionDB = new Map<string, uprove.Issuer>()
 
 // issuance protocol handler
-app.post(settings.ISSUANCE_SUFFIX, (req, res) => {
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
+app.post(settings.ISSUANCE_SUFFIX, async (req: Request, res: Response) => {
     console.log('Received POST for', settings.ISSUANCE_SUFFIX, req.body)
     res.type('json')
     try {
@@ -97,7 +99,7 @@ app.post(settings.ISSUANCE_SUFFIX, (req, res) => {
                 refreshID = msg.rID
             } else {
                 // create a random refresh ID to recognize the user in subsequent issuance calls
-                refreshID = crypto.randomBytes(32).toString('base64')
+                refreshID = bytesToBase64(crypto.getRandomValues(new Uint8Array(32)))
             }
 
             let n = 1
@@ -109,7 +111,7 @@ app.post(settings.ISSUANCE_SUFFIX, (req, res) => {
                 n = msg.n <= MAX_TOKEN_COUNT ? msg.n : MAX_TOKEN_COUNT
             }
             // create a random session ID to recognize the user session on the second call
-            const sessionID = crypto.randomBytes(32).toString('base64')
+            const sessionID = bytesToBase64(crypto.getRandomValues(new Uint8Array(32)))
 
             // create the token information object; this will be included in every token and will be visible
             // to Verifiers
@@ -124,7 +126,7 @@ app.post(settings.ISSUANCE_SUFFIX, (req, res) => {
             }
             const TI = upjf.encodeTokenInformation(tokenInformation)
 
-            const issuer = new uprove.Issuer(issuerKeyAndParams, [], TI, n)
+            const issuer = await uprove.Issuer.create(issuerKeyAndParams, [], TI, n)
             const message1 = serialization.encodeFirstIssuanceMessage(issuer.createFirstMessage())
 
             response = {
@@ -150,3 +152,7 @@ app.post(settings.ISSUANCE_SUFFIX, (req, res) => {
 http.createServer(app).listen(settings.ISSUER_PORT, () => {
     console.log('Issuer listening at: ' + settings.ISSUER_URL)
 })
+
+function bytesToBase64 (a: Uint8Array | number[]): string {
+    return btoa(String.fromCharCode(...a))
+  }

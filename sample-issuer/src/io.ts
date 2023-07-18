@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import { type serialization, type IssuerParamsJWK } from 'uprove-node-reference'
 
 export interface IssuerParamsJWKS {
@@ -12,6 +15,7 @@ export interface TokenRequestMessage {
 
 // first issuance message from Issuer
 export interface FirstIssuanceMessage {
+    kid: string // key ID
     sID: string // session ID
     rID: string // refresh ID
     TI: string // Token Information

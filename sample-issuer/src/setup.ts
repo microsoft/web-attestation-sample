@@ -46,7 +46,7 @@ void (async () => {
             default:
                 throw new Error(`Unsupported curve ${options.curve}`)
         }
-        const ikp = UPJF.createIssuerKeyAndParamsUPJF(
+        const ikp = await UPJF.createIssuerKeyAndParamsUPJF(
             descGq,
             {
                 n: 0, // no attributes

@@ -6,12 +6,14 @@
 import fs from 'fs'
 import { Command } from 'commander'
 import process from 'process'
-import QRCode, { QRCodeByteSegment, QRCodeToFileOptions } from 'qrcode'
+import QRCode, { type QRCodeByteSegment, type QRCodeToFileOptions } from 'qrcode'
 import sharp from 'sharp'
 
 import { upjf, uprove, serialization } from 'uprove-node-reference'
 import type * as io from './io.js'
 import * as settings from './settings.js'
+
+const DEFAULT_SCOPE = `${settings.ISSUER_URL}/index.html` // e.g. https://example.com
 
 interface Options {
     issuerJwksPath: string
@@ -34,7 +36,7 @@ program.option('-t, --tokenPath <tokenPath>', 'path to the output token file', '
 program.option('-u, --issuerUrl <issuerUrl>', 'issuer URL to encode in the token', settings.ISSUER_URL)
 program.option('-e, --expiration <expiration>', 'token expiration in days', '500')
 program.option('-l, --label <label>', 'token label', '1')
-program.option('-s, --uwaScope <uwaScope>', 'UWA scope', 'https://example.com')
+program.option('-s, --uwaScope <uwaScope>', 'UWA scope', `${DEFAULT_SCOPE}`)
 program.option('-a, --uwaPath <uwaPath>', 'path to the output UWA file', 'uwa.txt')
 program.option('-q, --qrPath <qrPath>', 'path to the output QR file', 'qr.png')
 
@@ -46,7 +48,7 @@ void (async () => {
         // read the issuer parameters
         const jwksString = fs.readFileSync(options.issuerJwksPath, 'utf8')
         const jwk: upjf.IssuerParamsJWK = (JSON.parse(jwksString) as io.IssuerParamsJWKS).keys[0] // TODO: add a config option to select the key
-        const issuerParams = upjf.decodeJWKAsIP(jwk)
+        const issuerParams = await upjf.decodeJWKAsIP(jwk)
         console.log('Issuer parameters loaded from: ' + options.issuerJwksPath)
 
         // read the private key
@@ -70,12 +72,12 @@ void (async () => {
         const TI = upjf.encodeTokenInformation(tokenInformation)
 
         // initialize the issuer and prover
-        const issuer = new uprove.Issuer(issuerKeyAndParams, [], TI, 1)
-        const prover = new uprove.Prover(issuerParams, [], TI, new Uint8Array(), 1)
+        const issuer = await uprove.Issuer.create(issuerKeyAndParams, [], TI, 1)
+        const prover = await uprove.Prover.create(issuerParams, [], TI, new Uint8Array(), 1)
 
         // perform issuance protocol
         const message1 = issuer.createFirstMessage()
-        const message2 = prover.createSecondMessage(message1)
+        const message2 = await prover.createSecondMessage(message1)
         const message3 = issuer.createThirdMessage(message2)
         const uproveKeysAndTokens = prover.createTokens(message3)
         const tokenKey = uproveKeysAndTokens[0].alphaInverse
@@ -91,7 +93,7 @@ void (async () => {
             scope: options.uwaScope,
             timestamp: Date.now()
         }))
-        const presentationData = uprove.generatePresentationProof(issuerParams, [], uproveKeysAndTokens[0], message, [])
+        const presentationData = await uprove.generatePresentationProof(issuerParams, [], uproveKeysAndTokens[0], message, [])
         const proof = serialization.encodePresentationProof(presentationData.pp)
         const tp = {
             upt: encodedToken,
@@ -104,39 +106,42 @@ void (async () => {
 
         // create QR code, save it to a temporary file
         const jwsByteParts = jws.split('.').map((part) => Buffer.from(part, 'base64'))
-        const qrSegments: QRCodeByteSegment[] = [ Buffer.from('uwa://')]
+        const qrSegments: QRCodeByteSegment[] = [Buffer.from('uwa://')]
             .concat(jwsByteParts)
-            .map((segment) => { return {
-                data: segment,
-                mode: 'byte'
-            }})
+            .map((segment) => {
+                return {
+                    data: segment,
+                    mode: 'byte'
+                }
+            })
         const qrOptions: QRCodeToFileOptions = {
             width: 350,
             errorCorrectionLevel: 'M',
-            type: 'png',
+            type: 'png'
         }
         const tempQrPath = 'tmp/tmpfile.png'
+        fs.existsSync('tmp') || fs.mkdirSync('tmp')
         await QRCode.toFile(tempQrPath, qrSegments, qrOptions)
 
         // add UWA logo to the QR
         await sharp(tempQrPath)
-        .metadata()
-        .then(({ width }) => {
-            if (!width) throw new Error('Could not read QR code width');
-            // resize logo to 25% of QR code width
-            return sharp('img/uwa-logo-blue.png')
-                .resize(Math.floor(width * 0.25))
-                .toBuffer();
-        })
-        .then((logoBuffer) => {
+            .metadata()
+            .then(async ({ width }) => {
+                if (width == null) throw new Error('Could not read QR code width')
+                // resize logo to 25% of QR code width
+                return await sharp('img/uwa-logo-blue.png')
+                    .resize(Math.floor(width * 0.25))
+                    .toBuffer()
+            })
+            .then(async (logoBuffer) => {
             // Use sharp to overlay resized logo onto QR code
-            return sharp(tempQrPath)
-                .composite([{ input: logoBuffer, gravity: 'center' }])
-                .toFile(options.qrPath);
-        })
-        .catch((err) => {
-            throw err;
-        });
+                return await sharp(tempQrPath)
+                    .composite([{ input: logoBuffer, gravity: 'center' }])
+                    .toFile(options.qrPath)
+            })
+            .catch((err) => {
+                throw err
+            })
         // delete the temporary QR code file
         fs.rmSync(tempQrPath, { force: true })
         console.log('Qr code written to: ' + options.qrPath)

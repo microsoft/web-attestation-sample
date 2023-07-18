@@ -13,7 +13,7 @@ import type * as io from './io.js'
 interface Options {
     uwa: string
     jwksPath: string
-};
+}
 
 const program = new Command()
 program.option('-u, --uwa <uwa>', 'the User-centric Web Attestation to parse') // TODO: add an option to parse from a file too
@@ -65,10 +65,10 @@ void (async () => {
         if (issuerParamsJWK == null) {
             // TODO: fetch the issuer params from the issuer URL if it's not in the JWKS or if not provided
             throw new Error('issuer params not found for kid: ' + kid)
-        };
+        }
 
         // parse the JSON Web Key as an Issuer parameters object
-        const issuerParams = upjf.decodeJWKAsIP(issuerParamsJWK)
+        const issuerParams = await upjf.decodeJWKAsIP(issuerParamsJWK)
         // check that JWS alg matches the issuer params's group
         if ((issuerParams.descGq === uprove.ECGroup.P256 && header.alg !== upjf.UPAlg.UP256) ||
             (issuerParams.descGq === uprove.ECGroup.P384 && header.alg !== upjf.UPAlg.UP384) ||
@@ -77,7 +77,7 @@ void (async () => {
         }
         // decode and verify the U-Prove token
         const upt = serialization.decodeUProveToken(issuerParams, token)
-        uprove.verifyTokenSignature(issuerParams, upt)
+        await uprove.verifyTokenSignature(issuerParams, upt)
 
         // parse the presentation message's scope and timestamp
         const parsedMessage = JSON.parse(Buffer.from(message).toString('utf8'))
@@ -96,7 +96,7 @@ void (async () => {
             console.log(`token expired at timestamp ${timestamp} (expiration ${tokenInfo.exp})`)
         }
         try {
-            uprove.verifyPresentationProof(
+            await uprove.verifyPresentationProof(
                 issuerParams,
                 upt,
                 message,
@@ -106,7 +106,7 @@ void (async () => {
         }
 
         // extract the label
-        const label = `${spec.lblType as string}${spec.lblValues[tokenInfo.lbl] as string}`
+        const label = `${spec.lblType as string}${(spec.lblValues as Record<number, string>)[tokenInfo.lbl as number]}`
         console.log(`Label: ${label}`)
     } catch (err) {
         console.log(err)

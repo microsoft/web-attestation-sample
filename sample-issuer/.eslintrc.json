@@ -3,7 +3,10 @@
         "browser": true,
         "es2021": true
     },
-    "extends": "standard-with-typescript",
+    "extends": [
+        "standard-with-typescript",
+        "plugin:@typescript-eslint/recommended"
+    ],
     "overrides": [],
     "parserOptions": {
         "ecmaVersion": "latest",
@@ -17,5 +20,6 @@
             "error",
             4
         ]
-    }
+    },
+    "root": true
 }

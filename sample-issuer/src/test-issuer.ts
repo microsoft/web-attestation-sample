@@ -16,7 +16,7 @@ void (async () => {
         const jwksJson: io.IssuerParamsJWKS = await got(jwksUrl).json()
         console.log('received Issuer JWKS', jwksJson)
         const jwk: upjf.IssuerParamsJWK = jwksJson.keys[0] // we assume there is one param set in the key set
-        const issuerParams = upjf.decodeJWKAsIP(jwk)
+        const issuerParams = await upjf.decodeJWKAsIP(jwk)
 
         //
         // Token issuance
@@ -34,10 +34,10 @@ void (async () => {
         const msg1 = serialization.decodeFirstIssuanceMessage(issuerParams, firstMsg.msg)
         const actualNumberOfTokens = msg1.sA.length
         const TI: Uint8Array = Buffer.from(firstMsg.TI, 'base64')
-        const prover = new uprove.Prover(issuerParams, [], TI, new Uint8Array(), actualNumberOfTokens)
+        const prover = await uprove.Prover.create(issuerParams, [], TI, new Uint8Array(), actualNumberOfTokens)
 
         // prover creates the second message
-        const msg2 = prover.createSecondMessage(msg1)
+        const msg2 = await prover.createSecondMessage(msg1)
         const secondMessage: io.SecondIssuanceMessage = {
             sID: firstMsg.sID,
             msg: serialization.encodeSecondIssuanceMessage(msg2)
@@ -57,11 +57,12 @@ void (async () => {
         const uproveKeysAndTokens = prover.createTokens(msg3)
 
         // verify the U-Prove tokens
-        uproveKeysAndTokens.forEach((ukat, i) => {
-            uprove.verifyTokenSignature(issuerParams, ukat.upt)
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        await Promise.all(uproveKeysAndTokens.map(async (ukat, _i) => {
+            await uprove.verifyTokenSignature(issuerParams, ukat.upt)
             console.log(`token ${JSON.stringify(serialization.encodeUProveToken(ukat.upt))}`)
             console.log(`key ${upjf.encodePrivateKeyAsBase64Url(ukat.alphaInverse)}`)
-        })
+        }))
 
         console.log('Success')
     } catch (err) {
