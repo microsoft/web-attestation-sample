@@ -5,7 +5,7 @@ import { storeTokens, listTokenIssuers, clearTokens, updateTokens, openTokenStor
 import { listIssuers, clearIssuerParams } from '../background/issuerStore.js'
 import { getTokens, getBaseURL, downloadIssuerParams } from '../background/tokens.js'
 import { createUWA } from '../background/uwa.js'
-import { type UProveTokenJSON } from 'uprove-node-reference/js/src/serialization.js'
+import { type serialization } from 'uprove-node-reference'
 import { encode } from '../qr.js'
 
 interface getTokensResponse {
@@ -13,7 +13,7 @@ interface getTokensResponse {
   expiration: number
   tokens: Array<{
     key: string
-    token: UProveTokenJSON
+    token: serialization.UProveTokenJSON
   }>
   kid: string
 }
